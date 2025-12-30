@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HCSEM Website - Complete Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0a0a1f 0%, #1a1a2e 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f97316 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .info {
+            display: inline-block;
+            background: rgba(249, 115, 22, 0.1);
+            border: 2px solid rgba(249, 115, 22, 0.3);
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            color: #f97316;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .video-player {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .current-section {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(249, 115, 22, 0.1);
+            border-radius: 1rem;
+            border: 1px solid rgba(249, 115, 22, 0.2);
+        }
+
+        .current-section h2 {
+            font-size: 1.5rem;
+            color: #f97316;
+            margin-bottom: 0.5rem;
+        }
+
+        .current-section p {
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f97316 0%, #f59e0b 100%);
+            border-radius: 9999px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(135deg, #f97316 0%, #f59e0b 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 9999px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .section-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .section-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .section-item:hover {
+            border-color: rgba(249, 115, 22, 0.5);
+            background: rgba(249, 115, 22, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .section-item.active {
+            border-color: #f97316;
+            background: rgba(249, 115, 22, 0.2);
+        }
+
+        .section-item h3 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            color: #f8fafc;
+        }
+
+        .section-item p {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            line-height: 1.5;
+        }
+
+        .section-number {
+            display: inline-block;
+            width: 2rem;
+            height: 2rem;
+            background: linear-gradient(135deg, #f97316 0%, #f59e0b 100%);
+            border-radius: 50%;
+            text-align: center;
+            line-height: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .video-player {
+                padding: 1rem;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>HCSEM Website Demo</h1>
+            <p class="subtitle">Complete Feature Walkthrough</p>
+            <div class="info">🎬 Auto-playing demo • Click sections below to jump</div>
+        </header>
+
+        <div class="video-player">
+            <div class="video-container">
+                <video id="demoVideo" controls autoplay muted>
+                    <source src="home_page_demo_1765112128251.webp" type="video/webm">
+                    Your browser does not support the video tag.
+                </video>
+            </div>
+
+            <div class="current-section">
+                <h2 id="sectionTitle">Home Page</h2>
+                <p id="sectionDesc">Hero section, statistics, infinite scroll, gallery, events, and blog</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button id="prevBtn" onclick="previousVideo()">← Previous</button>
+                <button id="playPauseBtn" onclick="togglePlayPause()">⏸ Pause</button>
+                <button id="nextBtn" onclick="nextVideo()">Next →</button>
+                <button onclick="restartDemo()">🔄 Restart Demo</button>
+            </div>
+        </div>
+
+        <footer>
+            <p>© 2024 HCSEM - Hossena Community & Social Engagement in Minnesota</p>
+            <p style="margin-top: 0.5rem; font-size: 0.875rem;">All features demonstrated • Total runtime: ~2 minutes</p>
+        </footer>
+    </div>
+
+    <script>
+        const videos = [
+            {
+                src: 'home_page_demo_1765112128251.webp',
+                title: 'Home Page',
+                desc: 'Hero section, statistics, infinite scroll, gallery, events, and blog'
+            },
+            {
+                src: 'about_page_demo_1765112287031.webp',
+                title: 'About Page',
+                desc: 'Mission, vision, and "What We Do" activities with flying animations'
+            },
+            {
+                src: 'events_page_demo_1765112355193.webp',
+                title: 'Events Page',
+                desc: 'Featured events, video player with controls, room tour, and gallery'
+            },
+            {
+                src: 'contact_page_demo_1765112456836.webp',
+                title: 'Contact Page',
+                desc: 'Contact information, office hours, and request form'
+            },
+            {
+                src: 'error_pages_demo_1765112699506.webp',
+                title: 'Error Pages',
+                desc: '404 Not Found, 500 Server Error, and 403 Forbidden pages'
+            },
+            {
+                src: 'navigation_demo_1765112805295.webp',
+                title: 'Navigation',
+                desc: 'Smooth page transitions and navigation demonstration'
+            }
+        ];
+
+        let currentIndex = 0;
+        const video = document.getElementById('demoVideo');
+        const sectionTitle = document.getElementById('sectionTitle');
+        const sectionDesc = document.getElementById('sectionDesc');
+        const progressFill = document.getElementById('progressFill');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+
+        // Update progress bar
+        video.addEventListener('timeupdate', () => {
+            const progress = (video.currentTime / video.duration) * 100;
+            progressFill.style.width = progress + '%';
+        });
+
+        // Auto-play next video when current ends
+        video.addEventListener('ended', () => {
+            if (currentIndex < videos.length - 1) {
+                nextVideo();
+            } else {
+                // Loop back to start
+                jumpToSection(0);
+            }
+        });
+
+        // Update play/pause button text
+        video.addEventListener('play', () => {
+            playPauseBtn.textContent = '⏸ Pause';
+        });
+
+        video.addEventListener('pause', () => {
+            playPauseBtn.textContent = '▶ Play';
+        });
+
+        function loadVideo(index) {
+            currentIndex = index;
+            video.src = videos[index].src;
+            sectionTitle.textContent = videos[index].title;
+            sectionDesc.textContent = videos[index].desc;
+            video.play();
+
+            // Update active section
+            document.querySelectorAll('.section-item').forEach((item, i) => {
+                item.classList.toggle('active', i === index);
+            });
+
+            // Update button states
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === videos.length - 1;
+        }
+
+        function nextVideo() {
+            if (currentIndex < videos.length - 1) {
+                loadVideo(currentIndex + 1);
+            }
+        }
+
+        function previousVideo() {
+            if (currentIndex > 0) {
+                loadVideo(currentIndex - 1);
+            }
+        }
+
+        function jumpToSection(index) {
+            loadVideo(index);
+        }
+
+        function togglePlayPause() {
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        }
+
+        function restartDemo() {
+            loadVideo(0);
+        }
+
+        // Initialize
+        prevBtn.disabled = true;
+    </script>
+</body>
+</html>

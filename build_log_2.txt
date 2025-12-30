@@ -1,0 +1,67 @@
+
+> hcsem-v2@0.1.0 build
+> next build
+
+   ▲ Next.js 15.1.0
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+<w> [webpack.cache.PackFileCacheStrategy] Skipped not serializable cache item 'Compilation/modules|C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\build\webpack\loaders\css-loader\src\index.js??ruleSet[1].rules[13].oneOf[10].use[2]!C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\build\webpack\loaders\postcss-loader\src\index.js??ruleSet[1].rules[13].oneOf[10].use[3]!C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\app\admin\admin.css': No serializer registered for PostCSSSyntaxError
+<w> while serializing webpack/lib/cache/PackFileCacheStrategy.PackContentItems -> webpack/lib/NormalModule -> webpack/lib/ModuleBuildError -> PostCSSSyntaxError
+Failed to compile.
+
+./app/admin/admin.css:246:5
+Syntax error: C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\app\admin\admin.css The `dark:` class does not exist. If `dark:` is a custom class, make sure it is defined within a `@layer` directive.
+
+ [90m 244 | [39m[90m/* Third party styling overrides */[39m
+ [90m 245 | [39m[33m.apexcharts-legend-text[39m [33m{[39m
+[1m[31m>[39m[22m[90m 246 | [39m    [36m@apply[39m !text-gray-700 dark[33m:[39m !text-gray-400[33m;[39m
+ [90m     | [39m    [1m[31m^[39m[22m
+ [90m 247 | [39m[33m}[39m
+ [90m 248 | [39m
+
+./app/admin/admin.css
+Syntax error: C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\app\admin\admin.css `@layer base` is used but no matching `@tailwind base` directive is present. (1:1)
+
+[1m[31m>[39m[22m[90m 1 | [39m[36m@layer[39m base [33m{[39m
+ [90m   | [39m[1m[31m^[39m[22m
+ [90m 2 | [39m    [33m:[39mroot [33m{[39m
+ [90m 3 | [39m        --font-outfit[33m:[39m Outfit, sans-serif[33m;[39m
+
+    at tryRunOrWebpackError (C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\webpack\bundle5.js:28:314962)
+    at __webpack_require_module__ (C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\webpack\bundle5.js:28:131434)
+    at __nested_webpack_require_161179__ (C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\webpack\bundle5.js:28:130872)
+    at C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\webpack\bundle5.js:28:131723
+    at symbolIterator (C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\neo-async\async.js:1:14444)
+    at done (C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\neo-async\async.js:1:14824)
+    at Hook.eval [as callAsync] (eval at create (C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\webpack\bundle5.js:13:9218), <anonymous>:15:1)
+    at Hook.CALL_ASYNC_DELEGATE [as _callAsync] (C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\webpack\bundle5.js:13:6372)
+    at C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\webpack\bundle5.js:28:130593
+    at symbolIterator (C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\neo-async\async.js:1:14402)
+-- inner error --
+Syntax error: C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\app\admin\admin.css `@layer base` is used but no matching `@tailwind base` directive is present. (1:1)
+
+[1m[31m>[39m[22m[90m 1 | [39m[36m@layer[39m base [33m{[39m
+ [90m   | [39m[1m[31m^[39m[22m
+ [90m 2 | [39m    [33m:[39mroot [33m{[39m
+ [90m 3 | [39m        --font-outfit[33m:[39m Outfit, sans-serif[33m;[39m
+
+    at Object.<anonymous> (C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\build\webpack\loaders\css-loader\src\index.js??ruleSet[1].rules[13].oneOf[10].use[2]!C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\build\webpack\loaders\postcss-loader\src\index.js??ruleSet[1].rules[13].oneOf[10].use[3]!C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\app\admin\admin.css:1:7)
+    at C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\webpack\bundle5.js:28:955548
+    at Hook.eval [as call] (eval at create (C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\webpack\bundle5.js:13:8996), <anonymous>:7:1)
+    at Hook.CALL_DELEGATE [as _call] (C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\webpack\bundle5.js:13:6266)
+    at C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\webpack\bundle5.js:28:131467
+    at tryRunOrWebpackError (C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\webpack\bundle5.js:28:314916)
+    at __webpack_require_module__ (C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\webpack\bundle5.js:28:131434)
+    at __nested_webpack_require_161179__ (C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\webpack\bundle5.js:28:130872)
+    at C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\webpack\bundle5.js:28:131723
+    at symbolIterator (C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\compiled\neo-async\async.js:1:14444)
+
+Generated code for C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\build\webpack\loaders\css-loader\src\index.js??ruleSet[1].rules[13].oneOf[10].use[2]!C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\node_modules\next\dist\build\webpack\loaders\postcss-loader\src\index.js??ruleSet[1].rules[13].oneOf[10].use[3]!C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\app\admin\admin.css
+
+Import trace for requested module:
+./app/admin/admin.css
+./app/admin/layout.js
+
+
+> Build failed because of webpack errors

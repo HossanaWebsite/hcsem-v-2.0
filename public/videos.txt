@@ -1,0 +1,6 @@
+file 'home_page_demo_1765112128251.webp'
+file 'about_page_demo_1765112287031.webp'
+file 'events_page_demo_1765112355193.webp'
+file 'contact_page_demo_1765112456836.webp'
+file 'error_pages_demo_1765112699506.webp'
+file 'navigation_demo_1765112805295.webp'

@@ -1,0 +1,14 @@
+
+> hcsem-v2@0.1.0 build
+> next build
+
+   ▲ Next.js 15.1.0
+   - Environments: .env.local
+
+   Creating an optimized production build ...
+uncaughtException [Error: EPERM: operation not permitted, open 'C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\.next\trace'] {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'open',
+  path: 'C:\\Users\\Abene_J\\Desktop\\pro\\improvement\\hcsem-v2\\.next\\trace'
+}
