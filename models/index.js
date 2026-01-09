@@ -1,13 +1,141 @@
 import mongoose from 'mongoose';
 
+
+// Force clear models in development to prevent schema caching issues
+if (process.env.NODE_ENV === 'development') {
+    if (mongoose.models.User) delete mongoose.models.User;
+    if (mongoose.models.Role) delete mongoose.models.Role;
+    if (mongoose.models.SiteSettings) delete mongoose.models.SiteSettings;
+    if (mongoose.models.AuditLog) delete mongoose.models.AuditLog;
+    if (mongoose.models.Blog) delete mongoose.models.Blog;
+    if (mongoose.models.Event) delete mongoose.models.Event;
+    if (mongoose.models.ContactRequest) delete mongoose.models.ContactRequest;
+    if (mongoose.models.MembershipRequest) delete mongoose.models.MembershipRequest;
+}
+
 // --- Site Settings Model (Hero/Banner Images, etc.) ---
 const SiteSettingsSchema = new mongoose.Schema({
     heroImage: {
         type: String,
         default: '/images/hero-bg.png', // Default placeholder
     },
+    logoUrl: { type: String, default: null },
     heroTitle: String,
     heroSubtitle: String,
+    eventsTitle: String,
+    eventsSubtitle: String,
+    stats: [
+        {
+            label: String,
+            value: String,
+        }
+    ],
+    tickerImages: [
+        {
+            url: String,
+            order: Number,
+            title: String,
+            subtitle: String
+        }
+    ],
+    galleryImages: [
+        {
+            url: String,
+            order: Number
+        }
+    ],
+    // --- New Page Settings ---
+    // Events Page
+    eventsPageTitle: String,
+    eventsPageSubtitle: String,
+    eventsPageImage: String,
+
+    // About Page
+    // About Page (Bilingual)
+    aboutPageTitle: { type: mongoose.Schema.Types.Mixed }, // { en: String, am: String }
+    aboutPageSubtitle: { type: mongoose.Schema.Types.Mixed },
+    aboutPageImage: String,
+
+    aboutMission: { type: mongoose.Schema.Types.Mixed }, // { en: String, am: String }
+    aboutMissionImage: String,
+
+    aboutVision: { type: mongoose.Schema.Types.Mixed }, // { en: String, am: String }
+    aboutVisionImage: String,
+
+    // What We Do (Dynamic & Bilingual)
+    aboutActivities: [{
+        title: { type: mongoose.Schema.Types.Mixed }, // { en, am }
+        description: { type: mongoose.Schema.Types.Mixed }, // { en, am }
+        icon: String,
+        color: String
+    }],
+
+    // Blog Page
+    blogPageTitle: String,
+    blogPageSubtitle: String,
+    blogPageImage: String,
+
+    // Contact Page
+    contactPageTitle: String,
+    contactPageSubtitle: String,
+    contactPageImage: String,
+    contactOfficeHours: String,
+    contactAddress: String,
+    contactPhone: String,
+    contactEmail: String,
+
+    // Home Page Additional Sections
+    galleryTitle: String,
+    gallerySubtitle: String,
+    upcomingEventsTitle: String,
+    upcomingEventsSubtitle: String,
+
+    // Events Page Additional Sections
+    eventsVideoTitle: String,
+    eventsVideoSubtitle: String,
+    eventsGalleryTitle: String,
+    eventsGallerySubtitle: String,
+    eventsGalleryImages: [
+        {
+            url: String,
+            order: Number,
+        }
+    ],
+    eventsVideoUrl: { type: String, default: '/folder/1.mp4' },
+
+    // Room Walkthrough / Explore Our Community
+    walkthroughTitle: String,
+    walkthroughSubtitle: String,
+    walkthroughItems: [
+        {
+            name: String,
+            title: String,
+            description: String,
+            image: String,
+            iconName: String, // lucide icon name string
+            features: [String],
+            order: Number
+        }
+    ],
+
+    // Visibility Settings (Section Toggles)
+    showHero: { type: Boolean, default: true },
+    showStats: { type: Boolean, default: true },
+    showEventsHighlight: { type: Boolean, default: true },
+    showCommunityGallery: { type: Boolean, default: true },
+    showUpcomingEvents: { type: Boolean, default: true },
+
+    showEventsHeader: { type: Boolean, default: true },
+    showEventsVideo: { type: Boolean, default: true },
+    showEventsGallery: { type: Boolean, default: true },
+
+    showAboutHeader: { type: Boolean, default: true },
+    showAboutMission: { type: Boolean, default: true },
+    showAboutVision: { type: Boolean, default: true },
+
+    showBlogHeader: { type: Boolean, default: true },
+    showContactHeader: { type: Boolean, default: true },
+
     // Add other global settings here as needed (e.g., footer text, social links)
     updatedBy: {
         type: mongoose.Schema.Types.ObjectId,
@@ -41,6 +169,25 @@ const AuditLogSchema = new mongoose.Schema({
 
 export const AuditLog = mongoose.models.AuditLog || mongoose.model('AuditLog', AuditLogSchema);
 
+// --- Role Model (RBAC) ---
+const RoleSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: [true, 'Please provide a role name'],
+        unique: true,
+    },
+    description: String,
+    permissions: [{
+        type: String, // e.g., 'manage_users', 'manage_content', 'view_audit_log'
+    }],
+    createdAt: {
+        type: Date,
+        default: Date.now,
+    },
+});
+
+export const Role = mongoose.models.Role || mongoose.model('Role', RoleSchema);
+
 // --- User Model ---
 const UserSchema = new mongoose.Schema({
     email: {
@@ -58,9 +205,9 @@ const UserSchema = new mongoose.Schema({
         required: [true, 'Please provide a full name'],
     },
     role: {
-        type: String,
-        enum: ['admin', 'editor', 'user'],
-        default: 'user',
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Role',
+        // default: <default_role_id> // We'll handle defaults in logic or seed
     },
     avatar: String,
     createdAt: {
@@ -70,6 +217,10 @@ const UserSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true,
+    },
+    mustChangePassword: {
+        type: Boolean,
+        default: false,
     },
 });
 
@@ -98,6 +249,7 @@ const BlogSchema = new mongoose.Schema({
     },
     summary: String,
     coverImage: String,
+    content: String,
     blocks: [BlogBlockSchema], // The flexible content blocks
     tags: [String],
     author: {
@@ -127,6 +279,14 @@ const EventSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please provide a slug'],
         unique: true,
+    },
+    layoutTemplate: {
+        type: String,
+        default: 'standard',
+        enum: [
+            'standard', 'featured', 'minimal', 'gallery', 'carousel',
+            'video-centric', 'hero-overlay', 'split-view', 'timeline', 'magazine'
+        ]
     },
     description: String,
     date: {
@@ -185,6 +345,19 @@ const ContactRequestSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    },
+    replies: [{
+        sender: String, // 'admin' or 'user' (though usually admin for now)
+        message: String,
+        subject: String,
+        createdAt: {
+            type: Date,
+            default: Date.now,
+        }
+    }],
     createdAt: {
         type: Date,
         default: Date.now,

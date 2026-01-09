@@ -3,6 +3,7 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/Button"
 import { Menu, X, Sun, Moon, Monitor, Search, Layout, History } from "lucide-react"
+import { useLanguage } from '@/context/LanguageContext';
 import { useTheme } from "next-themes"
 import SearchOverlay from "@/components/SearchOverlay"
 
@@ -11,8 +12,11 @@ export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
     const [showThemeMenu, setShowThemeMenu] = useState(false)
     const [isSearchOpen, setIsSearchOpen] = useState(false)
+    const [showLanguageMenu, setShowLanguageMenu] = useState(false)
     const { theme, setTheme } = useTheme()
     const [mounted, setMounted] = useState(false)
+    const [logoUrl, setLogoUrl] = useState(null);
+    const { language, setLanguage } = useLanguage();
 
     useEffect(() => {
         setMounted(true)
@@ -20,6 +24,20 @@ export default function Navbar() {
             setIsScrolled(window.scrollY > 50)
         }
         window.addEventListener("scroll", handleScroll)
+
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch('/api/settings');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.logoUrl) setLogoUrl(data.logoUrl);
+                }
+            } catch (error) {
+                console.error("Failed to fetch settings for navbar logo", error);
+            }
+        };
+        fetchSettings();
+
         return () => window.removeEventListener("scroll", handleScroll)
     }, [])
 
@@ -37,21 +55,33 @@ export default function Navbar() {
         { name: 'Dark', value: 'dark', icon: Moon },
     ]
 
+    const languageOptions = [
+        { name: 'English', value: 'en', flag: '🇺🇸' },
+        { name: 'Amharic', value: 'am', flag: '🇪🇹' },
+    ]
+
     return (
         <>
             <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
             <header
-                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "py-2 bg-background/80 backdrop-blur-md border-b border-white/10" : "py-4 bg-transparent"
+                className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "py-2 backdrop-blur-md border-b border-white/10" : "py-4 bg-transparent"
                     }`}
             >
                 <div className="container mx-auto px-4">
                     <nav className="flex items-center justify-between">
                         {/* Logo */}
                         <Link href="/" className="text-2xl font-bold tracking-tighter flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white">
-                                H
-                            </div>
+                            {logoUrl ? (
+                                <div className="relative w-8 h-8">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img src={logoUrl} alt="Logo" className="object-contain w-full h-full" />
+                                </div>
+                            ) : (
+                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white">
+                                    H
+                                </div>
+                            )}
                             <span>HCSEM<span className="text-primary">.</span></span>
                         </Link>
 
@@ -81,6 +111,39 @@ export default function Navbar() {
                                 <Search className="h-5 w-5" />
                                 <span className="sr-only">Search</span>
                             </Button>
+
+                            {/* Language Dropdown */}
+                            <div className="relative">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="rounded-full px-3 gap-2"
+                                    onClick={() => setShowLanguageMenu(!showLanguageMenu)}
+                                >
+                                    <span>{language === 'en' ? '🇺🇸 EN' : '🇪🇹 AM'}</span>
+                                </Button>
+
+                                {showLanguageMenu && (
+                                    <div className="absolute top-full right-0 mt-2 bg-background/95 backdrop-blur-md border border-border rounded-lg shadow-lg p-2 min-w-[140px]">
+                                        {languageOptions.map((option) => (
+                                            <button
+                                                key={option.value}
+                                                onClick={() => {
+                                                    setLanguage(option.value);
+                                                    setShowLanguageMenu(false);
+                                                }}
+                                                className={`w-full flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${language === option.value
+                                                    ? 'bg-primary/10 text-primary'
+                                                    : 'hover:bg-muted text-muted-foreground'
+                                                    }`}
+                                            >
+                                                <span className="text-base">{option.flag}</span>
+                                                <span className="text-sm font-medium">{option.name}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
 
                             {/* Theme Toggle Dropdown */}
                             <div className="relative">
@@ -123,6 +186,7 @@ export default function Navbar() {
                                         })}
                                     </div>
                                 )}
+
                             </div>
                         </div>
 

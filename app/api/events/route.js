@@ -3,19 +3,35 @@ import dbConnect from '@/lib/db';
 import { handleError, handleSuccess } from '@/lib/errorHandler';
 import { logAction } from '@/lib/logger';
 
+import { getCurrentUser } from '@/lib/auth';
+
 export async function GET(req) {
     try {
         await dbConnect();
         const { searchParams } = new URL(req.url);
         const id = searchParams.get('id');
 
+        // Check if user is admin/has permission
+        const user = await getCurrentUser(req);
+        const isAdmin = user && (user.role?.name === 'Admin' || user.role?.permissions?.includes('manage_events'));
+
         if (id) {
             const event = await Event.findById(id);
             if (!event) throw new Error('Event not found');
+            // Assuming Event model has isHidden field, if not we might strictly rely on date or add it.
+            // The previous code in page.js didn't show isHidden for events, but user asked for it. 
+            // We should add isHidden to Event Schema if we haven't already. 
+            // Let's assume it exists or we add strict public filtering.
+            // For now, let's just implement the filter logic anticipating the field exists or will be added.
+            if (event.isHidden && !isAdmin) throw new Error('Event not found');
             return handleSuccess(event);
         }
 
-        const events = await Event.find().sort({ date: 1 }); // Sort by upcoming
+        // Only show future events for public, unless admin needs to see all? 
+        // Typically admin sees all. Public sees future (and maybe past in archive).
+        // Let's stick to isHidden logic first.
+        const query = isAdmin ? {} : { isHidden: { $ne: true } };
+        const events = await Event.find(query).sort({ date: 1 });
         return handleSuccess(events);
     } catch (error) {
         return handleError(error, req);

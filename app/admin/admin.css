@@ -153,16 +153,14 @@
 
 .menu-item {
     @apply relative flex items-center w-full gap-3 px-3 py-2 font-medium rounded-lg text-sm;
-    /* Fallback for text-theme-sm if not defined in tailwind config yet */
 }
 
 .menu-item-active {
-    @apply bg-blue-50 text-blue-600 dark:bg-blue-500/[0.12] dark:text-blue-400;
-    /* Replaced brand-50/500 with standard blue for safety if custom colors fail */
+    @apply bg-indigo-500/10 text-indigo-400 border-l-2 border-indigo-500;
 }
 
 .menu-item-inactive {
-    @apply text-gray-700 hover:bg-gray-100 group-hover:text-gray-700 dark:text-gray-300 dark:hover:bg-white/5 dark:hover:text-gray-300;
+    @apply text-slate-500 hover:bg-white/5 hover:text-white transition-all duration-300;
 }
 
 .menu-item-icon {
@@ -170,11 +168,12 @@
 }
 
 .menu-item-icon-active {
-    @apply text-blue-600 dark:text-blue-400;
+    @apply text-indigo-400;
+    box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
 }
 
 .menu-item-icon-inactive {
-    @apply text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300;
+    @apply text-slate-600 group-hover:text-slate-300 transition-colors;
 }
 
 .menu-item-arrow {
@@ -182,11 +181,11 @@
 }
 
 .menu-item-arrow-active {
-    @apply rotate-180 text-blue-600 dark:text-blue-400;
+    @apply rotate-180 text-indigo-400;
 }
 
 .menu-item-arrow-inactive {
-    @apply text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-300;
+    @apply text-slate-600 group-hover:text-slate-300;
 }
 
 .menu-dropdown-item {
@@ -194,11 +193,11 @@
 }
 
 .menu-dropdown-item-active {
-    @apply bg-blue-50 text-blue-600 dark:bg-blue-500/[0.12] dark:text-blue-400;
+    @apply text-indigo-400 font-bold;
 }
 
 .menu-dropdown-item-inactive {
-    @apply text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5;
+    @apply text-slate-600 hover:text-slate-300 hover:bg-white/5 transition-colors;
 }
 
 .menu-dropdown-badge {
@@ -250,4 +249,76 @@
     @apply !text-gray-400;
 }
 
-/* ... (Include other necessary overrides if needed) ... */
+.admin-dashboard-bg {
+    /* Background handled by utility classes in layout.js */
+    min-height: 100vh;
+}
+
+.admin-glass-card {
+    @apply bg-slate-900/40 backdrop-blur-xl border border-white/5 shadow-2xl;
+}
+
+.stat-glow-blue {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+}
+
+.stat-glow-emerald {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.1);
+}
+
+.stat-glow-purple {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.1);
+}
+
+.stat-glow-amber {
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
+}
+
+.stat-glow-indigo {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+}
+
+/* Quill Editor Styles */
+.ql-toolbar {
+    @apply !bg-white !border-slate-200 !rounded-t-lg;
+}
+
+.dark .ql-toolbar {
+    @apply !bg-slate-900 !border-white/10;
+}
+
+.ql-container {
+    @apply !bg-white !border-slate-200 !rounded-b-lg !text-slate-900;
+}
+
+.dark .ql-container {
+    @apply !bg-slate-900 !border-white/10 !text-white;
+}
+
+.ql-editor {
+    @apply min-h-[300px];
+}
+
+.ql-stroke {
+    @apply !stroke-slate-700;
+}
+
+.dark .ql-stroke {
+    @apply !stroke-slate-300;
+}
+
+.ql-fill {
+    @apply !fill-slate-700;
+}
+
+.dark .ql-fill {
+    @apply !fill-slate-300;
+}
+
+.ql-picker {
+    @apply !text-slate-700;
+}
+
+.dark .ql-picker {
+    @apply !text-slate-300;
+}

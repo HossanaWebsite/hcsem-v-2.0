@@ -8,71 +8,97 @@ import RoomWalkthrough from '@/components/RoomWalkthrough';
 import InfiniteScroll from '@/components/InfiniteScroll';
 import VideoSection from '@/components/VideoSection';
 import LargeGallery from '@/components/LargeGallery';
+import PhotoTicker from '@/components/PhotoTicker';
 
 export default function EventsPage() {
     const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [settings, setSettings] = useState({
+        eventsPageTitle: 'Events',
+        eventsPageSubtitle: 'Join us in our upcoming gatherings\nand celebrations.',
+        eventsVideoTitle: 'Experience Our Events',
+        eventsVideoSubtitle: 'Watch how we celebrate culture, unity, and community together',
+        eventsVideoUrl: '/folder/1.mp4',
+        walkthroughTitle: 'Explore Our Community',
+        walkthroughSubtitle: 'Take a journey through our community spaces and discover what we offer',
+        walkthroughItems: [],
+        eventsGalleryTitle: 'Event Gallery',
+        eventsGallerySubtitle: 'Moments captured from our community events and celebrations',
+        eventsGalleryImages: [],
+        tickerImages: [],
+        defaultEvents: [],
+        showEventsHeader: true,
+        showEventsVideo: true,
+        showEventsGallery: true,
+        showWalkthrough: true
+    });
 
     useEffect(() => {
         // Fetch events
         fetch('/api/events')
             .then(res => res.json())
             .then(data => {
-                setEvents(data.events || []);
+                setEvents(data.data || []);
                 setLoading(false);
             })
             .catch(() => setLoading(false));
+
+        // Fetch settings
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch('/api/settings');
+                if (res.ok) {
+                    const data = await res.json();
+                    setSettings({
+                        ...data,
+                        eventsPageTitle: data.eventsPageTitle || 'Events',
+                        eventsPageSubtitle: data.eventsPageSubtitle || 'Join us in our upcoming gatherings\nand celebrations.',
+                        eventsVideoTitle: data.eventsVideoTitle || 'Experience Our Events',
+                        eventsVideoSubtitle: data.eventsVideoSubtitle || 'Watch how we celebrate culture, unity, and community together',
+                        eventsVideoUrl: data.eventsVideoUrl || '/folder/1.mp4',
+                        walkthroughTitle: data.walkthroughTitle || 'Explore Our Community',
+                        walkthroughSubtitle: data.walkthroughSubtitle || 'Take a journey through our community spaces and discover what we offer',
+                        walkthroughItems: data.walkthroughItems || [],
+                        eventsGalleryTitle: data.eventsGalleryTitle || 'Event Gallery',
+                        eventsGallerySubtitle: data.eventsGallerySubtitle || 'Moments captured from our community events and celebrations',
+                        eventsGalleryImages: (data.eventsGalleryImages && data.eventsGalleryImages.length > 0) ? data.eventsGalleryImages : [],
+                        tickerImages: data.tickerImages || [],
+                        defaultEvents: data.defaultEvents || [],
+                        showEventsHeader: data.showEventsHeader !== undefined ? data.showEventsHeader : true,
+                        showEventsVideo: data.showEventsVideo !== undefined ? data.showEventsVideo : true,
+                        showEventsGallery: data.showEventsGallery !== undefined ? data.showEventsGallery : true,
+                        showWalkthrough: data.showWalkthrough !== undefined ? data.showWalkthrough : true
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to fetch settings:', error);
+            }
+        };
+        fetchSettings();
     }, []);
 
-    // Mock events for demonstration
-    const mockEvents = [
-        {
-            _id: '1',
-            title: 'Cultural Festival 2024',
-            description: 'Join us for our annual cultural celebration featuring traditional music, dance, and food.',
-            date: new Date('2024-12-15'),
-            location: 'Minneapolis Convention Center',
-            coverImage: '/event-placeholder.png'
-        },
-        {
-            _id: '2',
-            title: 'Community Gathering',
-            description: 'Monthly meetup for community members to connect and share experiences.',
-            date: new Date('2024-12-20'),
-            location: 'Community Center',
-            coverImage: '/blog-placeholder.png'
-        },
-        {
-            _id: '3',
-            title: 'Youth Education Program',
-            description: 'Educational workshop for young members of our community.',
-            date: new Date('2024-12-25'),
-            location: 'Public Library',
-            coverImage: '/about-mission.png'
-        }
-    ];
-
-    const displayEvents = events.length > 0 ? events : mockEvents;
+    const displayEvents = events.length > 0 ? events : settings.defaultEvents;
 
     return (
         <div className="min-h-screen">
             {/* Hero Section */}
-            <section className="min-h-[60vh] flex items-center justify-center px-6 py-20">
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.8 }}
-                    className="max-w-4xl mx-auto text-center space-y-6"
-                >
-                    <h1 className="text-6xl md:text-8xl font-heading font-bold">
-                        Events
-                    </h1>
-                    <p className="text-2xl md:text-3xl font-light text-foreground/80">
-                        Join us in our upcoming gatherings<br />
-                        and celebrations.
-                    </p>
-                </motion.div>
-            </section>
+            {settings.showEventsHeader && (
+                <section className="min-h-[60vh] flex items-center justify-center px-6 py-20">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.8 }}
+                        className="max-w-4xl mx-auto text-center space-y-6"
+                    >
+                        <h1 className="text-6xl md:text-8xl font-heading font-bold">
+                            {settings.eventsPageTitle}
+                        </h1>
+                        <p className="text-2xl md:text-3xl font-light text-foreground/80 whitespace-pre-line">
+                            {settings.eventsPageSubtitle}
+                        </p>
+                    </motion.div>
+                </section>
+            )}
 
             {/* Events Grid with Flying Animations */}
             <section className="py-20 px-6">
@@ -196,79 +222,90 @@ export default function EventsPage() {
                 </div>
             </section>
 
-            {/* Community Video Section */}
-            <section className="py-32 px-6">
-                <div className="max-w-7xl mx-auto">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="text-center space-y-4 mb-12"
-                    >
-                        <h2 className="text-5xl md:text-6xl font-heading font-bold text-gradient">
-                            Experience Our Events
-                        </h2>
-                        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                            Watch how we celebrate culture, unity, and community together
-                        </p>
-                    </motion.div>
+            {/* Events Carousel */}
+            {settings.tickerImages && settings.tickerImages.length > 0 && (
+                <PhotoTicker images={settings.tickerImages} />
+            )}
 
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        className="aspect-video max-w-5xl mx-auto"
-                    >
-                        <VideoSection
-                            src="/folder/1.mp4"
-                            title="Community Events Highlights"
-                            description="See our vibrant community in action"
-                        />
-                    </motion.div>
-                </div>
-            </section>
+            {/* Community Video Section */}
+            {settings.showEventsVideo && (
+                <section className="py-32 px-6">
+                    <div className="max-w-7xl mx-auto">
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-center space-y-4 mb-12"
+                        >
+                            <h2 className="text-5xl md:text-6xl font-heading font-bold text-gradient">
+                                {settings.eventsVideoTitle}
+                            </h2>
+                            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                                {settings.eventsVideoSubtitle}
+                            </p>
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            className="aspect-video max-w-5xl mx-auto"
+                        >
+                            <VideoSection
+                                src={settings.eventsVideoUrl || "/folder/1.mp4"}
+                                title={settings.eventsVideoTitle}
+                                description={settings.eventsVideoSubtitle}
+                            />
+                        </motion.div>
+                    </div>
+                </section>
+            )}
 
             {/* Room-by-Room Walkthrough */}
-            <section className="py-32 px-6 bg-muted/20">
-                <div className="max-w-7xl mx-auto">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="text-center space-y-4 mb-16"
-                    >
-                        <h2 className="text-5xl md:text-6xl font-heading font-bold text-gradient">
-                            Explore Our Community
-                        </h2>
-                        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                            Take a journey through our community spaces and discover what we offer
-                        </p>
-                    </motion.div>
+            {settings.showWalkthrough && (
+                <section className="py-32 px-6 bg-muted/20">
+                    <div className="max-w-7xl mx-auto">
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-center space-y-4 mb-16"
+                        >
+                            <h2 className="text-5xl md:text-6xl font-heading font-bold text-gradient">
+                                {settings.walkthroughTitle || "Explore Our Community"}
+                            </h2>
+                            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                                {settings.walkthroughSubtitle || "Take a journey through our community spaces and discover what we offer"}
+                            </p>
+                        </motion.div>
 
-                    <RoomWalkthrough />
-                </div>
-            </section>
+                        <RoomWalkthrough items={settings.walkthroughItems} />
+                    </div>
+                </section>
+            )}
 
             {/* Large Gallery */}
-            <section className="py-32 px-6 bg-muted/20">
-                <div className="max-w-7xl mx-auto">
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="text-center space-y-4 mb-12"
-                    >
-                        <h2 className="text-5xl md:text-6xl font-heading font-bold text-gradient">
-                            Event Gallery
-                        </h2>
-                        <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                            Moments captured from our community events and celebrations
-                        </p>
-                    </motion.div>
+            {settings.showEventsGallery && (
+                <section className="py-32 px-6 bg-muted/20">
+                    <div className="max-w-7xl mx-auto">
+                        <motion.div
+                            initial={{ opacity: 0, y: 30 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="text-center space-y-4 mb-12"
+                        >
+                            <h2 className="text-5xl md:text-6xl font-heading font-bold text-gradient">
+                                {settings.eventsGalleryTitle}
+                            </h2>
+                            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                                {settings.eventsGallerySubtitle}
+                            </p>
+                        </motion.div>
 
-                    <LargeGallery />
-                </div>
-            </section>
+                        <LargeGallery images={settings.eventsGalleryImages} />
+                    </div>
+                </section>
+            )}
 
             {/* CTA Section */}
             <section className="py-32 px-6">

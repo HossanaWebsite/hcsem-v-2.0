@@ -4,19 +4,27 @@ import { handleError, handleSuccess } from '@/lib/errorHandler';
 import { logAction } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 
+import { getCurrentUser } from '@/lib/auth';
+
 export async function GET(req) {
     try {
         await dbConnect();
         const { searchParams } = new URL(req.url);
         const id = searchParams.get('id');
 
+        // Check if user is admin/has permission
+        const user = await getCurrentUser(req);
+        const isAdmin = user && (user.role?.name === 'Admin' || user.role?.permissions?.includes('manage_blogs'));
+
         if (id) {
             const blog = await Blog.findById(id).populate('author', 'fullName');
             if (!blog) throw new Error('Blog not found');
+            if (blog.isHidden && !isAdmin) throw new Error('Blog not found'); // Hide from public if hidden
             return handleSuccess(blog);
         }
 
-        const blogs = await Blog.find().sort({ updatedAt: -1 }).populate('author', 'fullName');
+        const query = isAdmin ? {} : { isHidden: { $ne: true } };
+        const blogs = await Blog.find(query).sort({ updatedAt: -1 }).populate('author', 'fullName');
         return handleSuccess(blogs);
     } catch (error) {
         return handleError(error, req);

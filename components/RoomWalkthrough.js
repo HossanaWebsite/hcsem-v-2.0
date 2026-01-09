@@ -2,13 +2,26 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, Home, Calendar, Users, Heart, Sparkles, Award } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Home, Calendar, Users, Heart, Sparkles, Award, MapPin, Building, Info, Star } from 'lucide-react';
 
-const rooms = [
+const iconMap = {
+    Home,
+    Calendar,
+    Users,
+    Heart,
+    Sparkles,
+    Award,
+    MapPin,
+    Building,
+    Info,
+    Star
+};
+
+const defaultRooms = [
     {
         id: 1,
         name: 'Welcome Hall',
-        icon: Home,
+        iconName: 'Home',
         title: 'Community Gathering Space',
         description: 'Our main gathering area where members connect and celebrate together.',
         image: '/folder/2.jpg',
@@ -17,7 +30,7 @@ const rooms = [
     {
         id: 2,
         name: 'Events Room',
-        icon: Calendar,
+        iconName: 'Calendar',
         title: 'Event Planning Center',
         description: 'Where we organize and coordinate all our community events and activities.',
         image: '/folder/3.jpg',
@@ -26,7 +39,7 @@ const rooms = [
     {
         id: 3,
         name: 'Community Hub',
-        icon: Users,
+        iconName: 'Users',
         title: 'Member Services',
         description: 'Support and resources for all community members.',
         image: '/folder/9.jpg',
@@ -35,7 +48,7 @@ const rooms = [
     {
         id: 4,
         name: 'Cultural Center',
-        icon: Heart,
+        iconName: 'Heart',
         title: 'Heritage Preservation',
         description: 'Dedicated to preserving and celebrating our rich Ethiopian culture.',
         image: '/folder/10.jpg',
@@ -44,7 +57,7 @@ const rooms = [
     {
         id: 5,
         name: 'Youth Wing',
-        icon: Sparkles,
+        iconName: 'Sparkles',
         title: 'Next Generation Programs',
         description: 'Empowering our youth through education and mentorship.',
         image: '/folder/13.jpg',
@@ -53,7 +66,7 @@ const rooms = [
     {
         id: 6,
         name: 'Achievement Hall',
-        icon: Award,
+        iconName: 'Award',
         title: 'Success Stories',
         description: 'Celebrating the accomplishments of our community members.',
         image: '/folder/16.jpg',
@@ -61,7 +74,8 @@ const rooms = [
     }
 ];
 
-export default function RoomWalkthrough() {
+export default function RoomWalkthrough({ items }) {
+    const rooms = (items && items.length > 0) ? items : defaultRooms;
     const [currentRoom, setCurrentRoom] = useState(0);
     const [direction, setDirection] = useState(0);
 
@@ -81,7 +95,7 @@ export default function RoomWalkthrough() {
     };
 
     const room = rooms[currentRoom];
-    const Icon = room.icon;
+    const Icon = iconMap[room.iconName] || iconMap.Info;
 
     const slideVariants = {
         enter: (direction) => ({
@@ -135,10 +149,10 @@ export default function RoomWalkthrough() {
                         key={index}
                         onClick={() => goToRoom(index)}
                         className={`transition-all duration-300 ${index === currentRoom
-                                ? 'w-12 h-3 bg-primary rounded-full'
-                                : index < currentRoom
-                                    ? 'w-3 h-3 bg-primary/50 rounded-full'
-                                    : 'w-3 h-3 bg-muted rounded-full'
+                            ? 'w-12 h-3 bg-primary rounded-full'
+                            : index < currentRoom
+                                ? 'w-3 h-3 bg-primary/50 rounded-full'
+                                : 'w-3 h-3 bg-muted rounded-full'
                             }`}
                         aria-label={`Go to room ${index + 1}`}
                     />

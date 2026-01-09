@@ -10,7 +10,7 @@ export async function POST(request) {
         await dbConnect();
         const { email, password } = await request.json();
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email }).select('+password');
 
         if (!user) {
             return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
@@ -23,7 +23,9 @@ export async function POST(request) {
         }
 
         // Create JWT
-        const token = await signToken({ userId: user._id, email: user.email, role: user.role });
+        // Ensure userId is a primitive string to avoid Buffer serialization issues
+        const userId = String(user._id);
+        const token = await signToken({ userId, email: user.email, role: user.role });
 
         // Set Cookie
         const cookieStore = await cookies();
@@ -35,7 +37,7 @@ export async function POST(request) {
             path: '/',
         });
 
-        return NextResponse.json({ success: true, user: { email: user.email, fullName: user.fullName, role: user.role } });
+        return NextResponse.json({ success: true, user: { email: user.email, fullName: user.fullName, role: user.role, mustChangePassword: user.mustChangePassword } });
     } catch (error) {
         console.error('Login error:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

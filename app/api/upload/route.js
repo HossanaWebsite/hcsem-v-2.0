@@ -19,7 +19,9 @@ export async function POST(req) {
         // Ensure unique filename slightly
         const filename = `${Date.now()}-${file.name.replace(/\s/g, '-')}`;
         const uploadDir = join(process.cwd(), 'public/uploads');
-        // Ideally ensure dir exists using fs.mkdir here if needed, but assuming it exists or handled
+        // Ensure directory exists
+        const { mkdir } = require('fs/promises');
+        await mkdir(uploadDir, { recursive: true });
 
         const path = join(uploadDir, filename);
         await writeFile(path, buffer);

@@ -1,0 +1,180 @@
+{
+    "logoUrl": "/images/logo.png",
+    "heroImage": "/hero-home.png",
+    "heroTitle": "HCSEM",
+    "heroSubtitle": "Building community. \nPreserving culture .",
+    "adminTheme": {
+        "colors": {
+            "primary": "#3b82f6",
+            "background": "#0f172a",
+            "text": "#f8fafc"
+        },
+        "font": {
+            "family": "Inter",
+            "size": "16px"
+        }
+    },
+    "footer": {
+        "copyright": "© 2024 HCSEM. All rights reserved.",
+        "columns": []
+    },
+    "updatedAt": "2026-01-09T01:44:30.053Z",
+    "aboutActivities": [
+        {
+            "title": {
+                "en": "Community Support",
+                "am": ""
+            },
+            "description": {
+                "en": "Assistance to new arrivals , integration help , and support during challenging times.",
+                "am": ""
+            },
+            "icon": "Sparkles",
+            "color": "from-amber-500 to-orange-500",
+            "_id": "695e476880b5b0cdb41bdc58"
+        },
+        {
+            "title": {
+                "en": "Youth Programs ",
+                "am": ""
+            },
+            "description": {
+                "en": "Educational Programs , mentorship , and cultural education for next generation",
+                "am": ""
+            },
+            "icon": "Users",
+            "color": "from-amber-500 to-orange-500",
+            "_id": "695e476880b5b0cdb41bdc59"
+        },
+        {
+            "title": {
+                "en": "Networking",
+                "am": ""
+            },
+            "description": {
+                "en": "Opportunities to connect , collaborate , and build meaningful relationships",
+                "am": ""
+            },
+            "icon": "Target",
+            "color": "from-amber-500 to-orange-500",
+            "_id": "695e476880b5b0cdb41bdc5a"
+        }
+    ],
+    "contactAddress": "Minneapolis, Minnesota",
+    "contactEmail": "info@hcsem.org",
+    "contactOfficeHours": "Monday - Friday: 9:00 AM - 5:00 PM\nSaturday: 10:00 AM - 2:00 PM\nSunday: Closed",
+    "contactPageImage": "",
+    "contactPageSubtitle": "Get in touch with us",
+    "contactPageTitle": "Contact Us",
+    "contactPhone": "+1 (555) 123-4567",
+    "eventsGalleryImages": [],
+    "eventsVideoUrl": "/folder/1.mp4",
+    "galleryImages": [
+        {
+            "url": "/folder/2.jpg",
+            "_id": "695e402180b5b0cdb41bdb56"
+        },
+        {
+            "url": "/folder/3.jpg",
+            "_id": "695e402180b5b0cdb41bdb57"
+        },
+        {
+            "url": "/folder/9.jpg",
+            "_id": "695e402180b5b0cdb41bdb58"
+        },
+        {
+            "url": "/folder/10.jpg",
+            "_id": "695e402180b5b0cdb41bdb59"
+        },
+        {
+            "url": "/folder/13.jpg",
+            "_id": "695e402180b5b0cdb41bdb5a"
+        },
+        {
+            "url": "/folder/16.jpg",
+            "_id": "695e402180b5b0cdb41bdb5b"
+        }
+    ],
+    "showAboutHeader": true,
+    "showAboutMission": true,
+    "showAboutVision": true,
+    "showBlogHeader": true,
+    "showCommunityGallery": true,
+    "showContactHeader": true,
+    "showEventsGallery": true,
+    "showEventsHeader": true,
+    "showEventsHighlight": true,
+    "showEventsVideo": true,
+    "showHero": true,
+    "showStats": true,
+    "showUpcomingEvents": true,
+    "stats": [
+        {
+            "label": "Members",
+            "value": "500+",
+            "_id": "695e402180b5b0cdb41bdb5c"
+        },
+        {
+            "label": "Events",
+            "value": "40+",
+            "_id": "695e402180b5b0cdb41bdb5d"
+        },
+        {
+            "label": "Years",
+            "value": "10+",
+            "_id": "695e402180b5b0cdb41bdb5e"
+        }
+    ],
+    "tickerImages": [
+        {
+            "url": "/folder/2.jpg",
+            "title": "Cultural Festival",
+            "subtitle": "Celebrating our heritage together",
+            "_id": "695e402180b5b0cdb41bdb5f"
+        },
+        {
+            "url": "/folder/3.jpg",
+            "title": "Community Gathering",
+            "subtitle": "Sharing traditional Ethiopian flavors",
+            "_id": "695e402180b5b0cdb41bdb60"
+        },
+        {
+            "url": "/folder/9.jpg",
+            "title": "Youth Program",
+            "subtitle": "Empowering our next generation",
+            "_id": "695e402180b5b0cdb41bdb61"
+        },
+        {
+            "url": "/folder/10.jpg",
+            "title": "Heritage Day",
+            "subtitle": "Keeping our traditions alive",
+            "_id": "695e402180b5b0cdb41bdb62"
+        }
+    ],
+    "walkthroughItems": [],
+    "eventsSubtitle": "Moments from our vibrant community celebrations.",
+    "eventsTitle": "Event highlights",
+    "gallerySubtitle": "Capturing the spirit of our community through photos",
+    "galleryTitle": "Community Gallery",
+    "upcomingEventsSubtitle": "Join us in our upcoming gatherings and celebrations",
+    "upcomingEventsTitle": "Upcoming Events",
+    "aboutMission": {
+        "en": "To foster a sense of belonging and unity among Ethiopians from Hossaaena city living in Minnesota , While Preserving our cultural identity and supporting our community members in their journey to success and integration.",
+        "am": "የባለቤትነት እና የአንድነት ስሜትን ለማሳደግ..."
+    },
+    "aboutMissionImage": "/about-mission.png",
+    "aboutPageImage": "/hero-home.png",
+    "aboutPageSubtitle": {
+        "en": "Connecting Ethiopians, preserving culture, building a stronger community in Minnesota",
+        "am": "ኢትዮጵያውያንን ማገናኘት፣ ባህልን መጠበቅ፣ በሜኒሶታ ጠንካራ ማህበረሰብ መገንባት"
+    },
+    "aboutPageTitle": {
+        "en": "About HCSEM",
+        "am": "ስለ HCSEM"
+    },
+    "aboutVision": {
+        "en": "To be the leading Ethiopian community organization in Minnesota , recognized for our commitment to our cultural preservation ,community development , and creating opportunities for our members to thrive and contribute to society",
+        "am": "ቀዳሚ የኢትዮጵያ ማህበረሰብ ድርጅት ለመሆን..."
+    },
+    "aboutVisionImage": "/about-vision.png"
+}

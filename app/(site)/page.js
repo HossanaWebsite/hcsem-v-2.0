@@ -1,237 +1,324 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import InfiniteScroll from '@/components/InfiniteScroll';
 import MiniGallery from '@/components/MiniGallery';
 import DonationModal from '@/components/DonationModal';
 
+import PhotoTicker from '@/components/PhotoTicker';
+
 export default function HomePage() {
   const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
+  const [settings, setSettings] = useState({
+    heroTitle: 'HCSEM',
+    heroSubtitle: 'Building community.\nPreserving culture.',
+    eventsTitle: 'Event Highlights',
+    eventsSubtitle: 'Moments from our vibrant community celebrations',
+    stats: [
+      { label: 'Members', value: '500+' },
+      { label: 'Events', value: '50+' },
+      { label: 'Years', value: '10+' },
+    ],
+    tickerImages: [],
+    galleryImages: [],
+    defaultEvents: [],
+    defaultBlogs: [],
+    showHero: true,
+    showStats: true,
+    showEventsHighlight: true,
+    showCommunityGallery: true,
+    showUpcomingEvents: true
+  });
+
+  const [realEvents, setRealEvents] = useState([]);
+  const [realBlogs, setRealBlogs] = useState([]);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch('/api/settings');
+        if (res.ok) {
+          const data = await res.json();
+          setSettings({
+            ...data,
+            stats: data.stats || [
+              { label: 'Members', value: '500+' },
+              { label: 'Events', value: '50+' },
+              { label: 'Years', value: '10+' },
+            ],
+            tickerImages: data.tickerImages || [],
+            galleryImages: data.galleryImages || [],
+            defaultEvents: data.defaultEvents || [],
+            defaultBlogs: data.defaultBlogs || [],
+            showHero: data.showHero !== undefined ? data.showHero : true,
+            showStats: data.showStats !== undefined ? data.showStats : true,
+            showEventsHighlight: data.showEventsHighlight !== undefined ? data.showEventsHighlight : true,
+            showCommunityGallery: data.showCommunityGallery !== undefined ? data.showCommunityGallery : true,
+            showUpcomingEvents: data.showUpcomingEvents !== undefined ? data.showUpcomingEvents : true
+          });
+        }
+      } catch (error) {
+        console.error('Failed to fetch settings:', error);
+      }
+    };
+
+    const fetchData = async () => {
+      try {
+        const [eventsRes, blogsRes] = await Promise.all([
+          fetch('/api/events'),
+          fetch('/api/blogs')
+        ]);
+        if (eventsRes.ok) {
+          const data = await eventsRes.json();
+          if (data.success) setRealEvents(data.data.filter(e => !e.isHidden).slice(0, 3));
+        }
+        if (blogsRes.ok) {
+          const data = await blogsRes.json();
+          if (data.success) setRealBlogs(data.data.filter(b => !b.isHidden).slice(0, 2));
+        }
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
+
+    fetchSettings();
+    fetchData();
+  }, []);
 
   return (
     <div className="min-h-screen">
       <DonationModal isOpen={isDonationModalOpen} onClose={() => setIsDonationModalOpen(false)} />
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center overflow-hidden">
-        {/* Background Image with Overlay */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/hero-home.png)' }}
-        />
-        {/* Theme-aware Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/20 dark:via-background/95 dark:to-background/50" />
-        <div className="absolute inset-0 backdrop-blur-[2px] bg-background/5 dark:bg-transparent" />
+      {settings.showHero && (
+        <section className="relative min-h-screen flex items-center overflow-hidden">
+          {/* Background Image with Overlay */}
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url(${settings.heroImage || '/hero-home.png'})` }}
+          />
+          {/* Theme-aware Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/20 dark:via-background/95 dark:to-background/50" />
+          <div className="absolute inset-0 backdrop-blur-[2px] bg-background/5 dark:bg-transparent" />
 
-        <div className="relative z-10 container mx-auto px-8 py-32">
-          <div className="max-w-7xl mx-auto">
-            {/* Content aligned to left */}
-            <div className="max-w-2xl">
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8 }}
-                className="space-y-8"
-              >
-                <h1 className="text-7xl md:text-8xl font-heading font-bold leading-tight">
-                  <span className="text-gradient">HCSEM</span>
-                </h1>
-
-                <p className="text-2xl md:text-3xl font-light text-foreground/90 leading-relaxed">
-                  Building community.<br />
-                  Preserving culture.
-                </p>
-
+          <div className="relative z-10 container mx-auto px-8 py-32">
+            <div className="max-w-7xl mx-auto">
+              {/* Content aligned to left */}
+              <div className="max-w-2xl">
                 <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.8, delay: 0.3 }}
-                  className="flex flex-wrap gap-4 pt-4"
+                  initial={{ opacity: 0, x: -30 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.8 }}
+                  className="space-y-8"
                 >
-                  <Link href="/about">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="bg-primary text-primary-foreground px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-primary/25 transition-all"
-                    >
-                      Learn More
-                    </motion.button>
-                  </Link>
-                  <Link href="/contact?donate=true">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      className="border-2 border-primary text-primary px-8 py-4 rounded-full font-semibold text-lg hover:bg-primary/10 transition-all"
-                    >
-                      Donate Now
-                    </motion.button>
-                  </Link>
-                </motion.div>
-              </motion.div>
+                  <h1 className="text-7xl md:text-8xl font-heading font-bold leading-tight">
+                    <span className="text-gradient whitespace-pre-line">{settings.heroTitle}</span>
+                  </h1>
 
-              {/* Stats - Horizontal layout */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-                className="grid grid-cols-3 gap-8 mt-20 pt-12 border-t border-border/50"
-              >
-                {[
-                  { label: 'Members', value: '500+' },
-                  { label: 'Events', value: '50+' },
-                  { label: 'Years', value: '10+' },
-                ].map((stat, i) => (
+                  <p className="text-2xl md:text-3xl font-light text-foreground/90 leading-relaxed whitespace-pre-line">
+                    {settings.heroSubtitle}
+                  </p>
+
                   <motion.div
-                    key={i}
-                    whileHover={{ y: -5 }}
-                    className="space-y-2"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.3 }}
+                    className="flex flex-wrap gap-4 pt-4"
                   >
-                    <div className="text-4xl font-heading font-bold text-gradient">{stat.value}</div>
-                    <div className="text-sm text-muted-foreground uppercase tracking-wider">{stat.label}</div>
+                    <Link href="/about">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="bg-primary text-primary-foreground px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:shadow-primary/25 transition-all"
+                      >
+                        Learn More
+                      </motion.button>
+                    </Link>
+                    <Link href="/contact?donate=true">
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="border-2 border-primary text-primary px-8 py-4 rounded-full font-semibold text-lg hover:bg-primary/10 transition-all"
+                      >
+                        Donate Now
+                      </motion.button>
+                    </Link>
                   </motion.div>
-                ))}
-              </motion.div>
+                </motion.div>
+
+                {/* Stats - Horizontal layout */}
+                {settings.showStats && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, delay: 0.6 }}
+                    className="grid grid-cols-3 gap-8 mt-20 pt-12 border-t border-border/50"
+                  >
+                    {(settings.stats && settings.stats.length > 0 ? settings.stats : [
+                      { label: 'Members', value: '500+' },
+                      { label: 'Events', value: '50+' },
+                      { label: 'Years', value: '10+' },
+                    ]).map((stat, i) => (
+                      <motion.div
+                        key={i}
+                        whileHover={{ y: -5 }}
+                        className="space-y-2"
+                      >
+                        <div className="text-4xl font-heading font-bold text-gradient">{stat.value}</div>
+                        <div className="text-sm text-muted-foreground uppercase tracking-wider">{stat.label}</div>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Scroll Indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-          className="absolute bottom-12 left-1/2 transform -translate-x-1/2"
-        >
+          {/* Scroll Indicator */}
           <motion.div
-            animate={{ y: [0, 10, 0] }}
-            transition={{ repeat: Infinity, duration: 2 }}
-            className="w-6 h-10 border-2 border-primary rounded-full flex items-start justify-center p-2"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5 }}
+            className="absolute bottom-12 left-1/2 transform -translate-x-1/2"
           >
-            <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+            <motion.div
+              animate={{ y: [0, 10, 0] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+              className="w-6 h-10 border-2 border-primary rounded-full flex items-start justify-center p-2"
+            >
+              <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+            </motion.div>
           </motion.div>
-        </motion.div>
-      </section>
+        </section>
+      )}
+
+
 
       {/* Event Gallery - Infinite Scroll */}
-      <section className="section-spacing">
-        <div className="container mx-auto container-spacing">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center space-y-4 mb-12"
-          >
-            <h2 className="text-5xl font-heading font-bold">Event Highlights</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Moments from our vibrant community celebrations
-            </p>
-          </motion.div>
+      {settings.showEventsHighlight && (
+        <section className="section-spacing">
+          <div className="container mx-auto container-spacing">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center space-y-4 mb-12"
+            >
+              <h2 className="text-5xl font-heading font-bold">{settings.eventsTitle}</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                {settings.eventsSubtitle}
+              </p>
+            </motion.div>
 
-          <InfiniteScroll
-            items={[
-              { type: 'image', src: '/folder/2.jpg', title: 'Cultural Festival', description: 'Annual celebration of Ethiopian culture' },
-              { type: 'image', src: '/folder/3.jpg', title: 'Community Gathering', description: 'Monthly meetup for all members' },
-              { type: 'image', src: '/folder/9.jpg', title: 'Youth Program', description: 'Educational workshop for young members' },
-              { type: 'image', src: '/folder/10.jpg', title: 'Heritage Day', description: 'Celebrating our rich cultural heritage' },
-              { type: 'image', src: '/folder/13.jpg', title: 'Family Event', description: 'Fun activities for the whole family' },
-              { type: 'image', src: '/folder/16.jpg', title: 'Achievement Awards', description: 'Recognizing community excellence' },
-            ]}
-            speed={10}
-          />
-        </div>
-      </section>
+            <InfiniteScroll
+              items={(settings.tickerImages && settings.tickerImages.length > 0) ? settings.tickerImages.map(img => ({
+                type: 'image',
+                src: img.url,
+                title: img.title || '',
+                description: img.subtitle || ''
+              })) : [
+                { type: 'image', src: '/images/defaults/community-1.png', title: 'Cultural Festival', description: 'Annual celebration' },
+                { type: 'image', src: '/images/defaults/community-2.png', title: 'Community Feast', description: 'Sharing traditions' },
+                { type: 'image', src: '/images/defaults/community-3.png', title: 'Traditional Dance', description: 'Cultural heritage' },
+                { type: 'image', src: '/images/defaults/event-1.png', title: 'Gathering', description: 'Community spirit' },
+              ]}
+              speed={10}
+            />
+          </div>
+        </section>
+      )}
 
       {/* Masonry Gallery */}
-      <section className="section-spacing bg-muted/20">
-        <div className="container mx-auto container-spacing">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center space-y-4 mb-12"
-          >
-            <h2 className="text-5xl font-heading font-bold">Community Gallery</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Capturing the spirit of our community through photos
-            </p>
-          </motion.div>
+      {settings.showCommunityGallery && (
+        <section className="section-spacing bg-muted/20">
+          <div className="container mx-auto container-spacing">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center space-y-4 mb-12"
+            >
+              <h2 className="text-5xl font-heading font-bold">{settings.galleryTitle || 'Community Gallery'}</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                {settings.gallerySubtitle || 'Capturing the spirit of our community through photos'}
+              </p>
+            </motion.div>
 
-          <MiniGallery />
-        </div>
-      </section>
+            <MiniGallery images={settings.galleryImages} />
+          </div>
+        </section>
+      )}
 
       {/* Upcoming Events - 3 Cards */}
-      <section className="section-spacing">
-        <div className="container mx-auto container-spacing">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-center space-y-4 mb-12"
-          >
-            <h2 className="text-5xl font-heading font-bold">Upcoming Events</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Join us in our upcoming gatherings and celebrations
-            </p>
-          </motion.div>
+      {settings.showUpcomingEvents && (
+        <section className="section-spacing">
+          <div className="container mx-auto container-spacing">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center space-y-4 mb-12"
+            >
+              <h2 className="text-5xl font-heading font-bold">{settings.upcomingEventsTitle || 'Upcoming Events'}</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                {settings.upcomingEventsSubtitle || 'Join us in our upcoming gatherings and celebrations'}
+              </p>
+            </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              { title: 'Cultural Festival 2024', date: 'Dec 15', description: 'Annual celebration featuring traditional music, dance, and food', image: '/event-placeholder.png' },
-              { title: 'Community Gathering', date: 'Dec 20', description: 'Monthly meetup for community members to connect', image: '/about-mission.png' },
-              { title: 'Youth Education Program', date: 'Dec 25', description: 'Educational workshop for young members', image: '/about-vision.png' }
-            ].map((event, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                whileHover={{ y: -10 }}
-                className="glass-card overflow-hidden group cursor-pointer"
-              >
-                <div className="h-56 relative overflow-hidden">
-                  <img
-                    src={event.image}
-                    alt={event.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold">
-                    {event.date}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {(realEvents.length > 0 ? realEvents : settings.defaultEvents).map((event, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  whileHover={{ y: -10 }}
+                  className="glass-card overflow-hidden group cursor-pointer"
+                >
+                  <div className="h-56 relative overflow-hidden">
+                    <img
+                      src={event.image || event.coverImage}
+                      alt={event.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold">
+                      {event.date && (typeof event.date === 'string' ? event.date : new Date(event.date).toLocaleDateString())}
+                    </div>
                   </div>
-                </div>
-                <div className="p-8 space-y-4">
-                  <h3 className="text-2xl font-heading font-bold group-hover:text-primary transition-colors">
-                    {event.title}
-                  </h3>
-                  <p className="text-muted-foreground">
-                    {event.description}
-                  </p>
-                  <Link href="/events" className="inline-flex items-center gap-2 text-primary font-medium">
-                    Learn More <ArrowRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                  <div className="p-8 space-y-4">
+                    <h3 className="text-2xl font-heading font-bold group-hover:text-primary transition-colors line-clamp-1">
+                      {event.title}
+                    </h3>
+                    <p className="text-muted-foreground line-clamp-2">
+                      {event.description}
+                    </p>
+                    <Link href={event.slug ? `/events/${event.slug}` : "/events"} className="inline-flex items-center gap-2 text-primary font-medium">
+                      Learn More <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
 
-          <div className="text-center mt-12">
-            <Link href="/events">
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                className="glass-card px-8 py-4 rounded-full font-bold inline-flex items-center gap-3"
-              >
-                View All Events
-                <ArrowRight className="w-5 h-5" />
-              </motion.button>
-            </Link>
+            <div className="text-center mt-12">
+              <Link href="/events">
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="glass-card px-8 py-4 rounded-full font-bold inline-flex items-center gap-3"
+                >
+                  View All Events
+                  <ArrowRight className="w-5 h-5" />
+                </motion.button>
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Featured Blog Posts */}
       <section className="section-spacing container-spacing bg-muted/20">
@@ -249,13 +336,10 @@ export default function HomePage() {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {[
-              { id: 1, image: '/blog-placeholder.png' },
-              { id: 2, image: '/folder/2.jpg' }
-            ].map((post) => (
+            {(realBlogs.length > 0 ? realBlogs : settings.defaultBlogs).map((post, i) => (
               <motion.div
-                key={post.id}
-                initial={{ opacity: 0, x: post.id === 1 ? -20 : 20 }}
+                key={i}
+                initial={{ opacity: 0, x: i === 0 ? -20 : 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 whileHover={{ y: -10 }}
@@ -263,26 +347,25 @@ export default function HomePage() {
               >
                 <div className="h-72 relative overflow-hidden">
                   <img
-                    src={post.image}
-                    alt="Blog post"
+                    src={post.image || post.coverImage}
+                    alt={post.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 </div>
                 <div className="p-8 space-y-4">
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span>Dec {post.id}, 2024</span>
+                    <span>{post.date || (post.publishedAt && new Date(post.publishedAt).toLocaleDateString()) || 'Recent'}</span>
                     <span>•</span>
                     <span>5 min read</span>
                   </div>
-                  <h3 className="text-3xl font-heading font-bold group-hover:text-primary transition-colors">
-                    Sample Blog Post {post.id}
+                  <h3 className="text-3xl font-heading font-bold group-hover:text-primary transition-colors line-clamp-1">
+                    {post.title}
                   </h3>
-                  <p className="text-muted-foreground leading-relaxed">
-                    Discover the latest updates and stories from our vibrant community.
-                    Learn about our initiatives, events, and the amazing people making a difference.
+                  <p className="text-muted-foreground leading-relaxed line-clamp-2">
+                    {post.summary}
                   </p>
-                  <Link href="/blog" className="inline-flex items-center gap-2 text-primary font-medium">
+                  <Link href={post.slug ? `/blog/${post.slug}` : "/blog"} className="inline-flex items-center gap-2 text-primary font-medium">
                     Read More <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>

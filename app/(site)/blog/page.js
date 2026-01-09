@@ -1,7 +1,9 @@
 import Link from 'next/link';
 import dbConnect from '@/lib/db';
-import { Blog } from '@/models';
+import { Blog, SiteSettings } from '@/models';
 import { Calendar, User } from 'lucide-react';
+import fs from 'fs';
+import path from 'path';
 
 export const revalidate = 60; // Revalidate every minute
 
@@ -15,8 +17,24 @@ async function getBlogs() {
     }
 }
 
+async function getSettings() {
+    try {
+        const filePath = path.join(process.cwd(), 'data', 'settings.json');
+        const fileData = fs.readFileSync(filePath, 'utf8');
+        const defaults = JSON.parse(fileData);
+
+        await dbConnect();
+        const settings = await SiteSettings.findOne();
+        return settings ? { ...defaults, ...settings.toObject() } : defaults;
+    } catch (error) {
+        return {};
+    }
+}
+
 export default async function BlogPage() {
     const blogs = await getBlogs();
+    const settings = await getSettings();
+    const displayBlogs = blogs.length > 0 ? blogs : (settings.defaultBlogs || []);
 
     return (
         <div className="min-h-screen py-20 px-6">
@@ -29,13 +47,13 @@ export default async function BlogPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {blogs.map((blog) => (
-                        <Link key={blog._id} href={`/blog/${blog.slug}`} className="group">
+                    {displayBlogs.map((blog) => (
+                        <Link key={blog._id || blog.title} href={blog.slug ? `/blog/${blog.slug}` : "/blog"} className="group">
                             <div className="glass-card h-full overflow-hidden flex flex-col">
                                 <div className="h-48 bg-muted relative overflow-hidden">
-                                    {blog.coverImage ? (
+                                    {(blog.coverImage || blog.image) ? (
                                         <img
-                                            src={blog.coverImage}
+                                            src={blog.coverImage || blog.image}
                                             alt={blog.title}
                                             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                         />
@@ -47,9 +65,9 @@ export default async function BlogPage() {
                                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                                         <div className="flex items-center gap-1">
                                             <Calendar className="w-3 h-3" />
-                                            {new Date(blog.createdAt).toLocaleDateString()}
+                                            {blog.date || (blog.createdAt && new Date(blog.createdAt).toLocaleDateString()) || 'Recent'}
                                         </div>
-                                        {blog.author && (
+                                        {(blog.author && blog.author.fullName) && (
                                             <div className="flex items-center gap-1">
                                                 <User className="w-3 h-3" />
                                                 {blog.author.fullName}
@@ -63,7 +81,7 @@ export default async function BlogPage() {
                                         {blog.summary}
                                     </p>
                                     <div className="pt-4 flex flex-wrap gap-2">
-                                        {blog.tags.map(tag => (
+                                        {(blog.tags || []).map(tag => (
                                             <span key={tag} className="text-xs px-2 py-1 rounded-full bg-primary/10 text-primary">
                                                 #{tag}
                                             </span>

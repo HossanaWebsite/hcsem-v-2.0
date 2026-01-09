@@ -1,0 +1,941 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { motion } from 'framer-motion';
+import { Save, Plus, Trash2, Upload, ArrowUp, ArrowDown, Loader2 } from 'lucide-react';
+import { toast } from 'react-toastify';
+import Image from 'next/image';
+
+export default function SettingsPage() {
+    const searchParams = useSearchParams();
+    const currentPage = searchParams.get('page') || 'home';
+
+    const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
+    const [settings, setSettings] = useState({
+        heroTitle: '',
+        heroSubtitle: '',
+        heroImage: '',
+        stats: [],
+        tickerImages: [],
+        eventsTitle: '',
+        eventsSubtitle: '',
+        eventsPageTitle: '',
+        eventsPageSubtitle: '',
+        eventsPageImage: '',
+        aboutPageTitle: '',
+        aboutPageSubtitle: '',
+        aboutPageImage: '',
+        aboutMission: '',
+        aboutVision: '',
+        blogPageTitle: '',
+        blogPageSubtitle: '',
+        blogPageImage: '',
+        contactPageTitle: '',
+        contactPageSubtitle: '',
+        contactPageImage: ''
+    });
+
+    const [previewOpen, setPreviewOpen] = useState(false);
+
+    useEffect(() => {
+        fetchSettings();
+    }, []);
+
+    const fetchSettings = async () => {
+        try {
+            const res = await fetch('/api/settings');
+            if (res.ok) {
+                const data = await res.json();
+                setSettings({
+                    ...data,
+                    heroImage: data.heroImage || '',
+                    stats: data.stats || [],
+                    tickerImages: data.tickerImages || []
+                });
+            } else {
+                toast.error('Failed to load settings');
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('Error loading settings');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSave = async () => {
+        setSaving(true);
+        try {
+            const res = await fetch('/api/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(settings),
+            });
+
+            if (res.ok) {
+                toast.success('Settings saved successfully');
+            } else {
+                toast.error('Failed to save settings');
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('Error saving settings');
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleStatChange = (index, field, value) => {
+        const newStats = [...settings.stats];
+        newStats[index][field] = value;
+        setSettings({ ...settings, stats: newStats });
+    };
+
+    const addStat = () => {
+        setSettings({
+            ...settings,
+            stats: [...settings.stats, { label: '', value: '' }]
+        });
+    };
+
+    const removeStat = (index) => {
+        const newStats = settings.stats.filter((_, i) => i !== index);
+        setSettings({ ...settings, stats: newStats });
+    };
+
+    const handleImageUpload = async (e, type = 'ticker') => {
+        const files = e.target.files;
+        if (!files || files.length === 0) return;
+
+        const toastId = toast.loading("Uploading image(s)...");
+        let successCount = 0;
+
+        try {
+            for (let i = 0; i < files.length; i++) {
+                const formData = new FormData();
+                formData.append('file', files[i]);
+
+                const res = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    if (type === 'hero') {
+                        setSettings(prev => ({ ...prev, heroImage: data.url }));
+                        successCount++;
+                        break;
+                    } else if (type === 'eventsPage') {
+                        setSettings(prev => ({ ...prev, eventsPageImage: data.url }));
+                        successCount++;
+                        break;
+                    } else if (type === 'aboutPage') {
+                        setSettings(prev => ({ ...prev, aboutPageImage: data.url }));
+                        successCount++;
+                        break;
+                    } else if (type === 'blogPage') {
+                        setSettings(prev => ({ ...prev, blogPageImage: data.url }));
+                        successCount++;
+                        break;
+                    } else if (type === 'contactPage') {
+                        setSettings(prev => ({ ...prev, contactPageImage: data.url }));
+                        successCount++;
+                        break;
+                    } else {
+                        setSettings(prev => ({
+                            ...prev,
+                            tickerImages: [
+                                ...prev.tickerImages,
+                                { url: data.url, order: prev.tickerImages.length }
+                            ]
+                        }));
+                        successCount++;
+                    }
+                }
+            }
+
+            if (successCount > 0) {
+                toast.update(toastId, { render: `${successCount} image(s) uploaded!`, type: "success", isLoading: false, autoClose: 3000 });
+            } else {
+                toast.update(toastId, { render: "Upload failed", type: "error", isLoading: false, autoClose: 3000 });
+            }
+
+        } catch (error) {
+            console.error(error);
+            toast.update(toastId, { render: "Error uploading", type: "error", isLoading: false, autoClose: 3000 });
+        }
+    };
+
+    const removeImage = (index) => {
+        const newImages = settings.tickerImages.filter((_, i) => i !== index);
+        setSettings({ ...settings, tickerImages: newImages });
+    };
+
+    const moveImage = (index, direction) => {
+        const newImages = [...settings.tickerImages];
+        if (direction === 'up' && index > 0) {
+            [newImages[index], newImages[index - 1]] = [newImages[index - 1], newImages[index]];
+        } else if (direction === 'down' && index < newImages.length - 1) {
+            [newImages[index], newImages[index + 1]] = [newImages[index + 1], newImages[index]];
+        }
+        setSettings({ ...settings, tickerImages: newImages });
+    };
+
+    if (loading) {
+        return (
+            <div className="flex h-[50vh] items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+        );
+    }
+
+    // Page title and description mapping
+    const pageConfig = {
+        home: { title: 'Home Page Content', description: 'Manage home page content and appearance' },
+        events: { title: 'Events Page Content', description: 'Manage events page appearance' },
+        about: { title: 'About Page Content', description: 'Manage about page content' },
+        blog: { title: 'Blog Page Content', description: 'Manage blog page appearance' },
+        contact: { title: 'Contact Page Content', description: 'Manage contact page appearance' }
+    };
+
+    const config = pageConfig[currentPage] || pageConfig.home;
+
+    return (
+        <div className="space-y-8 max-w-5xl mx-auto pb-20">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-3xl font-bold font-heading text-white">{config.title}</h1>
+                    <p className="text-slate-400">{config.description}</p>
+                </div>
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-medium shadow-lg shadow-indigo-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    Save Changes
+                </motion.button>
+            </div>
+
+            {/* HOME PAGE CONTENT */}
+            {currentPage === 'home' && (
+                <>
+                    <section className="glass-panel p-6 rounded-2xl border border-white/5 bg-slate-900/50 backdrop-blur-xl">
+                        <h2 className="text-xl font-semibold text-white mb-6">Hero Section</h2>
+                        <div className="grid gap-8 md:grid-cols-2">
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-slate-300">Hero Title</label>
+                                    <input
+                                        type="text"
+                                        value={settings.heroTitle}
+                                        onChange={(e) => setSettings({ ...settings, heroTitle: e.target.value })}
+                                        className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all"
+                                        placeholder="e.g. HCSEM"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-slate-300">Hero Subtitle</label>
+                                    <textarea
+                                        value={settings.heroSubtitle}
+                                        onChange={(e) => setSettings({ ...settings, heroSubtitle: e.target.value })}
+                                        className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all h-[80px] min-h-[50px] resize-y"
+                                        placeholder="Subtitle text..."
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-300">Hero Background Image</label>
+                                <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 group">
+                                    {settings.heroImage && settings.heroImage.trim() !== '' ? (
+                                        <Image src={settings.heroImage} alt="Hero" fill className="object-cover" />
+                                    ) : (
+                                        <div className="absolute inset-0 flex items-center justify-center text-slate-500">No Image</div>
+                                    )}
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors border border-white/10 flex items-center gap-2">
+                                            <Upload className="w-4 h-4" /> Change Image
+                                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'hero')} />
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="glass-panel p-6 rounded-2xl border border-white/5 bg-slate-900/50 backdrop-blur-xl">
+                        <h2 className="text-xl font-semibold text-white mb-6">Events Highlight Section</h2>
+                        <div className="grid gap-6 md:grid-cols-2">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-300">Section Title</label>
+                                <input
+                                    type="text"
+                                    value={settings.eventsTitle || ''}
+                                    onChange={(e) => setSettings({ ...settings, eventsTitle: e.target.value })}
+                                    className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all"
+                                    placeholder="e.g. Event Highlights"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-300">Section Subtitle</label>
+                                <input
+                                    type="text"
+                                    value={settings.eventsSubtitle || ''}
+                                    onChange={(e) => setSettings({ ...settings, eventsSubtitle: e.target.value })}
+                                    className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all"
+                                    placeholder="Subtitle text..."
+                                />
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="glass-panel p-6 rounded-2xl border border-white/5 bg-slate-900/50 backdrop-blur-xl">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-semibold text-white">Statistics Numbers</h2>
+                            <button
+                                onClick={addStat}
+                                className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-colors"
+                            >
+                                <Plus className="w-4 h-4" /> Add Stat
+                            </button>
+                        </div>
+
+                        <div className="space-y-4">
+                            {settings.stats.map((stat, index) => (
+                                <motion.div
+                                    key={index}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    className="flex items-start gap-4 p-4 rounded-xl bg-slate-950/30 border border-white/5 group"
+                                >
+                                    <div className="flex-1 grid grid-cols-2 gap-4">
+                                        <div className="space-y-1">
+                                            <label className="text-xs text-slate-500">Value (e.g. 500+)</label>
+                                            <input
+                                                type="text"
+                                                value={stat.value}
+                                                onChange={(e) => handleStatChange(index, 'value', e.target.value)}
+                                                className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50"
+                                            />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <label className="text-xs text-slate-500">Label (e.g. Members)</label>
+                                            <input
+                                                type="text"
+                                                value={stat.label}
+                                                onChange={(e) => handleStatChange(index, 'label', e.target.value)}
+                                                className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50"
+                                            />
+                                        </div>
+                                    </div>
+                                    <button
+                                        onClick={() => removeStat(index)}
+                                        className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors self-center mt-4"
+                                        title="Remove"
+                                    >
+                                        <Trash2 className="w-4 h-4" />
+                                    </button>
+                                </motion.div>
+                            ))}
+
+                            {settings.stats.length === 0 && (
+                                <div className="text-center py-8 text-slate-500 italic bg-slate-950/20 rounded-xl border border-dashed border-white/10">
+                                    No stats added yet. Click "Add Stat" to get started. Default stats will be shown on home page if left empty.
+                                </div>
+                            )}
+                        </div>
+                    </section>
+
+                    <section className="glass-panel p-6 rounded-2xl border border-white/5 bg-slate-900/50 backdrop-blur-xl">
+                        <div className="flex items-center justify-between mb-6">
+                            <div>
+                                <h2 className="text-xl font-semibold text-white">Photo Carousel</h2>
+                                <p className="text-slate-400 text-sm mt-1">Images to display in the moving horizontal ticker.</p>
+                            </div>
+                            <div className="flex gap-4">
+                                <button
+                                    onClick={() => setPreviewOpen(!previewOpen)}
+                                    className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm border border-white/10 transition-colors"
+                                >
+                                    {previewOpen ? "Hide Preview" : "Show Animation Preview"}
+                                </button>
+                                <div className="relative">
+                                    <input
+                                        type="file"
+                                        id="ticker-upload"
+                                        className="hidden"
+                                        accept="image/*"
+                                        multiple
+                                        onChange={(e) => handleImageUpload(e, 'ticker')}
+                                    />
+                                    <label
+                                        htmlFor="ticker-upload"
+                                        className="flex items-center gap-2 cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm transition-colors shadow-lg shadow-indigo-500/20"
+                                    >
+                                        <Upload className="w-4 h-4" /> Upload Photos
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        {previewOpen && settings.tickerImages.length > 0 && (
+                            <div className="mb-8 p-4 bg-black/20 rounded-xl border border-white/5 overflow-hidden">
+                                <div className="flex gap-4 animate-scroll whitespace-nowrap">
+                                    {[...settings.tickerImages, ...settings.tickerImages, ...settings.tickerImages].map((img, i) => (
+                                        <div key={i} className="relative w-48 h-28 flex-shrink-0 rounded-lg overflow-hidden border border-white/10">
+                                            <img src={img.url} className="w-full h-full object-cover" alt="Preview" />
+                                        </div>
+                                    ))}
+                                </div>
+                                <style jsx>{`
+                                    .animate-scroll {
+                                        animation: scroll 20s linear infinite;
+                                    }
+                                    @keyframes scroll {
+                                        0% { transform: translateX(0); }
+                                        100% { transform: translateX(-50%); }
+                                    }
+                                `}</style>
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                            {settings.tickerImages.map((img, index) => (
+                                <motion.div
+                                    key={index}
+                                    layout
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="group relative aspect-video bg-slate-950 rounded-lg overflow-hidden border border-white/10"
+                                >
+                                    <Image
+                                        src={img.url}
+                                        alt="Ticker"
+                                        fill
+                                        className="object-cover"
+                                    />
+                                    <button
+                                        onClick={() => removeImage(index)}
+                                        className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"
+                                        title="Remove Image"
+                                    >
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                                        </svg>
+                                    </button>
+
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 pointer-events-none">
+                                        <div className="flex gap-2 pointer-events-auto">
+                                            <button
+                                                onClick={() => moveImage(index, 'up')}
+                                                disabled={index === 0}
+                                                className="p-1.5 bg-white/20 hover:bg-white/30 rounded disabled:opacity-30 text-white backdrop-blur-sm"
+                                            >
+                                                <ArrowUp className="w-4 h-4" />
+                                            </button>
+                                            <button
+                                                onClick={() => moveImage(index, 'down')}
+                                                disabled={index === settings.tickerImages.length - 1}
+                                                className="p-1.5 bg-white/20 hover:bg-white/30 rounded disabled:opacity-30 text-white backdrop-blur-sm"
+                                            >
+                                                <ArrowDown className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                        {settings.tickerImages.length === 0 && (
+                            <div className="text-center py-12 text-slate-500 italic bg-slate-950/20 rounded-xl border border-dashed border-white/10 mt-4">
+                                No images uploaded. Add photos to populate the ticker.
+                            </div>
+                        )}
+                    </section>
+                </>
+            )}
+
+            {/* EVENTS PAGE CONTENT */}
+            {currentPage === 'events' && (
+                <section className="glass-panel p-6 rounded-2xl border border-white/5 bg-slate-900/50 backdrop-blur-xl">
+                    <h2 className="text-xl font-semibold text-white mb-6">Page Header</h2>
+                    <div className="grid gap-8 md:grid-cols-2">
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-300">Page Title</label>
+                                <input
+                                    type="text"
+                                    value={settings.eventsPageTitle}
+                                    onChange={(e) => setSettings({ ...settings, eventsPageTitle: e.target.value })}
+                                    className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all"
+                                    placeholder="e.g. Events"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-300">Page Subtitle</label>
+                                <textarea
+                                    value={settings.eventsPageSubtitle}
+                                    onChange={(e) => setSettings({ ...settings, eventsPageSubtitle: e.target.value })}
+                                    className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all h-[80px] min-h-[50px] resize-y"
+                                    placeholder="Subtitle text..."
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-300">Header Background Image</label>
+                            <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 group">
+                                {settings.eventsPageImage && settings.eventsPageImage.trim() !== '' ? (
+                                    <Image src={settings.eventsPageImage} alt="Events Header" fill className="object-cover" />
+                                ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center text-slate-500">No Image</div>
+                                )}
+                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors border border-white/10 flex items-center gap-2">
+                                        <Upload className="w-4 h-4" /> Change Image
+                                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'eventsPage')} />
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {/* ABOUT PAGE CONTENT */}
+            {currentPage === 'about' && (
+                <>
+                    <section className="glass-panel p-6 rounded-2xl border border-white/5 bg-slate-900/50 backdrop-blur-xl">
+                        <h2 className="text-xl font-semibold text-white mb-6">Page Header</h2>
+                        <div className="grid gap-8 md:grid-cols-2">
+                            <div className="space-y-6">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-slate-300">Page Title</label>
+                                    <input
+                                        type="text"
+                                        value={settings.aboutPageTitle}
+                                        onChange={(e) => setSettings({ ...settings, aboutPageTitle: e.target.value })}
+                                        className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all"
+                                        placeholder="e.g. About Us"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium text-slate-300">Page Subtitle</label>
+                                    <textarea
+                                        value={settings.aboutPageSubtitle}
+                                        onChange={(e) => setSettings({ ...settings, aboutPageSubtitle: e.target.value })}
+                                        className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all h-[80px] min-h-[50px] resize-y"
+                                        placeholder="Subtitle text..."
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-300">Header Background Image</label>
+                                <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 group">
+                                    {settings.aboutPageImage && settings.aboutPageImage.trim() !== '' ? (
+                                        <Image src={settings.aboutPageImage} alt="About Header" fill className="object-cover" />
+                                    ) : (
+                                        <div className="absolute inset-0 flex items-center justify-center text-slate-500">No Image</div>
+                                    )}
+                                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors border border-white/10 flex items-center gap-2">
+                                            <Upload className="w-4 h-4" /> Change Image
+                                            <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'aboutPage')} />
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="glass-panel p-6 rounded-2xl border border-white/5 bg-slate-900/50 backdrop-blur-xl">
+                        <h2 className="text-xl font-semibold text-white mb-6">Mission & Vision</h2>
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-300">Mission Statement</label>
+                                <textarea
+                                    value={settings.aboutMission}
+                                    onChange={(e) => setSettings({ ...settings, aboutMission: e.target.value })}
+                                    className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all h-[120px] resize-y"
+                                    placeholder="Enter your organization's mission..."
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-300">Vision Statement</label>
+                                <textarea
+                                    value={settings.aboutVision}
+                                    onChange={(e) => setSettings({ ...settings, aboutVision: e.target.value })}
+                                    className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all h-[120px] resize-y"
+                                    placeholder="Enter your organization's vision..."
+                                />
+                            </div>
+                        </div>
+                    </section>
+                </>
+            )}
+
+            {/* BLOG PAGE CONTENT */}
+            {currentPage === 'blog' && (
+                <section className="glass-panel p-6 rounded-2xl border border-white/5 bg-slate-900/50 backdrop-blur-xl">
+                    <h2 className="text-xl font-semibold text-white mb-6">Page Header</h2>
+                    <div className="grid gap-8 md:grid-cols-2">
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-300">Page Title</label>
+                                <input
+                                    type="text"
+                                    value={settings.blogPageTitle}
+                                    onChange={(e) => setSettings({ ...settings, blogPageTitle: e.target.value })}
+                                    className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all"
+                                    placeholder="e.g. Blog"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-300">Page Subtitle</label>
+                                <textarea
+                                    value={settings.blogPageSubtitle}
+                                    onChange={(e) => setSettings({ ...settings, blogPageSubtitle: e.target.value })}
+                                    className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all h-[80px] min-h-[50px] resize-y"
+                                    placeholder="Subtitle text..."
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-300">Header Background Image</label>
+                            <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 group">
+                                {settings.blogPageImage && settings.blogPageImage.trim() !== '' ? (
+                                    <Image src={settings.blogPageImage} alt="Blog Header" fill className="object-cover" />
+                                ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center text-slate-500">No Image</div>
+                                )}
+                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors border border-white/10 flex items-center gap-2">
+                                        <Upload className="w-4 h-4" /> Change Image
+                                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'blogPage')} />
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            )}
+
+            {/* CONTACT PAGE CONTENT */}
+            {currentPage === 'contact' && (
+                <section className="glass-panel p-6 rounded-2xl border border-white/5 bg-slate-900/50 backdrop-blur-xl">
+                    <h2 className="text-xl font-semibold text-white mb-6">Page Header</h2>
+                    <div className="grid gap-8 md:grid-cols-2">
+                        <div className="space-y-6">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-300">Page Title</label>
+                                <input
+                                    type="text"
+                                    value={settings.contactPageTitle}
+                                    onChange={(e) => setSettings({ ...settings, contactPageTitle: e.target.value })}
+                                    className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all"
+                                    placeholder="e.g. Contact Us"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-slate-300">Page Subtitle</label>
+                                <textarea
+                                    value={settings.contactPageSubtitle}
+                                    onChange={(e) => setSettings({ ...settings, contactPageSubtitle: e.target.value })}
+                                    className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all h-[80px] min-h-[50px] resize-y"
+                                    placeholder="Subtitle text..."
+                                />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-300">Header Background Image</label>
+                            <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 group">
+                                {settings.contactPageImage && settings.contactPageImage.trim() !== '' ? (
+                                    <Image src={settings.contactPageImage} alt="Contact Header" fill className="object-cover" />
+                                ) : (
+                                    <div className="absolute inset-0 flex items-center justify-center text-slate-500">No Image</div>
+                                )}
+                                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                    <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors border border-white/10 flex items-center gap-2">
+                                        <Upload className="w-4 h-4" /> Change Image
+                                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'contactPage')} />
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            )}
+        </div>
+    );
+}
+
+<div className="flex items-center justify-between">
+    <div>
+        <h1 className="text-3xl font-bold font-heading text-white">Site Settings</h1>
+        <p className="text-slate-400">Manage home page content and appearance</p>
+    </div>
+    <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={handleSave}
+        disabled={saving}
+        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-medium shadow-lg shadow-indigo-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+    >
+        {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+        Save Changes
+    </motion.button>
+</div>
+
+{/* General Settings & Hero Image */ }
+<section className="glass-panel p-6 rounded-2xl border border-white/5 bg-slate-900/50 backdrop-blur-xl">
+    <h2 className="text-xl font-semibold text-white mb-6">Hero Section</h2>
+    <div className="grid gap-8 md:grid-cols-2">
+        <div className="space-y-6">
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-300">Hero Title</label>
+                <input
+                    type="text"
+                    value={settings.heroTitle}
+                    onChange={(e) => setSettings({ ...settings, heroTitle: e.target.value })}
+                    className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all"
+                    placeholder="e.g. HCSEM"
+                />
+            </div>
+            <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-300">Hero Subtitle</label>
+                <textarea
+                    value={settings.heroSubtitle}
+                    onChange={(e) => setSettings({ ...settings, heroSubtitle: e.target.value })}
+                    className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all h-[80px] min-h-[50px] resize-y"
+                    placeholder="Subtitle text..."
+                />
+            </div>
+        </div>
+
+        <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-300">Hero Background Image</label>
+            <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 group">
+                {settings.heroImage && settings.heroImage.trim() !== '' ? (
+                    <Image src={settings.heroImage} alt="Hero" fill className="object-cover" />
+                ) : (
+                    <div className="absolute inset-0 flex items-center justify-center text-slate-500">No Image</div>
+                )}
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <label className="cursor-pointer bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors border border-white/10 flex items-center gap-2">
+                        <Upload className="w-4 h-4" /> Change Image
+                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'hero')} />
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{/* Events Section Settings */ }
+<section className="glass-panel p-6 rounded-2xl border border-white/5 bg-slate-900/50 backdrop-blur-xl">
+    <h2 className="text-xl font-semibold text-white mb-6">Events Highlight Section</h2>
+    <div className="grid gap-6 md:grid-cols-2">
+        <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-300">Section Title</label>
+            <input
+                type="text"
+                value={settings.eventsTitle || ''}
+                onChange={(e) => setSettings({ ...settings, eventsTitle: e.target.value })}
+                className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all"
+                placeholder="e.g. Event Highlights"
+            />
+        </div>
+        <div className="space-y-2">
+            <label className="text-sm font-medium text-slate-300">Section Subtitle</label>
+            <input
+                type="text"
+                value={settings.eventsSubtitle || ''}
+                onChange={(e) => setSettings({ ...settings, eventsSubtitle: e.target.value })}
+                className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all"
+                placeholder="Subtitle text..."
+            />
+        </div>
+    </div>
+</section>
+
+{/* Stats Settings */ }
+<section className="glass-panel p-6 rounded-2xl border border-white/5 bg-slate-900/50 backdrop-blur-xl">
+    <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-white">Statistics Numbers</h2>
+        <button
+            onClick={addStat}
+            className="flex items-center gap-2 text-indigo-400 hover:text-indigo-300 text-sm font-medium transition-colors"
+        >
+            <Plus className="w-4 h-4" /> Add Stat
+        </button>
+    </div>
+
+    <div className="space-y-4">
+        {settings.stats.map((stat, index) => (
+            <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-start gap-4 p-4 rounded-xl bg-slate-950/30 border border-white/5 group"
+            >
+                <div className="flex-1 grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                        <label className="text-xs text-slate-500">Value (e.g. 500+)</label>
+                        <input
+                            type="text"
+                            value={stat.value}
+                            onChange={(e) => handleStatChange(index, 'value', e.target.value)}
+                            className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50"
+                        />
+                    </div>
+                    <div className="space-y-1">
+                        <label className="text-xs text-slate-500">Label (e.g. Members)</label>
+                        <input
+                            type="text"
+                            value={stat.label}
+                            onChange={(e) => handleStatChange(index, 'label', e.target.value)}
+                            className="w-full bg-slate-900 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500/50"
+                        />
+                    </div>
+                </div>
+                <button
+                    onClick={() => removeStat(index)}
+                    className="p-2 text-rose-500 hover:bg-rose-500/10 rounded-lg transition-colors self-center mt-4"
+                    title="Remove"
+                >
+                    <Trash2 className="w-4 h-4" />
+                </button>
+            </motion.div>
+        ))}
+
+        {settings.stats.length === 0 && (
+            <div className="text-center py-8 text-slate-500 italic bg-slate-950/20 rounded-xl border border-dashed border-white/10">
+                No stats added yet. Click "Add Stat" to get started. Default stats will be shown on home page if left empty.
+            </div>
+        )}
+    </div>
+</section>
+
+{/* Photo Ticker Settings */ }
+<section className="glass-panel p-6 rounded-2xl border border-white/5 bg-slate-900/50 backdrop-blur-xl">
+    <div className="flex items-center justify-between mb-6">
+        <div>
+            <h2 className="text-xl font-semibold text-white">Photo Carousel</h2>
+            <p className="text-slate-400 text-sm mt-1">Images to display in the moving horizontal ticker.</p>
+        </div>
+        <div className="flex gap-4">
+            <button
+                onClick={() => setPreviewOpen(!previewOpen)}
+                className="flex items-center gap-2 bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-lg text-sm border border-white/10 transition-colors"
+            >
+                {previewOpen ? "Hide Preview" : "Show Animation Preview"}
+            </button>
+            <div className="relative">
+                <input
+                    type="file"
+                    id="ticker-upload"
+                    className="hidden"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) => handleImageUpload(e, 'ticker')}
+                />
+                <label
+                    htmlFor="ticker-upload"
+                    className="flex items-center gap-2 cursor-pointer bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm transition-colors shadow-lg shadow-indigo-500/20"
+                >
+                    <Upload className="w-4 h-4" /> Upload Photos
+                </label>
+            </div>
+        </div>
+    </div>
+
+    {previewOpen && settings.tickerImages.length > 0 && (
+        <div className="mb-8 p-4 bg-black/20 rounded-xl border border-white/5 overflow-hidden">
+            <div className="flex gap-4 animate-scroll whitespace-nowrap">
+                {[...settings.tickerImages, ...settings.tickerImages, ...settings.tickerImages].map((img, i) => ( // Repeat for effect
+                    <div key={i} className="relative w-48 h-28 flex-shrink-0 rounded-lg overflow-hidden border border-white/10">
+                        <img src={img.url} className="w-full h-full object-cover" alt="Preview" />
+                    </div>
+                ))}
+            </div>
+            <style jsx>{`
+                            .animate-scroll {
+                                animation: scroll 20s linear infinite;
+                            }
+                            @keyframes scroll {
+                                0% { transform: translateX(0); }
+                                100% { transform: translateX(-50%); }
+                            }
+                        `}</style>
+        </div>
+    )}
+
+    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        {settings.tickerImages.map((img, index) => (
+            <motion.div
+                key={index}
+                layout
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="group relative aspect-video bg-slate-950 rounded-lg overflow-hidden border border-white/10"
+            >
+                <Image
+                    src={img.url}
+                    alt="Ticker"
+                    fill
+                    className="object-cover"
+                />
+                {/* X Button at Top Right as requested */}
+                <button
+                    onClick={() => removeImage(index)}
+                    className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"
+                    title="Remove Image"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 pointer-events-none">
+                    {/* Only arrows here now, delete is top-right */}
+                    <div className="flex gap-2 pointer-events-auto">
+                        <button
+                            onClick={() => moveImage(index, 'up')}
+                            disabled={index === 0}
+                            className="p-1.5 bg-white/20 hover:bg-white/30 rounded disabled:opacity-30 text-white backdrop-blur-sm"
+                        >
+                            <ArrowUp className="w-4 h-4" />
+                        </button>
+                        <button
+                            onClick={() => moveImage(index, 'down')}
+                            disabled={index === settings.tickerImages.length - 1}
+                            className="p-1.5 bg-white/20 hover:bg-white/30 rounded disabled:opacity-30 text-white backdrop-blur-sm"
+                        >
+                            <ArrowDown className="w-4 h-4" />
+                        </button>
+                    </div>
+                </div>
+            </motion.div>
+        ))}
+    </div>
+    {settings.tickerImages.length === 0 && (
+        <div className="text-center py-12 text-slate-500 italic bg-slate-950/20 rounded-xl border border-dashed border-white/10 mt-4">
+            No images uploaded. Add photos to populate the ticker.
+        </div>
+    )}
+</section>
+</div >
+    );
+}
