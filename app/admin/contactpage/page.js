@@ -27,8 +27,13 @@ export default function ContactContentPage() {
         contactAddress: defaults.contactAddress,
         contactPhone: defaults.contactPhone,
         contactEmail: defaults.contactEmail,
-        showContactHeader: true
+        contactPhone: defaults.contactPhone,
+        contactEmail: defaults.contactEmail,
+        showContactHeader: true,
+        contactReasons: []
     });
+
+    const [newReason, setNewReason] = useState({ en: '', am: '' });
 
     useEffect(() => {
         fetchSettings();
@@ -48,7 +53,10 @@ export default function ContactContentPage() {
                     contactAddress: data.contactAddress || defaults.contactAddress,
                     contactPhone: data.contactPhone || defaults.contactPhone,
                     contactEmail: data.contactEmail || defaults.contactEmail,
-                    showContactHeader: data.showContactHeader !== undefined ? data.showContactHeader : true
+                    contactPhone: data.contactPhone || defaults.contactPhone,
+                    contactEmail: data.contactEmail || defaults.contactEmail,
+                    showContactHeader: data.showContactHeader !== undefined ? data.showContactHeader : true,
+                    contactReasons: data.contactReasons || []
                 });
             }
         } catch (error) {
@@ -106,6 +114,29 @@ export default function ContactContentPage() {
             console.error(error);
             toast.update(toastId, { render: "Error uploading", type: "error", isLoading: false, autoClose: 3000 });
         }
+    };
+
+    const handleAddReason = () => {
+        if (!newReason.en || !newReason.am) {
+            toast.error('Please provide both English and Amharic labels');
+            return;
+        }
+
+        const updatedReasons = [...(settings.contactReasons || []), {
+            value: newReason.en,
+            label: { en: newReason.en, am: newReason.am }
+        }];
+
+        setSettings({ ...settings, contactReasons: updatedReasons });
+        setNewReason({ en: '', am: '' });
+        toast.success('Reason added - click Save Changes to persist');
+    };
+
+    const handleRemoveReason = (index) => {
+        const updatedReasons = [...(settings.contactReasons || [])];
+        updatedReasons.splice(index, 1);
+        setSettings({ ...settings, contactReasons: updatedReasons });
+        toast.info('Reason removed - click Save Changes to persist');
     };
 
     if (loading) {
@@ -250,6 +281,60 @@ export default function ContactContentPage() {
                     </div>
                 </div>
             </section>
-        </div>
+
+            {/* Contact Reasons Management */}
+            <section className="glass-panel p-6 rounded-2xl border border-white/5 bg-slate-900/50 backdrop-blur-xl">
+                <h2 className="text-xl font-semibold text-white mb-6">Contact Reasons</h2>
+                <div className="space-y-6">
+                    <div className="grid gap-4 md:grid-cols-[1fr_1fr_auto]">
+                        <input
+                            type="text"
+                            value={newReason.en}
+                            onChange={(e) => setNewReason({ ...newReason, en: e.target.value })}
+                            placeholder="Reason (English)"
+                            className="bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600"
+                        />
+                        <input
+                            type="text"
+                            value={newReason.am}
+                            onChange={(e) => setNewReason({ ...newReason, am: e.target.value })}
+                            placeholder="Reason (Amharic)"
+                            className="bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600"
+                        />
+                        <button
+                            onClick={handleAddReason}
+                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-medium transition-colors"
+                        >
+                            Add
+                        </button>
+                    </div>
+
+                    <div className="space-y-3">
+                        {settings.contactReasons && settings.contactReasons.length > 0 ? (
+                            settings.contactReasons.map((reason, index) => (
+                                <div key={index} className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/5 group">
+                                    <div className="flex gap-4 items-center">
+                                        <div className="text-white font-medium">{reason.label?.en || reason.value}</div>
+                                        <div className="text-slate-600">|</div>
+                                        <div className="text-slate-300 font-amharic">{reason.label?.am}</div>
+                                    </div>
+                                    <button
+                                        onClick={() => handleRemoveReason(index)}
+                                        className="text-slate-500 hover:text-red-400 transition-colors p-2 hover:bg-white/5 rounded-full opacity-0 group-hover:opacity-100"
+                                        title="Remove Reason"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="py-8 text-center text-slate-500 bg-white/5 rounded-xl border border-dashed border-white/10">
+                                No custom reasons added yet
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </section>
+        </div >
     );
 }

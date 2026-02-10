@@ -213,12 +213,14 @@ export default function HomePage() {
             </motion.div>
 
             <InfiniteScroll
-              items={(settings.tickerImages && settings.tickerImages.length > 0) ? settings.tickerImages.map(img => ({
-                type: 'image',
-                src: img.url,
-                title: img.title || '',
-                description: img.subtitle || ''
-              })) : [
+              items={(settings.tickerImages && settings.tickerImages.length > 0) ? settings.tickerImages
+                .filter(img => img.url && img.url.trim() !== '')
+                .map(img => ({
+                  type: 'image',
+                  src: img.url,
+                  title: img.title || '',
+                  description: img.subtitle || ''
+                })) : [
                 { type: 'image', src: '/images/defaults/community-1.png', title: 'Cultural Festival', description: 'Annual celebration' },
                 { type: 'image', src: '/images/defaults/community-2.png', title: 'Community Feast', description: 'Sharing traditions' },
                 { type: 'image', src: '/images/defaults/community-3.png', title: 'Traditional Dance', description: 'Cultural heritage' },
@@ -280,7 +282,7 @@ export default function HomePage() {
                 >
                   <div className="h-56 relative overflow-hidden">
                     <img
-                      src={event.image || event.coverImage}
+                      src={event.image || event.coverImage || '/images/event-default.jpg'}
                       alt={event.title}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
@@ -347,7 +349,7 @@ export default function HomePage() {
               >
                 <div className="h-72 relative overflow-hidden">
                   <img
-                    src={post.image || post.coverImage}
+                    src={post.image || post.coverImage || '/images/event-default.jpg'}
                     alt={post.title}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />

@@ -18,7 +18,7 @@
         "copyright": "© 2024 HCSEM. All rights reserved.",
         "columns": []
     },
-    "updatedAt": "2026-02-05T03:21:36.190Z",
+    "updatedAt": "2026-02-10T19:07:15.948Z",
     "aboutActivities": [
         {
             "title": {
@@ -182,5 +182,15 @@
         "en": "Our vision is to build a strong, united, and compassionate community where members support one another, preserve their cultural values, empower future generations, and extend humanitarian help to Ethiopians affected by hardship both locally and beyond.",
         "am": "ቀዳሚ የኢትዮጵያ ማህበረሰብ ድርጅት ለመሆን..."
     },
-    "aboutVisionImage": "/about-vision.png"
+    "aboutVisionImage": "/about-vision.png",
+    "contactReasons": [
+        {
+            "value": "New Home",
+            "label": {
+                "en": "New Home",
+                "am": "የቤት ምረቃት"
+            },
+            "_id": "698b6fc5a045cd29b93a05de"
+        }
+    ]
 }

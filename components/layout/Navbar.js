@@ -1,5 +1,6 @@
 'use client'
 import Link from "next/link"
+import Image from "next/image"
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/Button"
 import { Menu, X, Sun, Moon, Monitor, Search, Layout, History } from "lucide-react"
@@ -75,11 +76,11 @@ export default function Navbar() {
                             {logoUrl ? (
                                 <div className="relative w-8 h-8">
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img src={logoUrl} alt="Logo" className="object-contain w-full h-full" />
+                                    <Image src={logoUrl} alt="Logo" width={32} height={32} className="object-contain w-full h-full" />
                                 </div>
                             ) : (
                                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white">
-                                    H
+                                    <Image src="/images/logo.png" alt="Logo" width={32} height={32} className="object-contain w-full h-full" />
                                 </div>
                             )}
                             <span>HCSEM<span className="text-primary">.</span></span>

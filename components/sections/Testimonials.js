@@ -67,7 +67,7 @@ export default function Testimonials() {
                                     <Quote className="w-10 h-10 text-primary/30 group-hover:text-primary/50 transition-colors" />
 
                                     <p className="text-muted-foreground leading-relaxed">
-                                        "{testimonial.content}"
+                                        &quot;{testimonial.content}&quot;
                                     </p>
 
                                     <div className="flex items-center gap-4 pt-4 border-t border-white/10">

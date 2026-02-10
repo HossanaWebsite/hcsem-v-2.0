@@ -71,47 +71,48 @@ export default function HomePageSettings() {
     const [previewOpen, setPreviewOpen] = useState(false);
 
     useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch('/api/settings');
+                if (res.ok) {
+                    const data = await res.json();
+                    setSettings({
+                        ...data,
+                        logoUrl: data.logoUrl || null,
+                        heroTitle: data.heroTitle || defaults.heroTitle,
+                        heroSubtitle: data.heroSubtitle || defaults.heroSubtitle,
+                        heroImage: data.heroImage || defaults.heroImage,
+                        stats: (data.stats && data.stats.length > 0) ? data.stats : defaults.stats,
+                        tickerImages: (data.tickerImages && data.tickerImages.length > 0) ? data.tickerImages : defaults.tickerImages,
+                        eventsTitle: data.eventsTitle || defaults.eventsTitle,
+                        eventsSubtitle: data.eventsSubtitle || defaults.eventsSubtitle,
+                        galleryTitle: data.galleryTitle || defaults.galleryTitle,
+                        gallerySubtitle: data.gallerySubtitle || defaults.gallerySubtitle,
+                        galleryImages: (data.galleryImages && data.galleryImages.length > 0) ? data.galleryImages : defaults.galleryImages,
+                        upcomingEventsTitle: data.upcomingEventsTitle || defaults.upcomingEventsTitle,
+                        upcomingEventsSubtitle: data.upcomingEventsSubtitle || defaults.upcomingEventsSubtitle,
+                        defaultEvents: data.defaultEvents || defaults.defaultEvents,
+                        defaultBlogs: data.defaultBlogs || defaults.defaultBlogs,
+                        showHero: data.showHero !== undefined ? data.showHero : true,
+                        showStats: data.showStats !== undefined ? data.showStats : true,
+                        showEventsHighlight: data.showEventsHighlight !== undefined ? data.showEventsHighlight : true,
+                        showCommunityGallery: data.showCommunityGallery !== undefined ? data.showCommunityGallery : true,
+                        showUpcomingEvents: data.showUpcomingEvents !== undefined ? data.showUpcomingEvents : true
+                    });
+                } else {
+                    toast.error('Failed to load settings');
+                }
+            } catch (error) {
+                console.error(error);
+                toast.error('Error loading settings');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchSettings();
     }, []);
 
-    const fetchSettings = async () => {
-        try {
-            const res = await fetch('/api/settings');
-            if (res.ok) {
-                const data = await res.json();
-                setSettings({
-                    ...data,
-                    logoUrl: data.logoUrl || null,
-                    heroTitle: data.heroTitle || defaults.heroTitle,
-                    heroSubtitle: data.heroSubtitle || defaults.heroSubtitle,
-                    heroImage: data.heroImage || defaults.heroImage,
-                    stats: (data.stats && data.stats.length > 0) ? data.stats : defaults.stats,
-                    tickerImages: (data.tickerImages && data.tickerImages.length > 0) ? data.tickerImages : defaults.tickerImages,
-                    eventsTitle: data.eventsTitle || defaults.eventsTitle,
-                    eventsSubtitle: data.eventsSubtitle || defaults.eventsSubtitle,
-                    galleryTitle: data.galleryTitle || defaults.galleryTitle,
-                    gallerySubtitle: data.gallerySubtitle || defaults.gallerySubtitle,
-                    galleryImages: (data.galleryImages && data.galleryImages.length > 0) ? data.galleryImages : defaults.galleryImages,
-                    upcomingEventsTitle: data.upcomingEventsTitle || defaults.upcomingEventsTitle,
-                    upcomingEventsSubtitle: data.upcomingEventsSubtitle || defaults.upcomingEventsSubtitle,
-                    defaultEvents: data.defaultEvents || defaults.defaultEvents,
-                    defaultBlogs: data.defaultBlogs || defaults.defaultBlogs,
-                    showHero: data.showHero !== undefined ? data.showHero : true,
-                    showStats: data.showStats !== undefined ? data.showStats : true,
-                    showEventsHighlight: data.showEventsHighlight !== undefined ? data.showEventsHighlight : true,
-                    showCommunityGallery: data.showCommunityGallery !== undefined ? data.showCommunityGallery : true,
-                    showUpcomingEvents: data.showUpcomingEvents !== undefined ? data.showUpcomingEvents : true
-                });
-            } else {
-                toast.error('Failed to load settings');
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error('Error loading settings');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleSave = async () => {
         setSaving(true);
@@ -507,6 +508,7 @@ export default function HomePageSettings() {
                         <div className="flex gap-4 animate-scroll whitespace-nowrap">
                             {[...settings.tickerImages, ...settings.tickerImages].map((img, i) => (
                                 <div key={i} className="relative w-64 h-40 flex-shrink-0 rounded-lg overflow-hidden border border-white/10 bg-slate-950">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={img.url} className="w-full h-full object-cover" alt="Preview" />
                                     {(img.title || img.subtitle) && (
                                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
@@ -539,12 +541,16 @@ export default function HomePageSettings() {
                             className="flex gap-4 p-4 rounded-xl bg-slate-950/30 border border-white/5 group"
                         >
                             <div className="relative w-32 h-24 flex-shrink-0 rounded-lg overflow-hidden border border-white/10 bg-slate-950">
-                                <Image
-                                    src={img.url}
-                                    alt="Carousel"
-                                    fill
-                                    className="object-cover"
-                                />
+                                {img.url ? (
+                                    <Image
+                                        src={img.url}
+                                        alt="Carousel"
+                                        fill
+                                        className="object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center bg-slate-900 text-slate-500 text-xs">No Image</div>
+                                )}
                                 <button
                                     onClick={() => removeImage(index)}
                                     className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"
@@ -673,12 +679,16 @@ export default function HomePageSettings() {
                             animate={{ opacity: 1, scale: 1 }}
                             className="group relative aspect-square bg-slate-950 rounded-lg overflow-hidden border border-white/10"
                         >
-                            <Image
-                                src={img.url}
-                                alt="Gallery"
-                                fill
-                                className="object-cover"
-                            />
+                            {img.url ? (
+                                <Image
+                                    src={img.url}
+                                    alt="Gallery"
+                                    fill
+                                    className="object-cover"
+                                />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-slate-900 text-slate-500 text-xs">No Image</div>
+                            )}
                             <button
                                 onClick={() => removeGalleryImage(index)}
                                 className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"
@@ -744,7 +754,12 @@ export default function HomePageSettings() {
                         {(settings.defaultEvents || []).map((event, i) => (
                             <div key={i} className="bg-slate-950/30 border border-white/5 rounded-xl overflow-hidden group">
                                 <div className="aspect-video relative">
-                                    <Image src={event.image} alt={event.title} fill className="object-cover opacity-50" />
+                                    <Image
+                                        src={event.image || '/images/event-default.jpg'}
+                                        alt={event.title}
+                                        fill
+                                        className="object-cover opacity-50"
+                                    />
                                     <div className="absolute inset-0 bg-black/40" />
                                     <div className="absolute top-2 right-2 bg-indigo-600/50 text-[10px] text-white px-2 py-1 rounded-full backdrop-blur-sm">DEFAULT</div>
                                 </div>

@@ -13,10 +13,11 @@ const images = [
     { src: '/folder/16.jpg', span: 'row-span-1' },
 ];
 
-export default function MiniGallery() {
+export default function MiniGallery({ images: propImages }) {
+    const displayImages = (propImages && propImages.length > 0) ? propImages : images;
     return (
         <div className="grid grid-cols-2 md:grid-cols-3 auto-rows-[180px] gap-3">
-            {images.map((image, index) => (
+            {displayImages.map((image, index) => (
                 <motion.div
                     key={index}
                     initial={{ opacity: 0, scale: 0.8 }}
@@ -27,7 +28,7 @@ export default function MiniGallery() {
                     className={`relative rounded-xl overflow-hidden glass-card group cursor-pointer ${image.span}`}
                 >
                     <Image
-                        src={image.src}
+                        src={image.url || image.src || '/images/event-default.jpg'}
                         alt={`Gallery image ${index + 1}`}
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-700"

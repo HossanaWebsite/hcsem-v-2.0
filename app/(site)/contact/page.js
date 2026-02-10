@@ -10,11 +10,33 @@ import 'react-toastify/dist/ReactToastify.css';
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, Heart } from 'lucide-react';
 import DonationModal from '@/components/DonationModal';
+import PhoneInput from 'react-phone-number-input';
+import 'react-phone-number-input/style.css';
+import { useLanguage } from '@/context/LanguageContext';
 
 function ContactContent() {
     const searchParams = useSearchParams();
     const [selectedReason, setSelectedReason] = useState('');
     const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
+    const [contactReasons, setContactReasons] = useState([]);
+    const { getLocalized, language } = useLanguage();
+
+    useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch('/api/settings');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.contactReasons) {
+                        setContactReasons(data.contactReasons);
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching settings:', error);
+            }
+        };
+        fetchSettings();
+    }, []);
 
     // Check if donate query parameter is present
     useEffect(() => {
@@ -29,6 +51,7 @@ function ContactContent() {
         watch,
         formState: { errors },
         reset,
+        setValue,
     } = useForm({
         resolver: zodResolver(contactSchema),
     });
@@ -171,14 +194,25 @@ function ContactContent() {
                                     onChange={(e) => setSelectedReason(e.target.value)}
                                     className="w-full bg-background/50 border border-border rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                                 >
-                                    <option value="">Choose the reason</option>
-                                    <option>Birthday</option>
-                                    <option>Graduation</option>
-                                    <option>New baby</option>
-                                    <option>Wedding</option>
-                                    <option>Funeral</option>
-                                    <option>New Arrival (to the US)</option>
-                                    <option>Other</option>
+                                    <option value="">{language === 'am' ? 'ምክንያት ይምረጡ' : 'Choose Reason'}</option>
+                                    {contactReasons.length > 0 ? (
+                                        contactReasons.map((reason, index) => (
+                                            <option key={index} value={reason.value}>
+                                                {getLocalized(reason.label)}
+                                            </option>
+                                        ))
+                                    ) : (
+                                        <>
+                                            <option>Birthday</option>
+                                            <option>Graduation</option>
+                                            <option>New baby</option>
+                                            <option>Wedding</option>
+                                            <option>Funeral</option>
+                                            <option>New Arrival (to the US)</option>
+                                            <option>Other</option>
+                                        </>
+                                    )}
+
                                 </select>
                                 {errors.selectedReason && (
                                     <p className="text-destructive text-sm">{errors.selectedReason.message}</p>
@@ -306,13 +340,16 @@ function ContactContent() {
                                     )}
                                 </div>
                                 <div className="space-y-3">
-                                    <label className="text-sm font-medium">Phone (123-456-7890)</label>
-                                    <input
-                                        type="tel"
-                                        placeholder="Phone (123-456-7890)"
-                                        {...register('phone')}
-                                        className="w-full bg-background/50 border border-border rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                                    />
+                                    <label className="text-sm font-medium">Phone</label>
+                                    <div className="phone-input-container">
+                                        <PhoneInput
+                                            placeholder="Enter phone number"
+                                            defaultCountry="US"
+                                            value={watch('phone')}
+                                            onChange={(value) => setValue('phone', value)}
+                                            className="phone-input-container w-full bg-background/50 border border-border rounded-lg p-4 focus-within:ring-2 focus-within:ring-primary/50 transition-all flex gap-2"
+                                        />
+                                    </div>
                                     {errors.phone && (
                                         <p className="text-destructive text-sm">{errors.phone.message}</p>
                                     )}

@@ -7,11 +7,6 @@ export default function AdminMessagesPage() {
     const [messages, setMessages] = useState([]);
     const [selectedMessage, setSelectedMessage] = useState(null);
 
-    useEffect(() => {
-        // In a real app, fetch from API
-        // For now, placeholder
-        setMessages([]);
-    }, []);
 
     return (
         <div className="space-y-6">

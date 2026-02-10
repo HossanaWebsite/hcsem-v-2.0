@@ -82,7 +82,16 @@ const SiteSettingsSchema = new mongoose.Schema({
     contactOfficeHours: String,
     contactAddress: String,
     contactPhone: String,
+    contactPhone: String,
     contactEmail: String,
+
+    // Dynamic Contact Reasons
+    contactReasons: [
+        {
+            value: String, // The value stored (usually English)
+            label: { type: mongoose.Schema.Types.Mixed }, // { en: String, am: String }
+        }
+    ],
 
     // Home Page Additional Sections
     galleryTitle: String,

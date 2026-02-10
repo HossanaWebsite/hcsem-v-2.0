@@ -96,4 +96,17 @@
   .container-spacing {
     @apply px-8 md:px-12 lg:px-16;
   }
+
+  /* Phone Input Customization */
+  .phone-input-container .PhoneInputInput {
+    @apply bg-transparent outline-none border-none text-foreground placeholder:text-muted-foreground;
+  }
+
+  .phone-input-container .PhoneInputCountry {
+    @apply mr-2 opacity-80 hover:opacity-100 transition-opacity;
+  }
+
+  .phone-input-container .PhoneInputCountrySelect {
+    @apply bg-background text-foreground;
+  }
 }

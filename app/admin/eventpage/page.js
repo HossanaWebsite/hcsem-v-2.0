@@ -106,41 +106,41 @@ export default function EventsContentPage() {
     });
 
     useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch('/api/settings');
+                if (res.ok) {
+                    const data = await res.json();
+                    setSettings({
+                        ...data,
+                        eventsPageTitle: data.eventsPageTitle || defaults.eventsPageTitle,
+                        eventsPageSubtitle: data.eventsPageSubtitle || defaults.eventsPageSubtitle,
+                        eventsPageImage: data.eventsPageImage || defaults.eventsPageImage,
+                        eventsVideoTitle: data.eventsVideoTitle || defaults.eventsVideoTitle,
+                        eventsVideoSubtitle: data.eventsVideoSubtitle || defaults.eventsVideoSubtitle,
+                        eventsGalleryTitle: data.eventsGalleryTitle || defaults.eventsGalleryTitle,
+                        eventsGallerySubtitle: data.eventsGallerySubtitle || defaults.eventsGallerySubtitle,
+                        eventsGalleryImages: (data.eventsGalleryImages && data.eventsGalleryImages.length > 0) ? data.eventsGalleryImages : defaults.eventsGalleryImages,
+                        eventsVideoUrl: data.eventsVideoUrl || defaults.eventsVideoUrl,
+                        walkthroughTitle: data.walkthroughTitle || defaults.walkthroughTitle,
+                        walkthroughSubtitle: data.walkthroughSubtitle || defaults.walkthroughSubtitle,
+                        walkthroughItems: (data.walkthroughItems && data.walkthroughItems.length > 0) ? data.walkthroughItems : defaults.walkthroughItems,
+                        showEventsHeader: data.showEventsHeader !== undefined ? data.showEventsHeader : true,
+                        showEventsVideo: data.showEventsVideo !== undefined ? data.showEventsVideo : true,
+                        showEventsGallery: data.showEventsGallery !== undefined ? data.showEventsGallery : true,
+                        showWalkthrough: data.showWalkthrough !== undefined ? data.showWalkthrough : true
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+                toast.error('Error loading settings');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchSettings();
     }, []);
-
-    const fetchSettings = async () => {
-        try {
-            const res = await fetch('/api/settings');
-            if (res.ok) {
-                const data = await res.json();
-                setSettings({
-                    ...data,
-                    eventsPageTitle: data.eventsPageTitle || defaults.eventsPageTitle,
-                    eventsPageSubtitle: data.eventsPageSubtitle || defaults.eventsPageSubtitle,
-                    eventsPageImage: data.eventsPageImage || defaults.eventsPageImage,
-                    eventsVideoTitle: data.eventsVideoTitle || defaults.eventsVideoTitle,
-                    eventsVideoSubtitle: data.eventsVideoSubtitle || defaults.eventsVideoSubtitle,
-                    eventsGalleryTitle: data.eventsGalleryTitle || defaults.eventsGalleryTitle,
-                    eventsGallerySubtitle: data.eventsGallerySubtitle || defaults.eventsGallerySubtitle,
-                    eventsGalleryImages: (data.eventsGalleryImages && data.eventsGalleryImages.length > 0) ? data.eventsGalleryImages : defaults.eventsGalleryImages,
-                    eventsVideoUrl: data.eventsVideoUrl || defaults.eventsVideoUrl,
-                    walkthroughTitle: data.walkthroughTitle || defaults.walkthroughTitle,
-                    walkthroughSubtitle: data.walkthroughSubtitle || defaults.walkthroughSubtitle,
-                    walkthroughItems: (data.walkthroughItems && data.walkthroughItems.length > 0) ? data.walkthroughItems : defaults.walkthroughItems,
-                    showEventsHeader: data.showEventsHeader !== undefined ? data.showEventsHeader : true,
-                    showEventsVideo: data.showEventsVideo !== undefined ? data.showEventsVideo : true,
-                    showEventsGallery: data.showEventsGallery !== undefined ? data.showEventsGallery : true,
-                    showWalkthrough: data.showWalkthrough !== undefined ? data.showWalkthrough : true
-                });
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error('Error loading settings');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleSave = async () => {
         setSaving(true);

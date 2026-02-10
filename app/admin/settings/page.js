@@ -40,30 +40,31 @@ export default function SettingsPage() {
     const [previewOpen, setPreviewOpen] = useState(false);
 
     useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch('/api/settings');
+                if (res.ok) {
+                    const data = await res.json();
+                    setSettings({
+                        ...data,
+                        heroImage: data.heroImage || '',
+                        stats: data.stats || [],
+                        tickerImages: data.tickerImages || []
+                    });
+                } else {
+                    toast.error('Failed to load settings');
+                }
+            } catch (error) {
+                console.error(error);
+                toast.error('Error loading settings');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchSettings();
     }, []);
 
-    const fetchSettings = async () => {
-        try {
-            const res = await fetch('/api/settings');
-            if (res.ok) {
-                const data = await res.json();
-                setSettings({
-                    ...data,
-                    heroImage: data.heroImage || '',
-                    stats: data.stats || [],
-                    tickerImages: data.tickerImages || []
-                });
-            } else {
-                toast.error('Failed to load settings');
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error('Error loading settings');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleSave = async () => {
         setSaving(true);
