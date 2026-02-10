@@ -4,11 +4,25 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Calendar, Clock, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import RoomWalkthrough from '@/components/RoomWalkthrough';
-import InfiniteScroll from '@/components/InfiniteScroll';
-import VideoSection from '@/components/VideoSection';
-import LargeGallery from '@/components/LargeGallery';
-import PhotoTicker from '@/components/PhotoTicker';
+import Image from 'next/image';
+import dynamic from 'next/dynamic';
+
+// Dynamic imports for heavy components to reduce initial bundle size
+const RoomWalkthrough = dynamic(() => import('@/components/RoomWalkthrough'), {
+    loading: () => <div className="h-96 animate-pulse bg-muted/20 rounded-3xl" />
+});
+const InfiniteScroll = dynamic(() => import('@/components/InfiniteScroll'), {
+    loading: () => <div className="h-96 animate-pulse bg-muted/20 rounded-3xl" />
+});
+const VideoSection = dynamic(() => import('@/components/VideoSection'), {
+    loading: () => <div className="h-96 animate-pulse bg-muted/20 rounded-3xl" />
+});
+const LargeGallery = dynamic(() => import('@/components/LargeGallery'), {
+    loading: () => <div className="h-96 animate-pulse bg-muted/20 rounded-3xl" />
+});
+const PhotoTicker = dynamic(() => import('@/components/PhotoTicker'), {
+    loading: () => <div className="h-32 animate-pulse bg-muted/20" />
+});
 
 export default function EventsPage() {
     const [events, setEvents] = useState([]);
@@ -140,11 +154,12 @@ export default function EventsPage() {
                                     >
                                         {event.coverImage ? (
                                             <>
-                                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img
+                                                <Image
                                                     src={event.coverImage}
                                                     alt={event.title}
-                                                    className="w-full h-full object-cover"
+                                                    fill
+                                                    sizes="(max-width: 1024px) 100vw, 50vw"
+                                                    className="object-cover"
                                                 />
                                             </>
                                         ) : (
@@ -319,7 +334,7 @@ export default function EventsPage() {
                     className="max-w-4xl mx-auto text-center space-y-8"
                 >
                     <h2 className="text-4xl md:text-5xl font-heading font-bold">
-                        Don't miss out on our events
+                        Don&apos;t miss out on our events
                     </h2>
                     <p className="text-xl text-muted-foreground">
                         Stay connected with our community and never miss an event.

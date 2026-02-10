@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Plus, Trash2, Image as ImageIcon, Type, Columns, Save, ArrowUp, ArrowDown, Grid3x3, Columns3 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -160,7 +161,9 @@ export default function BlogEditor({ initialData = {}, onSave }) {
                                         placeholder="Image URL"
                                     />
                                     {block.content && (
-                                        <img src={block.content} alt="Preview" className="max-h-80 rounded-lg object-cover w-full" />
+                                        <div className="relative aspect-video rounded-lg overflow-hidden">
+                                            <Image src={block.content} alt="Preview" fill sizes="(max-width: 1536px) 100vw, 1536px" className="object-cover" />
+                                        </div>
                                     )}
                                 </div>
                             )}
@@ -182,7 +185,9 @@ export default function BlogEditor({ initialData = {}, onSave }) {
                                             placeholder="Image URL"
                                         />
                                         {block.content.image && (
-                                            <img src={block.content.image} alt="Preview" className="rounded-lg object-cover w-full h-48" />
+                                            <div className="relative h-48 rounded-lg overflow-hidden">
+                                                <Image src={block.content.image} alt="Preview" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+                                            </div>
                                         )}
                                     </div>
                                 </div>
@@ -224,7 +229,9 @@ export default function BlogEditor({ initialData = {}, onSave }) {
                                             placeholder="Left image URL"
                                         />
                                         {block.content.left && (
-                                            <img src={block.content.left} alt="Left" className="rounded-lg object-cover w-full h-48" />
+                                            <div className="relative h-48 rounded-lg overflow-hidden">
+                                                <Image src={block.content.left} alt="Left" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+                                            </div>
                                         )}
                                     </div>
                                     <div className="space-y-3">
@@ -236,7 +243,9 @@ export default function BlogEditor({ initialData = {}, onSave }) {
                                             placeholder="Right image URL"
                                         />
                                         {block.content.right && (
-                                            <img src={block.content.right} alt="Right" className="rounded-lg object-cover w-full h-48" />
+                                            <div className="relative h-48 rounded-lg overflow-hidden">
+                                                <Image src={block.content.right} alt="Right" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+                                            </div>
                                         )}
                                     </div>
                                 </div>

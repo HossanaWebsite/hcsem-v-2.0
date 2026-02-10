@@ -28,7 +28,7 @@ export default function MiniGallery({ images: propImages }) {
                     className={`relative rounded-xl overflow-hidden glass-card group cursor-pointer ${image.span}`}
                 >
                     <Image
-                        src={image.url || image.src || '/images/event-default.jpg'}
+                        src={image.url || image.src || '/event-placeholder.png'}
                         alt={`Gallery image ${index + 1}`}
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-700"

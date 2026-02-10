@@ -44,6 +44,7 @@
   "devDependencies": {
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
-    "lorem-ipsum": "^2.0.8"
+    "lorem-ipsum": "^2.0.8",
+    "typescript": "^5.9.3"
   }
 }

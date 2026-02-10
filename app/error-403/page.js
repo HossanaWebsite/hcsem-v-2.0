@@ -34,7 +34,7 @@ export default function Error403() {
                         Access Forbidden
                     </h2>
                     <p className="text-xl text-muted-foreground max-w-md mx-auto">
-                        You don't have permission to access this resource. Please contact an administrator if you believe this is an error.
+                        You don&apos;t have permission to access this resource. Please contact an administrator if you believe this is an error.
                     </p>
                 </motion.div>
 

@@ -3,12 +3,21 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
-import InfiniteScroll from '@/components/InfiniteScroll';
-import MiniGallery from '@/components/MiniGallery';
-import DonationModal from '@/components/DonationModal';
+import dynamic from 'next/dynamic';
 
-import PhotoTicker from '@/components/PhotoTicker';
+// Dynamic imports for heavy components to reduce initial bundle size
+const InfiniteScroll = dynamic(() => import('@/components/InfiniteScroll'), {
+  loading: () => <div className="h-96 animate-pulse bg-muted/20 rounded-3xl" />
+});
+const MiniGallery = dynamic(() => import('@/components/MiniGallery'), {
+  loading: () => <div className="h-96 animate-pulse bg-muted/20 rounded-3xl" />
+});
+const DonationModal = dynamic(() => import('@/components/DonationModal'));
+const PhotoTicker = dynamic(() => import('@/components/PhotoTicker'), {
+  loading: () => <div className="h-32 animate-pulse bg-muted/20" />
+});
 
 export default function HomePage() {
   const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
@@ -281,10 +290,12 @@ export default function HomePage() {
                   className="glass-card overflow-hidden group cursor-pointer"
                 >
                   <div className="h-56 relative overflow-hidden">
-                    <img
-                      src={event.image || event.coverImage || '/images/event-default.jpg'}
+                    <Image
+                      src={event.image || event.coverImage || '/event-placeholder.png'}
                       alt={event.title}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                     <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold">
@@ -348,10 +359,12 @@ export default function HomePage() {
                 className="glass-card overflow-hidden group cursor-pointer"
               >
                 <div className="h-72 relative overflow-hidden">
-                  <img
-                    src={post.image || post.coverImage || '/images/event-default.jpg'}
+                  <Image
+                    src={post.image || post.coverImage || '/blog-placeholder.png'}
                     alt={post.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 </div>

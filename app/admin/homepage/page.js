@@ -508,8 +508,7 @@ export default function HomePageSettings() {
                         <div className="flex gap-4 animate-scroll whitespace-nowrap">
                             {[...settings.tickerImages, ...settings.tickerImages].map((img, i) => (
                                 <div key={i} className="relative w-64 h-40 flex-shrink-0 rounded-lg overflow-hidden border border-white/10 bg-slate-950">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img src={img.url} className="w-full h-full object-cover" alt="Preview" />
+                                    <Image src={img.url} fill sizes="256px" className="object-cover" alt="Preview" />
                                     {(img.title || img.subtitle) && (
                                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
                                             {img.title && <p className="text-white font-medium text-sm">{img.title}</p>}
@@ -607,7 +606,7 @@ export default function HomePageSettings() {
 
                     {settings.tickerImages.length === 0 && (
                         <div className="text-center py-12 text-slate-500 italic bg-slate-950/20 rounded-xl border border-dashed border-white/10">
-                            No carousel images uploaded. Click "Upload Images" to add photos.
+                            No carousel images uploaded. Click &quot;Upload Images&quot; to add photos.
                         </div>
                     )}
                 </div>
@@ -705,7 +704,7 @@ export default function HomePageSettings() {
 
                 {settings.galleryImages.length === 0 && (
                     <div className="text-center py-12 text-slate-500 italic bg-slate-950/20 rounded-xl border border-dashed border-white/10">
-                        No gallery images uploaded. Click "Upload Images" to add photos.
+                        No gallery images uploaded. Click &quot;Upload Images&quot; to add photos.
                     </div>
                 )}
             </section>
@@ -755,7 +754,7 @@ export default function HomePageSettings() {
                             <div key={i} className="bg-slate-950/30 border border-white/5 rounded-xl overflow-hidden group">
                                 <div className="aspect-video relative">
                                     <Image
-                                        src={event.image || '/images/event-default.jpg'}
+                                        src={event.image || '/event-placeholder.png'}
                                         alt={event.title}
                                         fill
                                         className="object-cover opacity-50"

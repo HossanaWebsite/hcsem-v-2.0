@@ -26,7 +26,7 @@ export default function Error500() {
                         Server Error
                     </h2>
                     <p className="text-xl text-muted-foreground max-w-md mx-auto">
-                        Oops! Something went wrong on our end. We're working to fix it. Please try again later.
+                        Oops! Something went wrong on our end. We&apos;re working to fix it. Please try again later.
                     </p>
                 </motion.div>
 

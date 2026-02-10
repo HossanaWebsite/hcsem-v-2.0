@@ -5,6 +5,9 @@ import { logAction } from '@/lib/logger';
 
 import { getCurrentUser } from '@/lib/auth';
 
+// Cache events for 20 seconds to reduce database load
+export const revalidate = 20;
+
 export async function GET(req) {
     try {
         await dbConnect();
@@ -16,7 +19,7 @@ export async function GET(req) {
         const isAdmin = user && (user.role?.name === 'Admin' || user.role?.permissions?.includes('manage_events'));
 
         if (id) {
-            const event = await Event.findById(id);
+            const event = await Event.findById(id).lean();
             if (!event) throw new Error('Event not found');
             // Assuming Event model has isHidden field, if not we might strictly rely on date or add it.
             // The previous code in page.js didn't show isHidden for events, but user asked for it. 
@@ -31,7 +34,7 @@ export async function GET(req) {
         // Typically admin sees all. Public sees future (and maybe past in archive).
         // Let's stick to isHidden logic first.
         const query = isAdmin ? {} : { isHidden: { $ne: true } };
-        const events = await Event.find(query).sort({ date: 1 });
+        const events = await Event.find(query).sort({ date: 1 }).lean();
         return handleSuccess(events);
     } catch (error) {
         return handleError(error, req);

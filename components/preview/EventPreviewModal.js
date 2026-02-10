@@ -1,6 +1,7 @@
 'use client';
 
 import { X, Calendar, MapPin, Clock } from 'lucide-react';
+import Image from 'next/image';
 import React from 'react';
 
 export default function EventPreviewModal({ isOpen, onClose, event }) {
@@ -31,11 +32,15 @@ export default function EventPreviewModal({ isOpen, onClose, event }) {
                         <div className="space-y-4">
                             <div className="rounded-2xl overflow-hidden aspect-[4/3] shadow-2xl bg-slate-100 dark:bg-slate-800">
                                 {event.coverImage ? (
-                                    <img
-                                        src={event.coverImage}
-                                        alt={event.title}
-                                        className="w-full h-full object-cover"
-                                    />
+                                    <div className="relative w-full h-full">
+                                        <Image
+                                            src={event.coverImage}
+                                            alt={event.title}
+                                            fill
+                                            sizes="(max-width: 768px) 100vw, 50vw"
+                                            className="object-cover"
+                                        />
+                                    </div>
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-slate-400">
                                         <Calendar className="w-16 h-16 opacity-50" />

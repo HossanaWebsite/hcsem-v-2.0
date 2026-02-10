@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import dbConnect from '@/lib/db';
 import { Blog, SiteSettings } from '@/models';
 import { Calendar, User } from 'lucide-react';
@@ -52,10 +53,12 @@ export default async function BlogPage() {
                             <div className="glass-card h-full overflow-hidden flex flex-col">
                                 <div className="h-48 bg-muted relative overflow-hidden">
                                     {(blog.coverImage || blog.image) ? (
-                                        <img
+                                        <Image
                                             src={blog.coverImage || blog.image}
                                             alt={blog.title}
-                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            fill
+                                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                            className="object-cover transition-transform duration-500 group-hover:scale-110"
                                         />
                                     ) : (
                                         <div className="w-full h-full bg-gradient-to-br from-primary/20 to-purple-500/20" />

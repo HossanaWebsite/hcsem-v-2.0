@@ -349,7 +349,7 @@ export default function SettingsPage() {
 
                             {settings.stats.length === 0 && (
                                 <div className="text-center py-8 text-slate-500 italic bg-slate-950/20 rounded-xl border border-dashed border-white/10">
-                                    No stats added yet. Click "Add Stat" to get started. Default stats will be shown on home page if left empty.
+                                    No stats added yet. Click &quot;Add Stat&quot; to get started. Default stats will be shown on home page if left empty.
                                 </div>
                             )}
                         </div>
@@ -392,7 +392,7 @@ export default function SettingsPage() {
                                 <div className="flex gap-4 animate-scroll whitespace-nowrap">
                                     {[...settings.tickerImages, ...settings.tickerImages, ...settings.tickerImages].map((img, i) => (
                                         <div key={i} className="relative w-48 h-28 flex-shrink-0 rounded-lg overflow-hidden border border-white/10">
-                                            <img src={img.url} className="w-full h-full object-cover" alt="Preview" />
+                                            <Image src={img.url} fill sizes="192px" className="object-cover" alt="Preview" />
                                         </div>
                                     ))}
                                 </div>

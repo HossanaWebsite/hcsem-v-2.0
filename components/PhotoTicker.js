@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 
 const PhotoTicker = ({ images }) => {
     if (!images || images.length === 0) return null;
@@ -11,10 +12,12 @@ const PhotoTicker = ({ images }) => {
                 {/* Triplicate for smooth infinite scroll */}
                 {[...images, ...images, ...images].map((img, i) => (
                     <div key={i} className="relative w-64 h-40 flex-shrink-0 rounded-lg overflow-hidden border border-white/10 mx-2 glass-card group cursor-pointer">
-                        <img
+                        <Image
                             src={img.url}
                             alt={img.title || "Gallery Image"}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                            fill
+                            sizes="256px"
+                            className="object-cover group-hover:scale-110 transition-transform duration-500"
                         />
                         {(img.title || img.subtitle) && (
                             <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/90 via-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">

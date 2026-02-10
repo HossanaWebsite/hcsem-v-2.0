@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import dbConnect from '@/lib/db';
 import { Blog } from '@/models';
 import { Calendar, User, ArrowLeft } from 'lucide-react';
@@ -58,7 +59,7 @@ export default async function BlogDetailPage({ params }) {
                     </h1>
                     {blog.coverImage && (
                         <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
-                            <img src={blog.coverImage} alt={blog.title} className="w-full h-full object-cover" />
+                            <Image src={blog.coverImage} alt={blog.title} fill sizes="(max-width: 1536px) 100vw, 1536px" className="object-cover" />
                         </div>
                     )}
                 </header>
@@ -78,8 +79,8 @@ export default async function BlogDetailPage({ params }) {
 
                                 {/* Single Image */}
                                 {block.type === 'image' && (
-                                    <div className="rounded-2xl overflow-hidden shadow-xl">
-                                        <img src={block.content} alt="" className="w-full h-auto" />
+                                    <div className="relative aspect-video rounded-2xl overflow-hidden shadow-xl">
+                                        <Image src={block.content} alt="" fill sizes="(max-width: 1536px) 100vw, 1536px" className="object-cover" />
                                     </div>
                                 )}
 
@@ -89,8 +90,8 @@ export default async function BlogDetailPage({ params }) {
                                         <div className="prose prose-lg dark:prose-invert">
                                             <p className="whitespace-pre-wrap leading-relaxed">{block.content.text}</p>
                                         </div>
-                                        <div className="rounded-2xl overflow-hidden shadow-xl">
-                                            <img src={block.content.image} alt="" className="w-full h-full object-cover" />
+                                        <div className="relative aspect-square rounded-2xl overflow-hidden shadow-xl">
+                                            <Image src={block.content.image} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
                                         </div>
                                     </div>
                                 )}
@@ -110,11 +111,11 @@ export default async function BlogDetailPage({ params }) {
                                 {/* Parallel Images (2 Columns) */}
                                 {block.type === 'parallel-images' && (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                        <div className="rounded-2xl overflow-hidden shadow-xl">
-                                            <img src={block.content.left} alt="" className="w-full h-full object-cover" />
+                                        <div className="relative aspect-square rounded-2xl overflow-hidden shadow-xl">
+                                            <Image src={block.content.left} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
                                         </div>
-                                        <div className="rounded-2xl overflow-hidden shadow-xl">
-                                            <img src={block.content.right} alt="" className="w-full h-full object-cover" />
+                                        <div className="relative aspect-square rounded-2xl overflow-hidden shadow-xl">
+                                            <Image src={block.content.right} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
                                         </div>
                                     </div>
                                 )}

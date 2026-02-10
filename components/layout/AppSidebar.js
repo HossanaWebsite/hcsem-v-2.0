@@ -248,8 +248,7 @@ const AppSidebar = () => {
                 <Link href="/" className="flex items-center gap-4 group">
                     {logoUrl ? (
                         <div className="relative w-10 h-10 group-hover:scale-110 transition-transform">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img src={logoUrl} alt="Logo" className="object-contain w-full h-full" />
+                            <Image src={logoUrl} alt="Logo" fill sizes="40px" className="object-contain" />
                         </div>
                     ) : (
                         <div className="w-10 h-10 bg-indigo-500 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform">

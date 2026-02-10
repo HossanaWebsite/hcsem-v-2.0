@@ -55,7 +55,7 @@ export default function Events() {
                     </h2>
 
                     <p className="text-lg text-muted-foreground">
-                        From cultural celebrations to educational workshops, there's always something happening in our community.
+                        From cultural celebrations to educational workshops, there&apos;s always something happening in our community.
                     </p>
                 </motion.div>
 

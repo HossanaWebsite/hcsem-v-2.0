@@ -1,4 +1,5 @@
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 import dbConnect from '@/lib/db';
 import { Event } from '@/models';
 import { Calendar, MapPin, ArrowLeft, Clock } from 'lucide-react';
@@ -53,7 +54,7 @@ export default async function EventDetailPage({ params }) {
                     </h1>
                     {event.coverImage && (
                         <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
-                            <img src={event.coverImage} alt={event.title} className="w-full h-full object-cover" />
+                            <Image src={event.coverImage} alt={event.title} fill sizes="(max-width: 1536px) 100vw, 1536px" className="object-cover" />
                         </div>
                     )}
                 </header>
@@ -68,8 +69,8 @@ export default async function EventDetailPage({ params }) {
                             <h3 className="text-3xl font-bold font-heading">Gallery</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {event.gallery.map((img, idx) => (
-                                    <div key={idx} className="rounded-xl overflow-hidden shadow-lg h-64">
-                                        <img src={img} alt={`Gallery ${idx + 1}`} className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+                                    <div key={idx} className="relative rounded-xl overflow-hidden shadow-lg h-64">
+                                        <Image src={img} alt={`Gallery ${idx + 1}`} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover hover:scale-105 transition-transform duration-500" />
                                     </div>
                                 ))}
                             </div>

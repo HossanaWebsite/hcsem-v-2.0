@@ -6,6 +6,9 @@ import { NextResponse } from 'next/server';
 
 import { getCurrentUser } from '@/lib/auth';
 
+// Cache blogs for 20 seconds to reduce database load
+export const revalidate = 20;
+
 export async function GET(req) {
     try {
         await dbConnect();
@@ -17,14 +20,14 @@ export async function GET(req) {
         const isAdmin = user && (user.role?.name === 'Admin' || user.role?.permissions?.includes('manage_blogs'));
 
         if (id) {
-            const blog = await Blog.findById(id).populate('author', 'fullName');
+            const blog = await Blog.findById(id).populate('author', 'fullName').lean();
             if (!blog) throw new Error('Blog not found');
             if (blog.isHidden && !isAdmin) throw new Error('Blog not found'); // Hide from public if hidden
             return handleSuccess(blog);
         }
 
         const query = isAdmin ? {} : { isHidden: { $ne: true } };
-        const blogs = await Blog.find(query).sort({ updatedAt: -1 }).populate('author', 'fullName');
+        const blogs = await Blog.find(query).sort({ updatedAt: -1 }).populate('author', 'fullName').lean();
         return handleSuccess(blogs);
     } catch (error) {
         return handleError(error, req);

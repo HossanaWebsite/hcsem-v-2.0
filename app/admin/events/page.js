@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import { Plus, Edit, Trash, Calendar } from 'lucide-react';
 import 'react-quill-new/dist/quill.snow.css';
 import EventPreviewModal from '@/components/preview/EventPreviewModal';
@@ -162,9 +163,9 @@ export default function EventsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {events.map(event => (
                     <div key={event._id} className="glass-panel border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/50 rounded-2xl shadow-sm overflow-hidden group">
-                        <div className="h-48 bg-slate-200 dark:bg-slate-800 relative overflow-hidden">
+                        <div className="relative h-48 bg-slate-200 dark:bg-slate-800 overflow-hidden">
                             {event.coverImage ? (
-                                <img src={event.coverImage} alt={event.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" onError={(e) => e.target.src = 'https://placehold.co/600x400'} />
+                                <Image src={event.coverImage} alt={event.title} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover transition-transform duration-500 group-hover:scale-110" onError={(e) => { e.currentTarget.src = 'https://placehold.co/600x400'; }} />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center text-slate-400">
                                     <Calendar className="w-12 h-12" />

@@ -20,7 +20,9 @@ export default function Navbar() {
     const { language, setLanguage } = useLanguage();
 
     useEffect(() => {
-        setMounted(true)
+        // Set mounted state
+        setMounted(true);
+
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 50)
         }
@@ -31,12 +33,15 @@ export default function Navbar() {
                 const res = await fetch('/api/settings');
                 if (res.ok) {
                     const data = await res.json();
-                    if (data.logoUrl) setLogoUrl(data.logoUrl);
+                    if (data.logoUrl) {
+                        setLogoUrl(data.logoUrl);
+                    }
                 }
             } catch (error) {
-                console.error("Failed to fetch settings for navbar logo", error);
+                console.error('Failed to fetch logo:', error);
             }
         };
+
         fetchSettings();
 
         return () => window.removeEventListener("scroll", handleScroll)

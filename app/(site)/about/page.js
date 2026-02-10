@@ -2,6 +2,7 @@
 
 import { motion, useScroll } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { Heart, Users, Lightbulb, Target, Shield, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -115,12 +116,14 @@ export default function AboutPage() {
                                     whileInView={{ opacity: 1, scale: 1 }}
                                     viewport={{ once: true }}
                                     transition={{ duration: 0.8, delay: 0.2 }}
-                                    className="h-96 rounded-3xl overflow-hidden glass-card"
+                                    className="relative h-96 rounded-3xl overflow-hidden glass-card"
                                 >
-                                    <img
+                                    <Image
                                         src={settings.aboutMissionImage || "/about-mission.png"}
                                         alt="Our Mission"
-                                        className="w-full h-full object-cover"
+                                        fill
+                                        sizes="(max-width: 1024px) 100vw, 50vw"
+                                        className="object-cover"
                                     />
                                 </motion.div>
                             </motion.div>
@@ -140,12 +143,14 @@ export default function AboutPage() {
                                     whileInView={{ opacity: 1, scale: 1 }}
                                     viewport={{ once: true }}
                                     transition={{ duration: 0.8, delay: 0.2 }}
-                                    className="h-96 rounded-3xl overflow-hidden glass-card order-2 lg:order-1"
+                                    className="relative h-96 rounded-3xl overflow-hidden glass-card order-2 lg:order-1"
                                 >
-                                    <img
+                                    <Image
                                         src={settings.aboutVisionImage || "/about-vision.png"}
                                         alt="Our Vision"
-                                        className="w-full h-full object-cover"
+                                        fill
+                                        sizes="(max-width: 1024px) 100vw, 50vw"
+                                        className="object-cover"
                                     />
                                 </motion.div>
                                 <div className="space-y-6 order-1 lg:order-2">

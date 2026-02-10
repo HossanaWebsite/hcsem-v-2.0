@@ -4,6 +4,9 @@ import { SiteSettings } from '@/models';
 import fs from 'fs/promises';
 import path from 'path';
 
+// Cache settings for 30 seconds to reduce database load
+export const revalidate = 30;
+
 // Helper to read fallback JSON
 async function getFallbackSettings() {
     try {
@@ -33,8 +36,8 @@ export async function GET() {
         // Fetch fallback first
         const fallback = await getFallbackSettings();
 
-        // Try to fetch from DB
-        let settings = await SiteSettings.findOne().sort({ updatedAt: -1 });
+        // Try to fetch from DB with .lean() for faster JSON serialization
+        let settings = await SiteSettings.findOne().sort({ updatedAt: -1 }).lean();
 
         if (!settings) {
             console.log('No settings in DB, using fallback');

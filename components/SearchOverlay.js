@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function SearchOverlay({ isOpen, onClose }) {
     const [searchQuery, setSearchQuery] = useState('');
@@ -170,7 +171,7 @@ export default function SearchOverlay({ isOpen, onClose }) {
                                 ) : results.length === 0 ? (
                                     /* No Results */
                                     <div className="text-center py-20">
-                                        <p className="text-lg text-muted-foreground">No results for "{searchQuery}"</p>
+                                        <p className="text-lg text-muted-foreground">No results for &quot;{searchQuery}&quot;</p>
                                     </div>
                                 ) : (
                                     /* Results */
@@ -189,8 +190,8 @@ export default function SearchOverlay({ isOpen, onClose }) {
                                                 >
                                                     <div className="flex items-start gap-4">
                                                         {result.avatar && (
-                                                            <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-800">
-                                                                <img src={result.avatar} alt="" className="w-full h-full object-cover" />
+                                                            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-slate-800">
+                                                                <Image src={result.avatar} alt="" fill sizes="40px" className="object-cover" />
                                                             </div>
                                                         )}
                                                         <div className="flex-1">

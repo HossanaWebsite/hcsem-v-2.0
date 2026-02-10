@@ -55,7 +55,7 @@ export default function About() {
                         </p>
 
                         <p className="text-lg text-muted-foreground leading-relaxed">
-                            Since our founding, we've brought together families, organized cultural events, and provided essential support services to help our community thrive in their new home while maintaining strong ties to our roots.
+                            Since our founding, we&apos;ve brought together families, organized cultural events, and provided essential support services to help our community thrive in their new home while maintaining strong ties to our roots.
                         </p>
 
                         <div className="grid grid-cols-2 gap-6 pt-6">

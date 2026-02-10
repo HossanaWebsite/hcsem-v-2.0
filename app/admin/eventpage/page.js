@@ -498,7 +498,7 @@ export default function EventsContentPage() {
 
                 {settings.eventsGalleryImages.length === 0 && (
                     <div className="text-center py-12 text-slate-500 italic bg-slate-950/20 rounded-xl border border-dashed border-white/10">
-                        No gallery images uploaded. Click "Upload Images" to add photos.
+                        No gallery images uploaded. Click &quot;Upload Images&quot; to add photos.
                     </div>
                 )}
             </section>

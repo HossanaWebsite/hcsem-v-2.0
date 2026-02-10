@@ -1,6 +1,7 @@
 'use client';
 
 import { X, Calendar, User, Clock } from 'lucide-react';
+import Image from 'next/image';
 import React from 'react';
 
 export default function BlogPreviewModal({ isOpen, onClose, blog }) {
@@ -46,11 +47,13 @@ export default function BlogPreviewModal({ isOpen, onClose, blog }) {
 
                     {/* Cover Image */}
                     {blog.coverImage && (
-                        <div className="rounded-2xl overflow-hidden aspect-video shadow-2xl">
-                            <img
+                        <div className="relative rounded-2xl overflow-hidden aspect-video shadow-2xl">
+                            <Image
                                 src={blog.coverImage}
                                 alt={blog.title}
-                                className="w-full h-full object-cover"
+                                fill
+                                sizes="(max-width: 1536px) 100vw, 1536px"
+                                className="object-cover"
                             />
                         </div>
                     )}
