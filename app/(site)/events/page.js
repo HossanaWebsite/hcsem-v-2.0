@@ -139,16 +139,18 @@ export default function EventsPage() {
                                         className={`relative h-96 rounded-3xl overflow-hidden ${!isEven ? 'lg:col-start-2' : ''}`}
                                     >
                                         {event.coverImage ? (
-                                            {/* eslint-disable-next-line @next/next/no-img-element */ }
-                                            < img
-                                                src={event.coverImage}
-                                        alt={event.title}
-                                        className="w-full h-full object-cover"
-                                            />
+                                            <>
+                                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img
+                                                    src={event.coverImage}
+                                                    alt={event.title}
+                                                    className="w-full h-full object-cover"
+                                                />
+                                            </>
                                         ) : (
-                                        <div className="w-full h-full bg-gradient-to-br from-primary via-orange-500 to-amber-500 flex items-center justify-center">
-                                            <Calendar className="w-24 h-24 text-foreground/30" />
-                                        </div>
+                                            <div className="w-full h-full bg-gradient-to-br from-primary via-orange-500 to-amber-500 flex items-center justify-center">
+                                                <Calendar className="w-24 h-24 text-foreground/30" />
+                                            </div>
                                         )}
                                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                                     </motion.div>
