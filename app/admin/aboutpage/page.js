@@ -6,18 +6,25 @@ import { Save, Upload, Loader2, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Image from 'next/image';
 
-export default function AboutContentPage() {
-    const defaults = {
-        aboutPageTitle: { en: "About HCSEM", am: "ስለ HCSEM" },
-        aboutPageSubtitle: { en: "Connecting Ethiopians, preserving culture, building a stronger community in Minnesota", am: "ኢትዮጵያውያንን ማገናኘት፣ ባህልን መጠበቅ፣ በሜኒሶታ ጠንካራ ማህበረሰብ መገንባት" },
-        aboutPageImage: "/hero-home.png",
-        aboutMission: { en: "To foster a sense of belonging and unity...", am: "የባለቤትነት እና የአንድነት ስሜትን ለማሳደግ..." },
-        aboutMissionImage: "/about-mission.png",
-        aboutVision: { en: "To be the leading Ethiopian community organization...", am: "ቀዳሚ የኢትዮጵያ ማህበረሰብ ድርጅት ለመሆን..." },
-        aboutVisionImage: "/about-vision.png",
-        aboutActivities: []
-    };
+const defaults = {
+    aboutPageTitle: { en: "About HCSEM", am: "ስለ HCSEM" },
+    aboutPageSubtitle: { en: "Connecting Ethiopians, preserving culture, building a stronger community in Minnesota", am: "ኢትዮጵያውያንን ማገናኘት፣ ባህልን መጠበቅ፣ በሜኒሶታ ጠንካራ ማህበረሰብ መገንባት" },
+    aboutPageImage: "/hero-home.png",
+    aboutMission: { en: "To foster a sense of belonging and unity...", am: "የባለቤትነት እና የአንድነት ስሜትን ለማሳደግ..." },
+    aboutMissionImage: "/about-mission.png",
+    aboutVision: { en: "To be the leading Ethiopian community organization...", am: "ቀዳሚ የኢትዮጵያ ማህበረሰብ ድርጅት ለመሆን..." },
+    aboutVisionImage: "/about-vision.png",
+    aboutActivities: []
+};
 
+// Helper to ensure bilingual structure
+const ensureBilingual = (val, defaultVal) => {
+    if (!val) return defaultVal;
+    if (typeof val === 'string') return { en: val, am: '' };
+    return val;
+};
+
+export default function AboutContentPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [editLang, setEditLang] = useState('en'); // 'en' or 'am'
@@ -36,43 +43,36 @@ export default function AboutContentPage() {
     });
 
     useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch('/api/settings');
+                if (res.ok) {
+                    const data = await res.json();
+                    setSettings({
+                        ...data,
+                        aboutPageTitle: ensureBilingual(data.aboutPageTitle, defaults.aboutPageTitle),
+                        aboutPageSubtitle: ensureBilingual(data.aboutPageSubtitle, defaults.aboutPageSubtitle),
+                        aboutPageImage: data.aboutPageImage || defaults.aboutPageImage,
+                        aboutMission: ensureBilingual(data.aboutMission, defaults.aboutMission),
+                        aboutMissionImage: data.aboutMissionImage || defaults.aboutMissionImage,
+                        aboutVision: ensureBilingual(data.aboutVision, defaults.aboutVision),
+                        aboutVisionImage: data.aboutVisionImage || defaults.aboutVisionImage,
+                        aboutActivities: data.aboutActivities || [],
+                        showAboutHeader: data.showAboutHeader !== undefined ? data.showAboutHeader : true,
+                        showAboutMission: data.showAboutMission !== undefined ? data.showAboutMission : true,
+                        showAboutVision: data.showAboutVision !== undefined ? data.showAboutVision : true
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+                toast.error('Error loading settings');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchSettings();
     }, []);
-
-    // Helper to ensure bilingual structure
-    const ensureBilingual = (val, defaultVal) => {
-        if (!val) return defaultVal;
-        if (typeof val === 'string') return { en: val, am: '' };
-        return val;
-    };
-
-    const fetchSettings = async () => {
-        try {
-            const res = await fetch('/api/settings');
-            if (res.ok) {
-                const data = await res.json();
-                setSettings({
-                    ...data,
-                    aboutPageTitle: ensureBilingual(data.aboutPageTitle, defaults.aboutPageTitle),
-                    aboutPageSubtitle: ensureBilingual(data.aboutPageSubtitle, defaults.aboutPageSubtitle),
-                    aboutPageImage: data.aboutPageImage || defaults.aboutPageImage,
-                    aboutMission: ensureBilingual(data.aboutMission, defaults.aboutMission),
-                    aboutMissionImage: data.aboutMissionImage || defaults.aboutMissionImage,
-                    aboutVision: ensureBilingual(data.aboutVision, defaults.aboutVision),
-                    aboutVisionImage: data.aboutVisionImage || defaults.aboutVisionImage,
-                    aboutActivities: data.aboutActivities || [],
-                    showAboutHeader: data.showAboutHeader !== undefined ? data.showAboutHeader : true,
-                    showAboutMission: data.showAboutMission !== undefined ? data.showAboutMission : true,
-                    showAboutVision: data.showAboutVision !== undefined ? data.showAboutVision : true
-                });
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error('Error loading settings');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleSave = async () => {
         setSaving(true);

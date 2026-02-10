@@ -6,84 +6,84 @@ import { Save, Upload, Loader2, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Image from 'next/image';
 
-export default function EventsContentPage() {
-    const defaults = {
-        eventsPageTitle: "Events",
-        eventsPageSubtitle: "Join us in our upcoming gatherings and celebrations",
-        eventsPageImage: "",
-        eventsVideoTitle: "Experience Our Events",
-        eventsVideoSubtitle: "Watch how we celebrate culture, unity, and community together",
-        eventsGalleryTitle: "Event Gallery",
-        eventsGallerySubtitle: "Moments captured from our community events and celebrations",
-        eventsGalleryImages: [
-            { url: "/folder/2.jpg" },
-            { url: "/folder/3.jpg" },
-            { url: "/folder/9.jpg" },
-            { url: "/folder/10.jpg" },
-            { url: "/folder/13.jpg" },
-            { url: "/folder/16.jpg" }
-        ],
-        eventsVideoUrl: "/folder/1.mp4",
-        walkthroughTitle: "Explore Our Community",
-        walkthroughSubtitle: "Take a journey through our community spaces and discover what we offer",
-        walkthroughItems: [
-            {
-                name: "Welcome Hall",
-                title: "Community Gathering Space",
-                description: "Our main gathering area where members connect and celebrate together.",
-                image: "/folder/2.jpg",
-                iconName: "Home",
-                features: ["Monthly meetups", "Cultural celebrations", "Networking events"],
-                order: 0
-            },
-            {
-                name: "Events Room",
-                title: "Event Planning Center",
-                description: "Where we organize and coordinate all our community events and activities.",
-                image: "/folder/3.jpg",
-                iconName: "Calendar",
-                features: ["Festival planning", "Workshop coordination", "Event management"],
-                order: 1
-            },
-            {
-                name: "Community Hub",
-                title: "Member Services",
-                description: "Support and resources for all community members.",
-                image: "/folder/9.jpg",
-                iconName: "Users",
-                features: ["New member orientation", "Resource sharing", "Community support"],
-                order: 2
-            },
-            {
-                name: "Cultural Center",
-                title: "Heritage Preservation",
-                description: "Dedicated to preserving and celebrating our rich Ethiopian culture.",
-                image: "/folder/10.jpg",
-                iconName: "Heart",
-                features: ["Language classes", "Traditional arts", "Cultural education"],
-                order: 3
-            },
-            {
-                name: "Youth Wing",
-                title: "Next Generation Programs",
-                description: "Empowering our youth through education and mentorship.",
-                image: "/folder/13.jpg",
-                iconName: "Sparkles",
-                features: ["Mentorship programs", "Educational workshops", "Youth leadership"],
-                order: 4
-            },
-            {
-                name: "Achievement Hall",
-                title: "Success Stories",
-                description: "Celebrating the accomplishments of our community members.",
-                image: "/folder/16.jpg",
-                iconName: "Award",
-                features: ["Member achievements", "Community impact", "Recognition programs"],
-                order: 5
-            }
-        ]
-    };
+const defaults = {
+    eventsPageTitle: "Events",
+    eventsPageSubtitle: "Join us in our upcoming gatherings and celebrations",
+    eventsPageImage: "",
+    eventsVideoTitle: "Experience Our Events",
+    eventsVideoSubtitle: "Watch how we celebrate culture, unity, and community together",
+    eventsGalleryTitle: "Event Gallery",
+    eventsGallerySubtitle: "Moments captured from our community events and celebrations",
+    eventsGalleryImages: [
+        { url: "/folder/2.jpg" },
+        { url: "/folder/3.jpg" },
+        { url: "/folder/9.jpg" },
+        { url: "/folder/10.jpg" },
+        { url: "/folder/13.jpg" },
+        { url: "/folder/16.jpg" }
+    ],
+    eventsVideoUrl: "/folder/1.mp4",
+    walkthroughTitle: "Explore Our Community",
+    walkthroughSubtitle: "Take a journey through our community spaces and discover what we offer",
+    walkthroughItems: [
+        {
+            name: "Welcome Hall",
+            title: "Community Gathering Space",
+            description: "Our main gathering area where members connect and celebrate together.",
+            image: "/folder/2.jpg",
+            iconName: "Home",
+            features: ["Monthly meetups", "Cultural celebrations", "Networking events"],
+            order: 0
+        },
+        {
+            name: "Events Room",
+            title: "Event Planning Center",
+            description: "Where we organize and coordinate all our community events and activities.",
+            image: "/folder/3.jpg",
+            iconName: "Calendar",
+            features: ["Festival planning", "Workshop coordination", "Event management"],
+            order: 1
+        },
+        {
+            name: "Community Hub",
+            title: "Member Services",
+            description: "Support and resources for all community members.",
+            image: "/folder/9.jpg",
+            iconName: "Users",
+            features: ["New member orientation", "Resource sharing", "Community support"],
+            order: 2
+        },
+        {
+            name: "Cultural Center",
+            title: "Heritage Preservation",
+            description: "Dedicated to preserving and celebrating our rich Ethiopian culture.",
+            image: "/folder/10.jpg",
+            iconName: "Heart",
+            features: ["Language classes", "Traditional arts", "Cultural education"],
+            order: 3
+        },
+        {
+            name: "Youth Wing",
+            title: "Next Generation Programs",
+            description: "Empowering our youth through education and mentorship.",
+            image: "/folder/13.jpg",
+            iconName: "Sparkles",
+            features: ["Mentorship programs", "Educational workshops", "Youth leadership"],
+            order: 4
+        },
+        {
+            name: "Achievement Hall",
+            title: "Success Stories",
+            description: "Celebrating the accomplishments of our community members.",
+            image: "/folder/16.jpg",
+            iconName: "Award",
+            features: ["Member achievements", "Community impact", "Recognition programs"],
+            order: 5
+        }
+    ]
+};
 
+export default function EventsContentPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [settings, setSettings] = useState({

@@ -21,6 +21,7 @@ export default function Navbar() {
 
     useEffect(() => {
         // Set mounted state
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setMounted(true);
 
         const handleScroll = () => {
@@ -80,7 +81,6 @@ export default function Navbar() {
                         <Link href="/" className="text-2xl font-bold tracking-tighter flex items-center gap-2">
                             {logoUrl ? (
                                 <div className="relative w-8 h-8">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <Image src={logoUrl} alt="Logo" width={32} height={32} className="object-contain w-full h-full" />
                                 </div>
                             ) : (

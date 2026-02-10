@@ -6,45 +6,45 @@ import { Save, Plus, Trash2, Upload, ArrowUp, ArrowDown, Loader2, X } from 'luci
 import { toast } from 'react-toastify';
 import Image from 'next/image';
 
-export default function HomePageSettings() {
-    const defaults = {
-        heroTitle: "HCSEM",
-        heroSubtitle: "Building community.\nPreserving culture.",
-        heroImage: "",
-        stats: [
-            { label: "Members", value: "500+" },
-            { label: "Events", value: "50+" },
-            { label: "Years", value: "10+" }
-        ],
-        tickerImages: [
-            { url: "/folder/2.jpg", title: "Cultural Festival", subtitle: "Celebrating our heritage together" },
-            { url: "/folder/3.jpg", title: "Community Gathering", subtitle: "Sharing traditional Ethiopian flavors" },
-            { url: "/folder/9.jpg", title: "Youth Program", subtitle: "Empowering our next generation" },
-            { url: "/folder/10.jpg", title: "Heritage Day", subtitle: "Keeping our traditions alive" }
-        ],
-        galleryTitle: "Community Gallery",
-        gallerySubtitle: "Capturing the spirit of our community through photos",
-        galleryImages: [
-            { url: "/folder/2.jpg" },
-            { url: "/folder/3.jpg" },
-            { url: "/folder/9.jpg" },
-            { url: "/folder/10.jpg" },
-            { url: "/folder/13.jpg" },
-            { url: "/folder/16.jpg" }
-        ],
-        upcomingEventsTitle: "Upcoming Events",
-        upcomingEventsSubtitle: "Join us in our upcoming gatherings and celebrations",
-        defaultEvents: [
-            { title: "Cultural Festival 2024", date: "Dec 15", description: "Annual celebration featuring traditional music, dance, and food", image: "/event-placeholder.png" },
-            { title: "Community Gathering", date: "Dec 20", description: "Monthly meetup for community members to connect", image: "/about-mission.png" },
-            { title: "Youth Education Program", date: "Dec 25", description: "Educational workshop for young members", image: "/about-vision.png" }
-        ],
-        defaultBlogs: [
-            { title: "Sample Blog Post 1", date: "Dec 1, 2024", summary: "Discover the latest updates and stories from our vibrant community.", image: "/blog-placeholder.png" },
-            { title: "Sample Blog Post 2", date: "Dec 2, 2024", summary: "Learn about our initiatives, events, and the amazing people making a difference.", image: "/folder/2.jpg" }
-        ]
-    };
+const defaults = {
+    heroTitle: "HCSEM",
+    heroSubtitle: "Building community.\nPreserving culture.",
+    heroImage: "",
+    stats: [
+        { label: "Members", value: "500+" },
+        { label: "Events", value: "50+" },
+        { label: "Years", value: "10+" }
+    ],
+    tickerImages: [
+        { url: "/folder/2.jpg", title: "Cultural Festival", subtitle: "Celebrating our heritage together" },
+        { url: "/folder/3.jpg", title: "Community Gathering", subtitle: "Sharing traditional Ethiopian flavors" },
+        { url: "/folder/9.jpg", title: "Youth Program", subtitle: "Empowering our next generation" },
+        { url: "/folder/10.jpg", title: "Heritage Day", subtitle: "Keeping our traditions alive" }
+    ],
+    galleryTitle: "Community Gallery",
+    gallerySubtitle: "Capturing the spirit of our community through photos",
+    galleryImages: [
+        { url: "/folder/2.jpg" },
+        { url: "/folder/3.jpg" },
+        { url: "/folder/9.jpg" },
+        { url: "/folder/10.jpg" },
+        { url: "/folder/13.jpg" },
+        { url: "/folder/16.jpg" }
+    ],
+    upcomingEventsTitle: "Upcoming Events",
+    upcomingEventsSubtitle: "Join us in our upcoming gatherings and celebrations",
+    defaultEvents: [
+        { title: "Cultural Festival 2024", date: "Dec 15", description: "Annual celebration featuring traditional music, dance, and food", image: "/event-placeholder.png" },
+        { title: "Community Gathering", date: "Dec 20", description: "Monthly meetup for community members to connect", image: "/about-mission.png" },
+        { title: "Youth Education Program", date: "Dec 25", description: "Educational workshop for young members", image: "/about-vision.png" }
+    ],
+    defaultBlogs: [
+        { title: "Sample Blog Post 1", date: "Dec 1, 2024", summary: "Discover the latest updates and stories from our vibrant community.", image: "/blog-placeholder.png" },
+        { title: "Sample Blog Post 2", date: "Dec 2, 2024", summary: "Learn about our initiatives, events, and the amazing people making a difference.", image: "/folder/2.jpg" }
+    ]
+};
 
+export default function HomePageSettings() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [settings, setSettings] = useState({

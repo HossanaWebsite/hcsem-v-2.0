@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
     Search,
     Eye,
@@ -51,7 +51,7 @@ export default function RequestsPage() {
     });
     const [sendingEmail, setSendingEmail] = useState(false);
 
-    const fetchRequests = async () => {
+    const fetchRequests = useCallback(async () => {
         setLoading(true);
         try {
             const query = new URLSearchParams({
@@ -72,11 +72,11 @@ export default function RequestsPage() {
         } finally {
             setLoading(false);
         }
-    };
+    }, [viewMode, filterStatus]);
 
     useEffect(() => {
         fetchRequests();
-    }, [filterStatus, viewMode]);
+    }, [fetchRequests]);
 
     // Filter and Search Logic
     const filteredRequests = requests.filter(request => {
@@ -432,8 +432,8 @@ export default function RequestsPage() {
                                     key={idx}
                                     onClick={() => paginate(idx + 1)}
                                     className={`w-9 h-9 rounded-lg text-sm font-medium transition-all ${currentPage === idx + 1
-                                            ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25'
-                                            : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white'
+                                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/25'
+                                        : 'bg-white/5 text-slate-400 hover:bg-white/10 hover:text-white'
                                         }`}
                                 >
                                     {idx + 1}

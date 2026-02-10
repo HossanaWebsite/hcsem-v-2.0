@@ -6,17 +6,17 @@ import { Save, Upload, Loader2, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Image from 'next/image';
 
-export default function ContactContentPage() {
-    const defaults = {
-        contactPageTitle: "Contact Us",
-        contactPageSubtitle: "Get in touch with us",
-        contactPageImage: "",
-        contactOfficeHours: "Monday - Friday: 9:00 AM - 5:00 PM\nSaturday: 10:00 AM - 2:00 PM\nSunday: Closed",
-        contactAddress: "Minneapolis, Minnesota",
-        contactPhone: "+1 (555) 123-4567",
-        contactEmail: "info@hcsem.org"
-    };
+const defaults = {
+    contactPageTitle: "Contact Us",
+    contactPageSubtitle: "Get in touch with us",
+    contactPageImage: "",
+    contactOfficeHours: "Monday - Friday: 9:00 AM - 5:00 PM\nSaturday: 10:00 AM - 2:00 PM\nSunday: Closed",
+    contactAddress: "Minneapolis, Minnesota",
+    contactPhone: "+1 (555) 123-4567",
+    contactEmail: "info@hcsem.org"
+};
 
+export default function ContactContentPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [settings, setSettings] = useState({
@@ -36,36 +36,34 @@ export default function ContactContentPage() {
     const [newReason, setNewReason] = useState({ en: '', am: '' });
 
     useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch('/api/settings');
+                if (res.ok) {
+                    const data = await res.json();
+                    setSettings({
+                        ...data,
+                        contactPageTitle: data.contactPageTitle || defaults.contactPageTitle,
+                        contactPageSubtitle: data.contactPageSubtitle || defaults.contactPageSubtitle,
+                        contactPageImage: data.contactPageImage || defaults.contactPageImage,
+                        contactOfficeHours: data.contactOfficeHours || defaults.contactOfficeHours,
+                        contactAddress: data.contactAddress || defaults.contactAddress,
+                        contactPhone: data.contactPhone || defaults.contactPhone,
+                        contactEmail: data.contactEmail || defaults.contactEmail,
+                        showContactHeader: data.showContactHeader !== undefined ? data.showContactHeader : true,
+                        contactReasons: data.contactReasons || []
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+                toast.error('Error loading settings');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchSettings();
     }, []);
-
-    const fetchSettings = async () => {
-        try {
-            const res = await fetch('/api/settings');
-            if (res.ok) {
-                const data = await res.json();
-                setSettings({
-                    ...data,
-                    contactPageTitle: data.contactPageTitle || defaults.contactPageTitle,
-                    contactPageSubtitle: data.contactPageSubtitle || defaults.contactPageSubtitle,
-                    contactPageImage: data.contactPageImage || defaults.contactPageImage,
-                    contactOfficeHours: data.contactOfficeHours || defaults.contactOfficeHours,
-                    contactAddress: data.contactAddress || defaults.contactAddress,
-                    contactPhone: data.contactPhone || defaults.contactPhone,
-                    contactEmail: data.contactEmail || defaults.contactEmail,
-                    contactPhone: data.contactPhone || defaults.contactPhone,
-                    contactEmail: data.contactEmail || defaults.contactEmail,
-                    showContactHeader: data.showContactHeader !== undefined ? data.showContactHeader : true,
-                    contactReasons: data.contactReasons || []
-                });
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error('Error loading settings');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleSave = async () => {
         setSaving(true);

@@ -6,13 +6,13 @@ import { Save, Upload, Loader2, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Image from 'next/image';
 
-export default function BlogContentPage() {
-    const defaults = {
-        blogPageTitle: "Blog",
-        blogPageSubtitle: "Latest news and stories from our community",
-        blogPageImage: ""
-    };
+const defaults = {
+    blogPageTitle: "Blog",
+    blogPageSubtitle: "Latest news and stories from our community",
+    blogPageImage: ""
+};
 
+export default function BlogContentPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [settings, setSettings] = useState({
@@ -23,29 +23,29 @@ export default function BlogContentPage() {
     });
 
     useEffect(() => {
+        const fetchSettings = async () => {
+            try {
+                const res = await fetch('/api/settings');
+                if (res.ok) {
+                    const data = await res.json();
+                    setSettings({
+                        ...data,
+                        blogPageTitle: data.blogPageTitle || defaults.blogPageTitle,
+                        blogPageSubtitle: data.blogPageSubtitle || defaults.blogPageSubtitle,
+                        blogPageImage: data.blogPageImage || defaults.blogPageImage,
+                        showBlogHeader: data.showBlogHeader !== undefined ? data.showBlogHeader : true
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+                toast.error('Error loading settings');
+            } finally {
+                setLoading(false);
+            }
+        };
+
         fetchSettings();
     }, []);
-
-    const fetchSettings = async () => {
-        try {
-            const res = await fetch('/api/settings');
-            if (res.ok) {
-                const data = await res.json();
-                setSettings({
-                    ...data,
-                    blogPageTitle: data.blogPageTitle || defaults.blogPageTitle,
-                    blogPageSubtitle: data.blogPageSubtitle || defaults.blogPageSubtitle,
-                    blogPageImage: data.blogPageImage || defaults.blogPageImage,
-                    showBlogHeader: data.showBlogHeader !== undefined ? data.showBlogHeader : true
-                });
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error('Error loading settings');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleSave = async () => {
         setSaving(true);

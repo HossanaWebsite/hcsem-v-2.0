@@ -27,7 +27,8 @@ async function getBlog(slug) {
 }
 
 export default async function BlogDetailPage({ params }) {
-    const blog = await getBlog(params.slug);
+    const { slug } = await params;
+    const blog = await getBlog(slug);
 
     if (!blog) {
         notFound();
