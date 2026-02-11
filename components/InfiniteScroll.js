@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import { Play, Pause } from 'lucide-react';
 import Image from 'next/image';
+import SafeImage from './SafeImage';
 
 export default function InfiniteScroll({ items = [], speed = 50 }) {
     const [isPlaying, setIsPlaying] = useState(true);
@@ -72,7 +73,7 @@ export default function InfiniteScroll({ items = [], speed = 50 }) {
                         >
                             {item.type === 'image' ? (
                                 <div className="relative w-full h-full">
-                                    <Image
+                                    <SafeImage
                                         src={item.src}
                                         alt={item.title || 'Gallery item'}
                                         fill

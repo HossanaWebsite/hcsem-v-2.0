@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import SafeImage from './SafeImage';
 
 // Mini gallery with fewer images for home page
 const images = [
@@ -27,7 +28,7 @@ export default function MiniGallery({ images: propImages }) {
                     whileHover={{ scale: 1.05, zIndex: 10 }}
                     className={`relative rounded-xl overflow-hidden glass-card group cursor-pointer ${image.span}`}
                 >
-                    <Image
+                    <SafeImage
                         src={image.url || image.src || '/event-placeholder.png'}
                         alt={`Gallery image ${index + 1}`}
                         fill

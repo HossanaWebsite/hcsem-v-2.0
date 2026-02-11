@@ -15,6 +15,7 @@ const MiniGallery = dynamic(() => import('@/components/MiniGallery'), {
   loading: () => <div className="h-96 animate-pulse bg-muted/20 rounded-3xl" />
 });
 const DonationModal = dynamic(() => import('@/components/DonationModal'));
+const SafeImage = dynamic(() => import('@/components/SafeImage'));
 const PhotoTicker = dynamic(() => import('@/components/PhotoTicker'), {
   loading: () => <div className="h-32 animate-pulse bg-muted/20" />
 });
@@ -104,9 +105,12 @@ export default function HomePage() {
       {settings.showHero && (
         <section className="relative min-h-screen flex items-center overflow-hidden">
           {/* Background Image with Overlay */}
-          <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${settings.heroImage || '/hero-home.png'})` }}
+          <SafeImage
+            src={settings.heroImage || '/hero-home.png'}
+            alt="Hero Background"
+            fill
+            className="object-cover"
+            priority
           />
           {/* Theme-aware Gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/20 dark:via-background/95 dark:to-background/50" />
@@ -290,7 +294,7 @@ export default function HomePage() {
                   className="glass-card overflow-hidden group cursor-pointer"
                 >
                   <div className="h-56 relative overflow-hidden">
-                    <Image
+                    <SafeImage
                       src={event.image || event.coverImage || '/event-placeholder.png'}
                       alt={event.title}
                       fill
@@ -359,7 +363,7 @@ export default function HomePage() {
                 className="glass-card overflow-hidden group cursor-pointer"
               >
                 <div className="h-72 relative overflow-hidden">
-                  <Image
+                  <SafeImage
                     src={post.image || post.coverImage || '/blog-placeholder.png'}
                     alt={post.title}
                     fill
