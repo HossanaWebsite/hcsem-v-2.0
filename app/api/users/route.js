@@ -78,9 +78,21 @@ export async function PUT(req) {
         }
 
         const body = await req.json();
-        const { id, password, ...updateData } = body;
+        const { id, password, unlockAccount, resetFailedAttempts, ...updateData } = body;
 
         if (!id) throw new Error('User ID is required');
+
+        // Handle account unlock
+        if (unlockAccount) {
+            updateData.accountLocked = false;
+            updateData.lockedUntil = null;
+            updateData.failedLoginAttempts = 0;
+        }
+
+        // Handle failed attempts reset
+        if (resetFailedAttempts) {
+            updateData.failedLoginAttempts = 0;
+        }
 
         if (password) {
             updateData.password = await bcrypt.hash(password, 10);
@@ -88,7 +100,7 @@ export async function PUT(req) {
 
         const user = await User.findByIdAndUpdate(id, updateData, { new: true }).select('-password').populate('role');
 
-        await logAction(currentUser._id, 'UPDATE_USER', { email: user.email, id: user._id }, req);
+        await logAction(currentUser._id, 'UPDATE_USER', { email: user.email, id: user._id, unlockAccount, resetFailedAttempts }, req);
         return handleSuccess(user, "User updated successfully");
     } catch (error) {
         return handleError(error, req);
