@@ -231,6 +231,16 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+
+    // Activity Tracking
+    lastLogin: { type: Date },
+    failedLoginAttempts: { type: Number, default: 0 },
+    accountLocked: { type: Boolean, default: false },
+    lockedUntil: { type: Date },
+
+    // Password Reset
+    passwordResetToken: { type: String },
+    passwordResetExpires: { type: Date },
 });
 
 export const User = mongoose.models.User || mongoose.model('User', UserSchema);

@@ -8,12 +8,126 @@ import Link from "next/link";
 import React, { useState, useEffect, useRef } from "react";
 import { Menu } from 'lucide-react';
 import SearchOverlay from "@/components/SearchOverlay";
+import { toast } from 'react-toastify';
+import { X } from 'lucide-react';
+
+const PasswordModal = ({ isOpen, onClose }) => {
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (newPassword !== confirmPassword) {
+            toast.error("Passwords do not match");
+            return;
+        }
+        if (newPassword.length < 6) {
+            toast.error("Password must be at least 6 characters");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const res = await fetch('/api/change-password', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ currentPassword, newPassword })
+            });
+
+            const data = await res.json();
+
+            if (data.success) {
+                toast.success("Password changed successfully");
+                onClose();
+                setCurrentPassword('');
+                setNewPassword('');
+                setConfirmPassword('');
+            } else {
+                toast.error(data.error || "Failed to change password");
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to change password");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+            <div className="w-full max-w-md glass-panel p-8 rounded-2xl border border-white/10 bg-slate-900 shadow-2xl relative">
+                <button
+                    onClick={onClose}
+                    className="absolute top-4 right-4 text-slate-400 hover:text-white"
+                >
+                    <X size={20} />
+                </button>
+                <h2 className="text-xl font-bold mb-6 text-white">Change Password</h2>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-1">Current Password</label>
+                        <input
+                            type="password"
+                            className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all"
+                            value={currentPassword}
+                            onChange={(e) => setCurrentPassword(e.target.value)}
+                            required
+                            placeholder="••••••••"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-1">New Password</label>
+                        <input
+                            type="password"
+                            className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            required
+                            placeholder="••••••••"
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-slate-300 mb-1">Confirm New Password</label>
+                        <input
+                            type="password"
+                            className="w-full bg-slate-950/50 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 placeholder:text-slate-600 transition-all"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            required
+                            placeholder="••••••••"
+                        />
+                    </div>
+                    <div className="pt-2">
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="w-full px-6 py-3 rounded-xl font-medium bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 transition-all disabled:opacity-50"
+                        >
+                            {loading ? 'Changing Password...' : 'Change Password'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
 
 const AppHeader = () => {
     const { isMobileOpen, toggleSidebar, toggleMobileSidebar } = useSidebar();
     const inputRef = useRef(null);
 
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+
+    useEffect(() => {
+        const handleOpenPasswordModal = () => setIsPasswordModalOpen(true);
+        window.addEventListener('open-password-modal', handleOpenPasswordModal);
+        return () => window.removeEventListener('open-password-modal', handleOpenPasswordModal);
+    }, []);
 
     const handleToggle = () => {
         if (typeof window !== 'undefined' && window.innerWidth >= 1024) {
@@ -36,6 +150,7 @@ const AppHeader = () => {
 
     return (
         <>
+            <PasswordModal isOpen={isPasswordModalOpen} onClose={() => setIsPasswordModalOpen(false)} />
             <SearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
             <header className="sticky top-0 flex w-full bg-white/80 dark:bg-slate-950/20 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 z-40 h-20 transition-all duration-300">
                 <div className="flex items-center justify-between grow px-4 lg:px-6">

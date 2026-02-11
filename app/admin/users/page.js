@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash } from 'lucide-react';
+import { Plus, Edit, Trash, Lock, Unlock, RefreshCw, Key, Calendar, AlertTriangle, X } from 'lucide-react';
 import { toast } from 'react-toastify';
 
 export default function UsersPage() {
@@ -10,6 +10,8 @@ export default function UsersPage() {
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [userForm, setUserForm] = useState({});
+    const [showResetModal, setShowResetModal] = useState(false);
+    const [resetToken, setResetToken] = useState(null);
     const [myPermissions, setMyPermissions] = useState([]);
 
     const [myRole, setMyRole] = useState(null);
@@ -93,6 +95,109 @@ export default function UsersPage() {
             console.error(error);
             toast.error('Error saving user');
         }
+    };
+
+    const handleUnlockAccount = async (userId) => {
+        if (!confirm('Unlock this user account?')) return;
+        try {
+            const res = await fetch('/api/users', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: userId, unlockAccount: true }),
+            });
+            if (res.ok) {
+                toast.success('Account unlocked successfully');
+                fetchData();
+            } else {
+                const data = await res.json();
+                toast.error(data.error || 'Failed to unlock account');
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('Error unlocking account');
+        }
+    };
+
+    const handleResetFailedAttempts = async (userId) => {
+        try {
+            const res = await fetch('/api/users', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: userId, resetFailedAttempts: true }),
+            });
+            if (res.ok) {
+                toast.success('Failed login attempts reset');
+                fetchData();
+            } else {
+                const data = await res.json();
+                toast.error(data.error || 'Failed to reset attempts');
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('Error resetting attempts');
+        }
+    };
+
+    const handleInitiatePasswordReset = async (userId) => {
+        try {
+            const res = await fetch('/api/password-reset', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId }),
+            });
+            const data = await res.json();
+            if (data.success) {
+                setResetToken(data.data);
+                setShowResetModal(true);
+                toast.success('Password reset initiated');
+            } else {
+                toast.error(data.error || 'Failed to initiate reset');
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('Error initiating reset');
+        }
+    };
+
+    const handleForcePasswordChange = async (userId, mustChange) => {
+        try {
+            const res = await fetch('/api/users', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: userId, mustChangePassword: mustChange }),
+            });
+            if (res.ok) {
+                toast.success(`Force password change ${mustChange ? 'enabled' : 'disabled'}`);
+                fetchData();
+            } else {
+                const data = await res.json();
+                toast.error(data.error || 'Failed to update setting');
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('Error updating setting');
+        }
+    };
+
+    const getStatusBadge = (user) => {
+        if (user.accountLocked) {
+            return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-500/10 text-red-500 border border-red-500/20">
+                <Lock className="w-3 h-3 mr-1" /> Locked
+            </span>;
+        }
+        if (user.mustChangePassword) {
+            return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
+                <AlertTriangle className="w-3 h-3 mr-1" /> Must Change Password
+            </span>;
+        }
+        if (user.isActive) {
+            return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-500/10 text-green-500 border border-green-500/20">
+                Active
+            </span>;
+        }
+        return <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-500/10 text-slate-500 border border-slate-500/20">
+            Inactive
+        </span>;
     };
 
     if (isEditing) {
@@ -214,6 +319,9 @@ export default function UsersPage() {
                                 <th className="px-6 py-4 text-xs uppercase font-semibold tracking-wider">Name</th>
                                 <th className="px-6 py-4 text-xs uppercase font-semibold tracking-wider">Email</th>
                                 <th className="px-6 py-4 text-xs uppercase font-semibold tracking-wider">Role</th>
+                                <th className="px-6 py-4 text-xs uppercase font-semibold tracking-wider">Status</th>
+                                <th className="px-6 py-4 text-xs uppercase font-semibold tracking-wider">Last Login</th>
+                                <th className="px-6 py-4 text-xs uppercase font-semibold tracking-wider">Failed Attempts</th>
                                 {canManageUsers && <th className="px-6 py-4 text-xs uppercase font-semibold tracking-wider text-right">Actions</th>}
                             </tr>
                         </thead>
@@ -231,29 +339,75 @@ export default function UsersPage() {
                                             }
                                         </span>
                                     </td>
+                                    <td className="px-6 py-4">{getStatusBadge(user)}</td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2 text-sm">
+                                            <Calendar className="w-4 h-4 text-slate-400" />
+                                            {user.lastLogin ? new Date(user.lastLogin).toLocaleDateString() : 'Never'}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <span className={`font-medium ${user.failedLoginAttempts > 0 ? 'text-red-500' : 'text-slate-500'}`}>
+                                            {user.failedLoginAttempts || 0}
+                                        </span>
+                                    </td>
                                     {canManageUsers && (
-                                        <td className="px-6 py-4 flex gap-3 justify-end">
-                                            <button
-                                                onClick={() => { setUserForm(user); setIsEditing(true); }}
-                                                className="p-2 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-all"
-                                                title="Edit User"
-                                            >
-                                                <Edit size={18} />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(user._id)}
-                                                className="p-2 text-red-600 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-all"
-                                                title="Delete User"
-                                            >
-                                                <Trash size={18} />
-                                            </button>
+                                        <td className="px-6 py-4">
+                                            <div className="flex gap-2 justify-end">
+                                                {user.accountLocked && (
+                                                    <button
+                                                        onClick={() => handleUnlockAccount(user._id)}
+                                                        className="p-2 text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-500/10 rounded-lg transition-all"
+                                                        title="Unlock Account"
+                                                    >
+                                                        <Unlock size={18} />
+                                                    </button>
+                                                )}
+                                                {user.failedLoginAttempts > 0 && (
+                                                    <button
+                                                        onClick={() => handleResetFailedAttempts(user._id)}
+                                                        className="p-2 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded-lg transition-all"
+                                                        title="Reset Failed Attempts"
+                                                    >
+                                                        <RefreshCw size={18} />
+                                                    </button>
+                                                )}
+                                                <button
+                                                    onClick={() => handleInitiatePasswordReset(user._id)}
+                                                    className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-all"
+                                                    title="Reset Password"
+                                                >
+                                                    <Key size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleForcePasswordChange(user._id, !user.mustChangePassword)}
+                                                    className={`p-2 hover:bg-yellow-50 dark:hover:bg-yellow-500/10 rounded-lg transition-all ${user.mustChangePassword ? 'text-yellow-600 dark:text-yellow-400' : 'text-slate-400'}`}
+                                                    title={user.mustChangePassword ? 'Remove Force Change' : 'Force Password Change'}
+                                                >
+                                                    <AlertTriangle size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => { setUserForm(user); setIsEditing(true); }}
+                                                    className="p-2 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-all"
+                                                    title="Edit User"
+                                                >
+                                                    <Edit size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(user._id)}
+                                                    className="p-2 text-red-600 dark:text-red-500 hover:text-red-700 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-all"
+                                                    title="Delete User"
+                                                >
+                                                    <Trash size={18} />
+                                                </button>
+                                            </div>
                                         </td>
                                     )}
                                 </tr>
                             ))}
                             {users.length === 0 && (
                                 <tr>
-                                    <td colSpan="4" className="px-6 py-12 text-center text-slate-500 italic">
+                                    <td colSpan="7" className="px-6 py-12 text-center text-slate-500 italic">
                                         No users found
                                     </td>
                                 </tr>
@@ -262,6 +416,57 @@ export default function UsersPage() {
                     </table>
                 </div>
             </div>
+
+            {/* Reset Token Modal */}
+            {showResetModal && resetToken && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+                    <div className="w-full max-w-2xl glass-panel p-8 rounded-2xl border border-white/10 bg-slate-900 shadow-2xl relative">
+                        <button
+                            onClick={() => {
+                                setShowResetModal(false);
+                                setResetToken(null);
+                            }}
+                            className="absolute top-4 right-4 text-slate-400 hover:text-white"
+                        >
+                            <X size={20} />
+                        </button>
+                        <h2 className="text-2xl font-bold text-white mb-6">Password Reset Token Generated</h2>
+                        <div className="space-y-4">
+                            <div>
+                                <label className="text-sm font-medium text-slate-300 mb-2 block">User</label>
+                                <p className="text-white">{resetToken.user.fullName} ({resetToken.user.email})</p>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-slate-300 mb-2 block">Reset URL</label>
+                                <div className="bg-slate-950/50 border border-white/10 rounded-lg p-4">
+                                    <code className="text-sm text-indigo-400 break-all">{resetToken.resetUrl}</code>
+                                </div>
+                            </div>
+                            <div>
+                                <label className="text-sm font-medium text-slate-300 mb-2 block">Token (for manual delivery)</label>
+                                <div className="bg-slate-950/50 border border-white/10 rounded-lg p-4">
+                                    <code className="text-sm text-green-400 break-all">{resetToken.resetToken}</code>
+                                </div>
+                            </div>
+                            <div className="text-sm text-slate-400">
+                                <p>⏰ Expires: {new Date(resetToken.expiresAt).toLocaleString()}</p>
+                                <p className="mt-2">📧 In production, this would be sent via email automatically.</p>
+                            </div>
+                        </div>
+                        <div className="mt-6 flex justify-end">
+                            <button
+                                onClick={() => {
+                                    setShowResetModal(false);
+                                    setResetToken(null);
+                                }}
+                                className="px-6 py-3 rounded-xl font-medium bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 transition-all"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
