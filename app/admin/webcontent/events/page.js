@@ -143,7 +143,7 @@ export default function EventsContentPage() {
                         <label className="text-sm font-medium text-slate-300">Header Background Image</label>
                         <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 group">
                             {settings.eventsPageImage && settings.eventsPageImage.trim() !== '' ? (
-                                <Image src={settings.eventsPageImage} alt="Events Header" fill className="object-cover" />
+                                <Image src={settings.eventsPageImage} alt="Events Header" fill className="object-cover" unoptimized />
                             ) : (
                                 <div className="absolute inset-0 flex items-center justify-center text-slate-500">No Image</div>
                             )}
