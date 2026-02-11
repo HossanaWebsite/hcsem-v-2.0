@@ -126,25 +126,27 @@ export default function SettingsPage() {
                 });
 
                 if (res.ok) {
-                    const data = await res.json();
+                    const response = await res.json();
+                    const imageUrl = response.data?.url || response.url;
+
                     if (type === 'hero') {
-                        setSettings(prev => ({ ...prev, heroImage: data.url }));
+                        setSettings(prev => ({ ...prev, heroImage: imageUrl }));
                         successCount++;
                         break;
                     } else if (type === 'eventsPage') {
-                        setSettings(prev => ({ ...prev, eventsPageImage: data.url }));
+                        setSettings(prev => ({ ...prev, eventsPageImage: imageUrl }));
                         successCount++;
                         break;
                     } else if (type === 'aboutPage') {
-                        setSettings(prev => ({ ...prev, aboutPageImage: data.url }));
+                        setSettings(prev => ({ ...prev, aboutPageImage: imageUrl }));
                         successCount++;
                         break;
                     } else if (type === 'blogPage') {
-                        setSettings(prev => ({ ...prev, blogPageImage: data.url }));
+                        setSettings(prev => ({ ...prev, blogPageImage: imageUrl }));
                         successCount++;
                         break;
                     } else if (type === 'contactPage') {
-                        setSettings(prev => ({ ...prev, contactPageImage: data.url }));
+                        setSettings(prev => ({ ...prev, contactPageImage: imageUrl }));
                         successCount++;
                         break;
                     } else {
@@ -152,7 +154,7 @@ export default function SettingsPage() {
                             ...prev,
                             tickerImages: [
                                 ...prev.tickerImages,
-                                { url: data.url, order: prev.tickerImages.length }
+                                { url: imageUrl, order: prev.tickerImages.length }
                             ]
                         }));
                         successCount++;
@@ -257,7 +259,7 @@ export default function SettingsPage() {
                                 <label className="text-sm font-medium text-slate-300">Hero Background Image</label>
                                 <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 group">
                                     {settings.heroImage && settings.heroImage.trim() !== '' ? (
-                                        <Image src={settings.heroImage} alt="Hero" fill className="object-cover" />
+                                        <Image src={settings.heroImage} alt="Hero" fill className="object-cover" unoptimized />
                                     ) : (
                                         <div className="absolute inset-0 flex items-center justify-center text-slate-500">No Image</div>
                                     )}
@@ -392,7 +394,7 @@ export default function SettingsPage() {
                                 <div className="flex gap-4 animate-scroll whitespace-nowrap">
                                     {[...settings.tickerImages, ...settings.tickerImages, ...settings.tickerImages].map((img, i) => (
                                         <div key={i} className="relative w-48 h-28 flex-shrink-0 rounded-lg overflow-hidden border border-white/10">
-                                            <Image src={img.url} fill sizes="192px" className="object-cover" alt="Preview" />
+                                            <Image src={img.url} fill sizes="192px" className="object-cover" alt="Preview" unoptimized />
                                         </div>
                                     ))}
                                 </div>
@@ -422,6 +424,7 @@ export default function SettingsPage() {
                                         alt="Ticker"
                                         fill
                                         className="object-cover"
+                                        unoptimized
                                     />
                                     <button
                                         onClick={() => removeImage(index)}
@@ -495,7 +498,7 @@ export default function SettingsPage() {
                             <label className="text-sm font-medium text-slate-300">Header Background Image</label>
                             <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 group">
                                 {settings.eventsPageImage && settings.eventsPageImage.trim() !== '' ? (
-                                    <Image src={settings.eventsPageImage} alt="Events Header" fill className="object-cover" />
+                                    <Image src={settings.eventsPageImage} alt="Events Header" fill className="object-cover" unoptimized />
                                 ) : (
                                     <div className="absolute inset-0 flex items-center justify-center text-slate-500">No Image</div>
                                 )}
@@ -543,7 +546,7 @@ export default function SettingsPage() {
                                 <label className="text-sm font-medium text-slate-300">Header Background Image</label>
                                 <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 group">
                                     {settings.aboutPageImage && settings.aboutPageImage.trim() !== '' ? (
-                                        <Image src={settings.aboutPageImage} alt="About Header" fill className="object-cover" />
+                                        <Image src={settings.aboutPageImage} alt="About Header" fill className="object-cover" unoptimized />
                                     ) : (
                                         <div className="absolute inset-0 flex items-center justify-center text-slate-500">No Image</div>
                                     )}
@@ -615,7 +618,7 @@ export default function SettingsPage() {
                             <label className="text-sm font-medium text-slate-300">Header Background Image</label>
                             <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 group">
                                 {settings.blogPageImage && settings.blogPageImage.trim() !== '' ? (
-                                    <Image src={settings.blogPageImage} alt="Blog Header" fill className="object-cover" />
+                                    <Image src={settings.blogPageImage} alt="Blog Header" fill className="object-cover" unoptimized />
                                 ) : (
                                     <div className="absolute inset-0 flex items-center justify-center text-slate-500">No Image</div>
                                 )}
@@ -662,7 +665,7 @@ export default function SettingsPage() {
                             <label className="text-sm font-medium text-slate-300">Header Background Image</label>
                             <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 group">
                                 {settings.contactPageImage && settings.contactPageImage.trim() !== '' ? (
-                                    <Image src={settings.contactPageImage} alt="Contact Header" fill className="object-cover" />
+                                    <Image src={settings.contactPageImage} alt="Contact Header" fill className="object-cover" unoptimized />
                                 ) : (
                                     <div className="absolute inset-0 flex items-center justify-center text-slate-500">No Image</div>
                                 )}

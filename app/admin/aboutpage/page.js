@@ -122,13 +122,15 @@ export default function AboutContentPage() {
             });
 
             if (res.ok) {
-                const data = await res.json();
+                const response = await res.json();
+                const imageUrl = response.data?.url || response.url;
+
                 if (type === 'header') {
-                    setSettings(prev => ({ ...prev, aboutPageImage: data.url }));
+                    setSettings(prev => ({ ...prev, aboutPageImage: imageUrl }));
                 } else if (type === 'mission') {
-                    setSettings(prev => ({ ...prev, aboutMissionImage: data.url }));
+                    setSettings(prev => ({ ...prev, aboutMissionImage: imageUrl }));
                 } else if (type === 'vision') {
-                    setSettings(prev => ({ ...prev, aboutVisionImage: data.url }));
+                    setSettings(prev => ({ ...prev, aboutVisionImage: imageUrl }));
                 }
                 toast.update(toastId, { render: "Image uploaded!", type: "success", isLoading: false, autoClose: 3000 });
             } else {
@@ -228,7 +230,7 @@ export default function AboutContentPage() {
                         <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-slate-950 group">
                             {settings.aboutPageImage && settings.aboutPageImage.trim() !== '' ? (
                                 <>
-                                    <Image src={settings.aboutPageImage} alt="About Header" fill className="object-cover" />
+                                    <Image src={settings.aboutPageImage} alt="About Header" fill className="object-cover" unoptimized />
                                     <button onClick={() => setSettings({ ...settings, aboutPageImage: '' })} className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"><X className="w-4 h-4" strokeWidth={3} /></button>
                                 </>
                             ) : (
@@ -270,7 +272,7 @@ export default function AboutContentPage() {
                         <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-slate-950 group">
                             {settings.aboutMissionImage && settings.aboutMissionImage.trim() !== '' ? (
                                 <>
-                                    <Image src={settings.aboutMissionImage} alt="Mission" fill className="object-cover" />
+                                    <Image src={settings.aboutMissionImage} alt="Mission" fill className="object-cover" unoptimized />
                                     <button onClick={() => setSettings({ ...settings, aboutMissionImage: '' })} className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"><X className="w-4 h-4" strokeWidth={3} /></button>
                                 </>
                             ) : (
@@ -311,7 +313,7 @@ export default function AboutContentPage() {
                         <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 dark:border-white/10 bg-slate-100 dark:bg-slate-950 group">
                             {settings.aboutVisionImage && settings.aboutVisionImage.trim() !== '' ? (
                                 <>
-                                    <Image src={settings.aboutVisionImage} alt="Vision" fill className="object-cover" />
+                                    <Image src={settings.aboutVisionImage} alt="Vision" fill className="object-cover" unoptimized />
                                     <button onClick={() => setSettings({ ...settings, aboutVisionImage: '' })} className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"><X className="w-4 h-4" strokeWidth={3} /></button>
                                 </>
                             ) : (

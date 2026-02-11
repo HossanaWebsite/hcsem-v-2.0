@@ -102,8 +102,9 @@ export default function ContactContentPage() {
             });
 
             if (res.ok) {
-                const data = await res.json();
-                setSettings(prev => ({ ...prev, contactPageImage: data.url }));
+                const response = await res.json();
+                const imageUrl = response.data?.url || response.url;
+                setSettings(prev => ({ ...prev, contactPageImage: imageUrl }));
                 toast.update(toastId, { render: "Image uploaded!", type: "success", isLoading: false, autoClose: 3000 });
             } else {
                 toast.update(toastId, { render: "Upload failed", type: "error", isLoading: false, autoClose: 3000 });
@@ -206,7 +207,7 @@ export default function ContactContentPage() {
                         <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 group">
                             {settings.contactPageImage && settings.contactPageImage.trim() !== '' ? (
                                 <>
-                                    <Image src={settings.contactPageImage} alt="Contact Header" fill className="object-cover" />
+                                    <Image src={settings.contactPageImage} alt="Contact Header" fill className="object-cover" unoptimized />
                                     <button
                                         onClick={() => setSettings({ ...settings, contactPageImage: '' })}
                                         className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"

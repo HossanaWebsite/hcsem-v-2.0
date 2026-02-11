@@ -182,9 +182,11 @@ export default function EventsContentPage() {
                 });
 
                 if (res.ok) {
-                    const data = await res.json();
+                    const response = await res.json();
+                    const imageUrl = response.data?.url || response.url;
+
                     if (type === 'header') {
-                        setSettings(prev => ({ ...prev, eventsPageImage: data.url }));
+                        setSettings(prev => ({ ...prev, eventsPageImage: imageUrl }));
                         successCount++;
                         break; // Only one header image
                     } else if (type === 'gallery') {
@@ -192,14 +194,14 @@ export default function EventsContentPage() {
                             ...prev,
                             eventsGalleryImages: [
                                 ...prev.eventsGalleryImages,
-                                { url: data.url, order: prev.eventsGalleryImages.length }
+                                { url: imageUrl, order: prev.eventsGalleryImages.length }
                             ]
                         }));
                         successCount++;
                     } else if (type.startsWith('walkthrough-')) {
                         const index = parseInt(type.split('-')[1]);
                         const newItems = [...settings.walkthroughItems];
-                        newItems[index].image = data.url;
+                        newItems[index].image = imageUrl;
                         setSettings(prev => ({ ...prev, walkthroughItems: newItems }));
                         successCount++;
                         break;
@@ -318,7 +320,7 @@ export default function EventsContentPage() {
                         <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 group">
                             {settings.eventsPageImage && settings.eventsPageImage.trim() !== '' ? (
                                 <>
-                                    <Image src={settings.eventsPageImage} alt="Events Header" fill className="object-cover" />
+                                    <Image src={settings.eventsPageImage} alt="Events Header" fill className="object-cover" unoptimized />
                                     <button
                                         onClick={() => setSettings({ ...settings, eventsPageImage: '' })}
                                         className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"
@@ -484,6 +486,7 @@ export default function EventsContentPage() {
                                 alt="Gallery"
                                 fill
                                 className="object-cover"
+                                unoptimized
                             />
                             <button
                                 onClick={() => removeGalleryImage(index)}
@@ -558,7 +561,7 @@ export default function EventsContentPage() {
                                     <label className="text-sm font-medium text-slate-400">Room Image</label>
                                     <div className="relative aspect-video rounded-lg overflow-hidden border border-white/5 bg-slate-900 group">
                                         {room.image ? (
-                                            <Image src={room.image} alt={room.name} fill className="object-cover" />
+                                            <Image src={room.image} alt={room.name} fill className="object-cover" unoptimized />
                                         ) : (
                                             <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-600 gap-1">
                                                 <Upload className="w-6 h-6 opacity-20" />

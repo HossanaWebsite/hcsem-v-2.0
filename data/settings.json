@@ -18,7 +18,7 @@
         "copyright": "© 2024 HCSEM. All rights reserved.",
         "columns": []
     },
-    "updatedAt": "2026-02-10T19:07:15.948Z",
+    "updatedAt": "2026-02-11T01:54:06.793Z",
     "aboutActivities": [
         {
             "title": {
@@ -93,6 +93,11 @@
         {
             "url": "/folder/16.jpg",
             "_id": "695e402180b5b0cdb41bdb5b"
+        },
+        {
+            "url": "/uploads/1770774821705-about-mission.png",
+            "order": 6,
+            "_id": "698be13ef45ec698e6614d9d"
         }
     ],
     "showAboutHeader": true,
@@ -151,10 +156,11 @@
             "_id": "695e402180b5b0cdb41bdb62"
         },
         {
+            "url": "/uploads/1770774809523-event-placeholder.png",
             "order": 4,
-            "title": "",
-            "subtitle": "",
-            "_id": "69840cc0cfeb817226c464be"
+            "title": "tst",
+            "subtitle": "test",
+            "_id": "698be13ef45ec698e6614da5"
         }
     ],
     "walkthroughItems": [],
@@ -192,5 +198,6 @@
             },
             "_id": "698b6fc5a045cd29b93a05de"
         }
-    ]
+    ],
+    "showDonateButton": false
 }

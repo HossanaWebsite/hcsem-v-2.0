@@ -172,13 +172,26 @@ export default function HomePageSettings() {
                 });
 
                 if (res.ok) {
-                    const data = await res.json();
+                    const response = await res.json();
+                    console.log('Upload response:', response); // Debug log
+                    console.log('Upload type:', type); // Debug log
+
+                    // Extract URL from nested data object
+                    const imageUrl = response.data?.url || response.url;
+                    console.log('Extracted image URL:', imageUrl); // Debug log
+
+                    if (!imageUrl) {
+                        console.error('No URL in response:', response);
+                        toast.error('Upload failed: No URL returned');
+                        continue;
+                    }
+
                     if (type === 'logo') {
-                        setSettings(prev => ({ ...prev, logoUrl: data.url }));
+                        setSettings(prev => ({ ...prev, logoUrl: imageUrl }));
                         successCount++;
                         break;
                     } else if (type === 'hero') {
-                        setSettings(prev => ({ ...prev, heroImage: data.url }));
+                        setSettings(prev => ({ ...prev, heroImage: imageUrl }));
                         successCount++;
                         break;
                     } else if (type === 'gallery') {
@@ -186,21 +199,27 @@ export default function HomePageSettings() {
                             ...prev,
                             galleryImages: [
                                 ...prev.galleryImages,
-                                { url: data.url, order: prev.galleryImages.length }
+                                { url: imageUrl, order: prev.galleryImages.length }
                             ]
                         }));
                         successCount++;
                     } else {
                         // ticker images with title and subtitle
+                        const newImage = { url: imageUrl, title: '', subtitle: '', order: settings.tickerImages.length };
+                        console.log('Adding ticker image:', newImage); // Debug log
                         setSettings(prev => ({
                             ...prev,
                             tickerImages: [
                                 ...prev.tickerImages,
-                                { url: data.url, title: '', subtitle: '', order: prev.tickerImages.length }
+                                newImage
                             ]
                         }));
                         successCount++;
                     }
+                } else {
+                    const errorText = await res.text();
+                    console.error('Upload failed:', res.status, errorText);
+                    toast.error(`Upload failed: ${res.status}`);
                 }
             }
 
@@ -211,8 +230,8 @@ export default function HomePageSettings() {
             }
 
         } catch (error) {
-            console.error(error);
-            toast.update(toastId, { render: "Error uploading", type: "error", isLoading: false, autoClose: 3000 });
+            console.error('Upload error:', error);
+            toast.update(toastId, { render: `Error uploading: ${error.message}`, type: "error", isLoading: false, autoClose: 3000 });
         }
     };
 
@@ -285,7 +304,7 @@ export default function HomePageSettings() {
                             {settings.logoUrl ? (
                                 <>
                                     <div className="relative w-full h-full">
-                                        <Image src={settings.logoUrl} alt="Logo" fill className="object-contain" />
+                                        <Image src={settings.logoUrl} alt="Logo" fill className="object-contain" unoptimized />
                                     </div>
                                     <button
                                         onClick={() => setSettings({ ...settings, logoUrl: null })}
@@ -354,7 +373,7 @@ export default function HomePageSettings() {
                         <div className="relative aspect-video rounded-xl overflow-hidden border border-white/10 bg-slate-950 group">
                             {settings.heroImage && settings.heroImage.trim() !== '' ? (
                                 <>
-                                    <Image src={settings.heroImage} alt="Hero" fill className="object-cover" />
+                                    <Image src={settings.heroImage} alt="Hero" fill className="object-cover" unoptimized />
                                     <button
                                         onClick={() => setSettings({ ...settings, heroImage: '' })}
                                         className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"
@@ -508,7 +527,7 @@ export default function HomePageSettings() {
                         <div className="flex gap-4 animate-scroll whitespace-nowrap">
                             {[...settings.tickerImages, ...settings.tickerImages].map((img, i) => (
                                 <div key={i} className="relative w-64 h-40 flex-shrink-0 rounded-lg overflow-hidden border border-white/10 bg-slate-950">
-                                    <Image src={img.url} fill sizes="256px" className="object-cover" alt="Preview" />
+                                    <Image src={img.url} fill sizes="256px" className="object-cover" alt="Preview" unoptimized />
                                     {(img.title || img.subtitle) && (
                                         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
                                             {img.title && <p className="text-white font-medium text-sm">{img.title}</p>}
@@ -546,6 +565,7 @@ export default function HomePageSettings() {
                                         alt="Carousel"
                                         fill
                                         className="object-cover"
+                                        unoptimized
                                     />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center bg-slate-900 text-slate-500 text-xs">No Image</div>
@@ -684,6 +704,7 @@ export default function HomePageSettings() {
                                     alt="Gallery"
                                     fill
                                     className="object-cover"
+                                    unoptimized
                                 />
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center bg-slate-900 text-slate-500 text-xs">No Image</div>
@@ -758,6 +779,7 @@ export default function HomePageSettings() {
                                         alt={event.title}
                                         fill
                                         className="object-cover opacity-50"
+                                        unoptimized
                                     />
                                     <div className="absolute inset-0 bg-black/40" />
                                     <div className="absolute top-2 right-2 bg-indigo-600/50 text-[10px] text-white px-2 py-1 rounded-full backdrop-blur-sm">DEFAULT</div>
