@@ -145,7 +145,7 @@ export default function HomePage() {
                         Learn More
                       </motion.button>
                     </Link>
-                    <Link href="/contact?donate=true">
+{/* <Link href="/contact?donate=true">
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
@@ -153,7 +153,7 @@ export default function HomePage() {
                       >
                         Donate Now
                       </motion.button>
-                    </Link>
+                    </Link> */}
                   </motion.div>
                 </motion.div>
 
@@ -430,7 +430,7 @@ export default function HomePage() {
                   Get Involved
                 </motion.button>
               </Link>
-              <Link href="/contact?donate=true">
+{/* <Link href="/contact?donate=true">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -438,7 +438,7 @@ export default function HomePage() {
                 >
                   Donate Now
                 </motion.button>
-              </Link>
+              </Link> */}
             </div>
           </div>
         </motion.div>

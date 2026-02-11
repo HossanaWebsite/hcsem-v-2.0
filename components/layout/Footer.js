@@ -97,8 +97,7 @@ export default function Footer() {
                     </div>
                 </div>
 
-                {/* Donate CTA */}
-                <div className="glass-card p-10 mb-16 text-center space-y-6">
+{/*                 <div className="glass-card p-10 mb-16 text-center space-y-6">
                     <Heart className="w-12 h-12 mx-auto text-primary" />
                     <h3 className="text-3xl font-heading font-bold">Support Our Community</h3>
                     <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
@@ -110,7 +109,7 @@ export default function Footer() {
                             Donate Now
                         </button>
                     </Link>
-                </div>
+                </div> */}
 
                 {/* Bottom Bar */}
                 <div className="pt-10 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6 text-muted-foreground">
