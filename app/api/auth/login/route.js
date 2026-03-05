@@ -65,7 +65,7 @@ export async function POST(request) {
         // Create JWT
         // Ensure userId is a primitive string to avoid Buffer serialization issues
         const userId = String(user._id);
-        const token = await signToken({ userId, email: user.email, role: user.role });
+        const token = await signToken({ userId, email: user.email, role: user.role?.name ?? null });
 
         // Set Cookie
         const cookieStore = await cookies();
