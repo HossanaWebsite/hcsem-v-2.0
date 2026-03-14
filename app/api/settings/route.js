@@ -33,24 +33,22 @@ export async function GET() {
     try {
         await dbConnect();
 
-        // Fetch fallback first
-        const fallback = await getFallbackSettings();
-
         // Try to fetch from DB with .lean() for faster JSON serialization
         let settings = await SiteSettings.findOne().sort({ updatedAt: -1 }).lean();
 
-        if (!settings) {
-            console.log('No settings in DB, using fallback');
-            return NextResponse.json(fallback || {
-                heroTitle: "HCSEM",
-                heroSubtitle: "Building community.\nPreserving culture.",
-            });
+        if (settings) {
+            return NextResponse.json(settings);
         }
 
-        return NextResponse.json(settings);
+        console.log('No settings in DB, using fallback');
+        const fallback = await getFallbackSettings();
+        return NextResponse.json(fallback || {
+            heroTitle: "HCSEM",
+            heroSubtitle: "Building community.\nPreserving culture.",
+        });
 
     } catch (error) {
-        console.error('Database connection failed, using fallback:', error);
+        console.error('Database connection failed or error occurred, using fallback:', error);
         const fallback = await getFallbackSettings();
         if (fallback) {
             return NextResponse.json(fallback);

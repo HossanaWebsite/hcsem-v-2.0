@@ -6,9 +6,12 @@
    - Environments: .env.local
 
    Creating an optimized production build ...
-uncaughtException [Error: EPERM: operation not permitted, open 'C:\Users\Abene_J\Desktop\pro\improvement\hcsem-v2\.next\trace'] {
-  errno: -4048,
-  code: 'EPERM',
-  syscall: 'open',
-  path: 'C:\\Users\\Abene_J\\Desktop\\pro\\improvement\\hcsem-v2\\.next\\trace'
-}
+Failed to compile.
+
+./app/api/upload/route.js
+Module not found: Can't resolve 'cloudinary'
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+> Build failed because of webpack errors
