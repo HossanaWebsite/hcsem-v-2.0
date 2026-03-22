@@ -1,6 +1,6 @@
 {
-    "logoUrl": "/images/logo.png",
-    "heroImage": "/hero-home.png",
+    "logoUrl": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774168882/hcsem_uploads/xpxqfqvqny6dj8ivmucx.png",
+    "heroImage": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774168751/hcsem_uploads/bvaz5veppbfb8hebx1ab.jpg",
     "heroTitle": "HCSEM",
     "heroSubtitle": "Building community. \nPreserving culture .",
     "adminTheme": {
@@ -18,7 +18,7 @@
         "copyright": "© 2024 HCSEM. All rights reserved.",
         "columns": []
     },
-    "updatedAt": "2026-03-22T03:31:09.171Z",
+    "updatedAt": "2026-03-22T10:18:37.803Z",
     "aboutActivities": [
         {
             "title": {
@@ -89,46 +89,47 @@
             "_id": "69bf627d9746dd94a6a5b0a1"
         },
         {
-            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774149694/hcsem_uploads/mfzvtz8zn5l5pcell2le.jpg",
-            "order": 6,
-            "_id": "69bf627d9746dd94a6a5b0a2"
+            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774173327/hcsem_uploads/sucvho1hlnnaipbxlfrm.jpg",
+            "order": 5,
+            "_id": "69bfbc98f73fc91b688a5356"
         },
         {
-            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774150260/hcsem_uploads/efphp3uowfa0yvcov8gh.jpg",
+            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774174682/hcsem_uploads/lhqyd1yqsttkehhgpart.jpg",
             "order": 6,
-            "_id": "69bf627d9746dd94a6a5b0a3"
+            "_id": "69bfc1fd7defa6c499dc13dd"
+        },
+        {
+            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774174703/hcsem_uploads/eglvy2fqkk61q2tapmpn.jpg",
+            "order": 7,
+            "_id": "69bfc1fd7defa6c499dc13de"
         }
     ],
     "eventsVideoUrl": "/folder/1.mp4",
     "galleryImages": [
         {
-            "url": "/folder/2.jpg",
-            "_id": "695e402180b5b0cdb41bdb56"
+            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774167934/hcsem_uploads/rj2tn6k4qywtrcldrv0t.jpg",
+            "order": 0,
+            "_id": "69bfab8485c77939bf941696"
         },
         {
-            "url": "/folder/3.jpg",
-            "_id": "695e402180b5b0cdb41bdb57"
+            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774167946/hcsem_uploads/vs3nv6zusxtjrguywc5z.jpg",
+            "order": 1,
+            "_id": "69bfab8485c77939bf941697"
         },
         {
-            "url": "/folder/9.jpg",
-            "_id": "695e402180b5b0cdb41bdb58"
+            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774167956/hcsem_uploads/ni1pe6c8jhbzcqfoledz.jpg",
+            "order": 2,
+            "_id": "69bfab8485c77939bf941698"
         },
         {
-            "url": "/folder/10.jpg",
-            "_id": "695e402180b5b0cdb41bdb59"
+            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774167965/hcsem_uploads/bruy935nccs39onx3bsw.jpg",
+            "order": 3,
+            "_id": "69bfab8485c77939bf941699"
         },
         {
-            "url": "/folder/13.jpg",
-            "_id": "695e402180b5b0cdb41bdb5a"
-        },
-        {
-            "url": "/folder/16.jpg",
-            "_id": "695e402180b5b0cdb41bdb5b"
-        },
-        {
-            "url": "/uploads/1770774821705-about-mission.png",
-            "order": 6,
-            "_id": "698be13ef45ec698e6614d9d"
+            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774167971/hcsem_uploads/mjiipsazoxpaumaqusv9.jpg",
+            "order": 4,
+            "_id": "69bfab8485c77939bf94169a"
         }
     ],
     "showAboutHeader": true,
@@ -164,14 +165,14 @@
     "tickerImages": [
         {
             "url": "/folder/2.jpg",
-            "title": "Cultural Festival",
+            "title": "Cultural Festival1",
             "subtitle": "Celebrating our heritage together",
             "_id": "695e402180b5b0cdb41bdb5f"
         },
         {
             "url": "/folder/3.jpg",
             "title": "Community Gathering",
-            "subtitle": "Sharing traditional Ethiopian flavors",
+            "subtitle": "Sharing traditional Ethiopian flavors1",
             "_id": "695e402180b5b0cdb41bdb60"
         },
         {
@@ -192,6 +193,13 @@
             "title": "tst",
             "subtitle": "test",
             "_id": "698be13ef45ec698e6614da5"
+        },
+        {
+            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774173357/hcsem_uploads/y17bkcaom51gkk6plwsu.jpg",
+            "order": 5,
+            "title": "",
+            "subtitle": "",
+            "_id": "69bfac7c85c77939bf941749"
         }
     ],
     "walkthroughItems": [
@@ -199,7 +207,7 @@
             "name": "Welcome Hall",
             "title": "Community Gathering Space",
             "description": "Our main gathering area where members connect and celebrate together.",
-            "image": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774149943/hcsem_uploads/cr33kkchfzuo9ajrqtdd.jpg",
+            "image": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774174653/hcsem_uploads/axbuugqrhv6izdbnkk9y.jpg",
             "iconName": "Home",
             "features": [
                 "Monthly meetups",

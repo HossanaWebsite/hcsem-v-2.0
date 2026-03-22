@@ -5,6 +5,7 @@ import { Event } from '@/models';
 import { Calendar, MapPin, ArrowLeft, Clock } from 'lucide-react';
 import Link from 'next/link';
 import RsvpButton from '@/components/RsvpButton';
+import ShareEvent from '@/components/ShareEvent';
 import EventCarousel from '@/components/EventCarousel';
 
 async function getEvent(idOrSlug) {
@@ -88,9 +89,9 @@ export default async function EventDetailPage({ params }) {
                 </header>
 
                 <div className="space-y-16">
-                    {/* RSVP Button */}
-                    <div className="flex justify-center">
+                    <div className="flex flex-col items-center justify-center gap-4">
                         <RsvpButton eventId={String(event._id)} rsvpCount={event.rsvps?.length || 0} />
+                        <ShareEvent title={event.title} description={event.description?.replace(/<[^>]+>/g, '').slice(0, 160) || ''} />
                     </div>
 
                     {event.layoutTemplate?.toLowerCase() === 'featured' ? (

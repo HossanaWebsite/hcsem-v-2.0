@@ -151,7 +151,7 @@ export default function SearchOverlay({ isOpen, onClose }) {
                                                 ))}
                                                 {isAdmin && (
                                                     <Link
-                                                        href="/admin/dashboard"
+                                                        href="/admin"
                                                         onClick={onClose}
                                                         className="p-4 rounded-xl bg-indigo-500/10 hover:bg-indigo-500/20 transition-all text-center group border border-indigo-500/20"
                                                     >

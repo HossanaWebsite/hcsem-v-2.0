@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash, Lock, Unlock, RefreshCw, Key, Calendar, AlertTriangle, X } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useAdminProgress } from '@/context/AdminProgressContext';
 
 export default function UsersPage() {
     const [users, setUsers] = useState([]);
@@ -15,6 +16,7 @@ export default function UsersPage() {
     const [myPermissions, setMyPermissions] = useState([]);
 
     const [myRole, setMyRole] = useState(null);
+    const { startProgress, stopProgress } = useAdminProgress();
 
     const fetchData = async () => {
         try {
@@ -49,6 +51,7 @@ export default function UsersPage() {
 
     const handleDelete = async (id) => {
         if (!confirm('Delete this user?')) return;
+        startProgress('Deleting user...');
         try {
             const res = await fetch(`/api/users?id=${id}`, { method: 'DELETE' });
             if (res.ok) {
@@ -61,7 +64,7 @@ export default function UsersPage() {
         } catch (error) {
             console.error(error);
             toast.error('Error deleting user');
-        }
+        } finally { stopProgress(); }
     };
 
     const handleSave = async (e) => {
@@ -76,6 +79,7 @@ export default function UsersPage() {
             role: roleId || (roles.length > 0 ? roles[0]._id : undefined) // Default to first role if available
         };
 
+        startProgress('Saving user...');
         try {
             const res = await fetch('/api/users', {
                 method,
@@ -94,11 +98,12 @@ export default function UsersPage() {
         } catch (error) {
             console.error(error);
             toast.error('Error saving user');
-        }
+        } finally { stopProgress(); }
     };
 
     const handleUnlockAccount = async (userId) => {
         if (!confirm('Unlock this user account?')) return;
+        startProgress('Unlocking account...');
         try {
             const res = await fetch('/api/users', {
                 method: 'PUT',
@@ -115,10 +120,11 @@ export default function UsersPage() {
         } catch (error) {
             console.error(error);
             toast.error('Error unlocking account');
-        }
+        } finally { stopProgress(); }
     };
 
     const handleResetFailedAttempts = async (userId) => {
+        startProgress('Resetting attempts...');
         try {
             const res = await fetch('/api/users', {
                 method: 'PUT',
@@ -135,10 +141,11 @@ export default function UsersPage() {
         } catch (error) {
             console.error(error);
             toast.error('Error resetting attempts');
-        }
+        } finally { stopProgress(); }
     };
 
     const handleInitiatePasswordReset = async (userId) => {
+        startProgress('Initiating password reset...');
         try {
             const res = await fetch('/api/password-reset', {
                 method: 'POST',
@@ -156,10 +163,11 @@ export default function UsersPage() {
         } catch (error) {
             console.error(error);
             toast.error('Error initiating reset');
-        }
+        } finally { stopProgress(); }
     };
 
     const handleForcePasswordChange = async (userId, mustChange) => {
+        startProgress('Updating password requirement...');
         try {
             const res = await fetch('/api/users', {
                 method: 'PUT',
@@ -176,7 +184,7 @@ export default function UsersPage() {
         } catch (error) {
             console.error(error);
             toast.error('Error updating setting');
-        }
+        } finally { stopProgress(); }
     };
 
     const getStatusBadge = (user) => {

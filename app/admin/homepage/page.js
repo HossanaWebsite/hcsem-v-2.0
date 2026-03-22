@@ -114,23 +114,26 @@ export default function HomePageSettings() {
     }, []);
 
 
-    const handleSave = async () => {
+    const handleSave = async (updatedSettings = null) => {
         setSaving(true);
+        const dataToSave = updatedSettings && !updatedSettings.nativeEvent ? updatedSettings : settings;
         try {
             const res = await fetch('/api/settings', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(settings),
+                body: JSON.stringify(dataToSave),
             });
 
             if (res.ok) {
-                toast.success('Home page settings saved successfully');
+                if (!updatedSettings || updatedSettings.nativeEvent) {
+                    toast.success('Home page settings saved successfully');
+                }
             } else {
                 toast.error('Failed to save settings');
             }
         } catch (error) {
-            console.error(error);
-            toast.error('Error saving settings');
+            console.error('Save settings error:', error);
+            toast.error('Error saving settings. Please check your connection.');
         } finally {
             setSaving(false);
         }
@@ -154,12 +157,16 @@ export default function HomePageSettings() {
         setSettings({ ...settings, stats: newStats });
     };
 
-    const handleImageUpload = async (e, type = 'ticker') => {
+    const [uploadingState, setUploadingState] = useState({ isUploading: false, type: null, index: null });
+
+    const handleImageUpload = async (e, type = 'ticker', index = null) => {
         const files = e.target.files;
         if (!files || files.length === 0) return;
 
-        const toastId = toast.loading("Uploading image(s)...");
+        setUploadingState({ isUploading: true, type, index });
+        const toastId = toast.loading("Uploading image(s) to secure storage...");
         let successCount = 0;
+        let newSettings = { ...settings };
 
         try {
             for (let i = 0; i < files.length; i++) {
@@ -173,65 +180,69 @@ export default function HomePageSettings() {
 
                 if (res.ok) {
                     const response = await res.json();
-                    console.log('Upload response:', response); // Debug log
-                    console.log('Upload type:', type); // Debug log
-
-                    // Extract URL from nested data object
                     const imageUrl = response.data?.url || response.url;
-                    console.log('Extracted image URL:', imageUrl); // Debug log
 
-                    if (!imageUrl) {
-                        console.error('No URL in response:', response);
-                        toast.error('Upload failed: No URL returned');
-                        continue;
-                    }
+                    if (!imageUrl) continue;
 
                     if (type === 'logo') {
-                        setSettings(prev => ({ ...prev, logoUrl: imageUrl }));
+                        newSettings.logoUrl = imageUrl;
                         successCount++;
                         break;
                     } else if (type === 'hero') {
-                        setSettings(prev => ({ ...prev, heroImage: imageUrl }));
+                        newSettings.heroImage = imageUrl;
                         successCount++;
                         break;
                     } else if (type === 'gallery') {
-                        setSettings(prev => ({
-                            ...prev,
-                            galleryImages: [
-                                ...prev.galleryImages,
-                                { url: imageUrl, order: prev.galleryImages.length }
-                            ]
-                        }));
+                        // Ensure we have a fresh array reference
+                        newSettings.galleryImages = [...newSettings.galleryImages];
+                        if (index !== null) {
+                            newSettings.galleryImages[index] = { ...newSettings.galleryImages[index], url: imageUrl };
+                        } else {
+                            newSettings.galleryImages.push({ url: imageUrl, order: newSettings.galleryImages.length });
+                        }
                         successCount++;
                     } else {
-                        // ticker images with title and subtitle
-                        const newImage = { url: imageUrl, title: '', subtitle: '', order: settings.tickerImages.length };
-                        console.log('Adding ticker image:', newImage); // Debug log
-                        setSettings(prev => ({
-                            ...prev,
-                            tickerImages: [
-                                ...prev.tickerImages,
-                                newImage
-                            ]
-                        }));
+                        // ticker images
+                        newSettings.tickerImages = [...newSettings.tickerImages];
+                        if (index !== null) {
+                            newSettings.tickerImages[index] = { ...newSettings.tickerImages[index], url: imageUrl };
+                        } else {
+                            newSettings.tickerImages.push({ url: imageUrl, title: '', subtitle: '', order: newSettings.tickerImages.length });
+                        }
                         successCount++;
                     }
                 } else {
-                    const errorText = await res.text();
-                    console.error('Upload failed:', res.status, errorText);
-                    toast.error(`Upload failed: ${res.status}`);
+                    console.error('Upload failed:', res.status);
                 }
             }
 
             if (successCount > 0) {
-                toast.update(toastId, { render: `${successCount} image(s) uploaded!`, type: "success", isLoading: false, autoClose: 3000 });
+                setSettings(newSettings);
+                // Background auto-save to DB to persist URLs immediately
+                try {
+                    const saveRes = await fetch('/api/settings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newSettings),
+                    });
+                    if (saveRes.ok) {
+                        toast.update(toastId, { render: `${successCount} image(s) successfuly uploaded and saved to Database!`, type: "success", isLoading: false, autoClose: 4000 });
+                    } else {
+                        throw new Error("DB persistence failed");
+                    }
+                } catch (saveError) {
+                    console.error("Auto-save error:", saveError);
+                    toast.update(toastId, { render: `Uploaded to Cloudinary but failed to sync to Database. Please click Save Changes manually.`, type: "warning", isLoading: false, autoClose: 5000 });
+                }
             } else {
-                toast.update(toastId, { render: "Upload failed", type: "error", isLoading: false, autoClose: 3000 });
+                toast.update(toastId, { render: "Upload mechanism failed. Please try again.", type: "error", isLoading: false, autoClose: 4000 });
             }
 
         } catch (error) {
-            console.error('Upload error:', error);
-            toast.update(toastId, { render: `Error uploading: ${error.message}`, type: "error", isLoading: false, autoClose: 3000 });
+            console.error('Upload component error:', error);
+            toast.update(toastId, { render: `System error during upload. Please check your connection.`, type: "error", isLoading: false, autoClose: 4000 });
+        } finally {
+            setUploadingState({ isUploading: false, type: null, index: null });
         }
     };
 
@@ -270,7 +281,24 @@ export default function HomePageSettings() {
     }
 
     return (
-        <div className="space-y-8 max-w-5xl mx-auto pb-20">
+        <>
+            {saving && (
+                <div className="fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center">
+                    <div className="bg-slate-900 px-10 py-8 rounded-2xl border border-white/10 shadow-2xl flex flex-col items-center gap-6 max-w-sm text-center">
+                        <div className="relative">
+                            <div className="w-16 h-16 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <Save className="w-6 h-6 text-indigo-400" />
+                            </div>
+                        </div>
+                        <div>
+                            <p className="text-xl font-bold text-white mb-2">Saving Changes...</p>
+                            <p className="text-sm text-slate-400">Please wait while your updates are securely saved to the database. This usually takes a second.</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+            <div className="space-y-8 max-w-5xl mx-auto pb-20">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold font-heading text-white">Home Page Content</h1>
@@ -558,7 +586,12 @@ export default function HomePageSettings() {
                             animate={{ opacity: 1, y: 0 }}
                             className="flex gap-4 p-4 rounded-xl bg-slate-950/30 border border-white/5 group"
                         >
-                            <div className="relative w-32 h-24 flex-shrink-0 rounded-lg overflow-hidden border border-white/10 bg-slate-950">
+                            <div className="relative w-32 h-24 flex-shrink-0 rounded-lg overflow-hidden border border-white/10 bg-slate-950 group/img">
+                                {uploadingState.isUploading && uploadingState.type === 'ticker' && uploadingState.index === index ? (
+                                    <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                                        <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
+                                    </div>
+                                ) : null}
                                 {img.url ? (
                                     <Image
                                         src={img.url}
@@ -570,9 +603,18 @@ export default function HomePageSettings() {
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center bg-slate-900 text-slate-500 text-xs">No Image</div>
                                 )}
+                                
+                                {/* Hover actions */}
+                                <div className="absolute inset-0 bg-black/50 transition-opacity flex flex-col items-center justify-center opacity-0 group-hover/img:opacity-100 backdrop-blur-sm gap-2">
+                                    <label className="cursor-pointer bg-indigo-600/80 hover:bg-indigo-600 text-white px-3 py-1.5 rounded-md transition-colors border border-white/10 flex items-center gap-2 text-xs shadow-lg">
+                                        <Upload className="w-3 h-3" /> Change
+                                        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'ticker', index)} disabled={uploadingState.isUploading} />
+                                    </label>
+                                </div>
+
                                 <button
                                     onClick={() => removeImage(index)}
-                                    className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"
+                                    className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover/img:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"
                                     title="Remove Image"
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -696,8 +738,13 @@ export default function HomePageSettings() {
                             layout
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            className="group relative aspect-square bg-slate-950 rounded-lg overflow-hidden border border-white/10"
+                            className="group/img relative aspect-square bg-slate-950 rounded-lg overflow-hidden border border-white/10"
                         >
+                            {uploadingState.isUploading && uploadingState.type === 'gallery' && uploadingState.index === index ? (
+                                <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                                    <Loader2 className="w-6 h-6 text-indigo-400 animate-spin" />
+                                </div>
+                            ) : null}
                             {img.url ? (
                                 <Image
                                     src={img.url}
@@ -709,9 +756,18 @@ export default function HomePageSettings() {
                             ) : (
                                 <div className="w-full h-full flex items-center justify-center bg-slate-900 text-slate-500 text-xs">No Image</div>
                             )}
+
+                            {/* Hover actions */}
+                            <div className="absolute inset-0 bg-black/50 transition-opacity flex flex-col items-center justify-center opacity-0 group-hover/img:opacity-100 backdrop-blur-sm gap-2">
+                                <label className="cursor-pointer bg-indigo-600/80 hover:bg-indigo-600 text-white px-3 py-1.5 rounded-md transition-colors border border-white/10 flex items-center gap-2 text-sm shadow-lg">
+                                    <Upload className="w-4 h-4" /> Change Image
+                                    <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageUpload(e, 'gallery', index)} disabled={uploadingState.isUploading} />
+                                </label>
+                            </div>
+
                             <button
                                 onClick={() => removeGalleryImage(index)}
-                                className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"
+                                className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover/img:opacity-100 transition-opacity shadow-lg z-10 hover:bg-red-600"
                                 title="Remove Image"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
@@ -794,5 +850,6 @@ export default function HomePageSettings() {
                 </div>
             </section>
         </div>
+        </>
     );
 }

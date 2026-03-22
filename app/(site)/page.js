@@ -11,7 +11,7 @@ import dynamic from 'next/dynamic';
 const InfiniteScroll = dynamic(() => import('@/components/InfiniteScroll'), {
   loading: () => <div className="h-96 animate-pulse bg-muted/20 rounded-3xl" />
 });
-const MiniGallery = dynamic(() => import('@/components/MiniGallery'), {
+const CreativeGallery = dynamic(() => import('@/components/CreativeGallery'), {
   loading: () => <div className="h-96 animate-pulse bg-muted/20 rounded-3xl" />
 });
 const DonationModal = dynamic(() => import('@/components/DonationModal'));
@@ -261,7 +261,7 @@ export default function HomePage() {
               </p>
             </motion.div>
 
-            <MiniGallery images={settings.galleryImages} />
+            <CreativeGallery images={settings.galleryImages} />
           </div>
         </section>
       )}

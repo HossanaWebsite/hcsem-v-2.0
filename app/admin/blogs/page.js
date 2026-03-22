@@ -6,6 +6,7 @@ import { Plus, Edit, Trash, Check, X, Eye } from 'lucide-react';
 import 'react-quill-new/dist/quill.snow.css';
 import BlogPreviewModal from '@/components/preview/BlogPreviewModal';
 import ImageInput from '@/components/ImageInput';
+import { useAdminProgress } from '@/context/AdminProgressContext';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 
@@ -15,6 +16,7 @@ export default function BlogsPage() {
     const [isEditing, setIsEditing] = useState(false);
     const [currentBlog, setCurrentBlog] = useState({});
     const [showPreview, setShowPreview] = useState(false);
+    const { startProgress, stopProgress } = useAdminProgress();
 
     // Fetch Blogs
     const fetchBlogs = async () => {
@@ -32,16 +34,18 @@ export default function BlogsPage() {
 
     const handleDelete = async (id) => {
         if (!confirm('Are you sure you want to delete this blog?')) return;
+        startProgress('Deleting blog...');
         try {
             const res = await fetch(`/api/blogs?id=${id}`, { method: 'DELETE' });
             if (res.ok) fetchBlogs();
         } catch (error) {
             alert('Failed to delete');
-        }
+        } finally { stopProgress(); }
     };
 
     const handleSave = async (e) => {
         e.preventDefault();
+        startProgress('Saving blog...');
         const method = currentBlog._id ? 'PUT' : 'POST';
         const body = { ...currentBlog, id: currentBlog._id }; // ensure id is passed for PUT
 
@@ -62,7 +66,7 @@ export default function BlogsPage() {
         } catch (error) {
             console.error(error);
             alert('Failed to save');
-        }
+        } finally { stopProgress(); }
     };
 
     const handleEdit = (blog) => {

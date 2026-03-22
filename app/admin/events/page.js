@@ -7,6 +7,7 @@ import { Plus, Edit, Trash, Calendar, X } from 'lucide-react';
 import 'react-quill-new/dist/quill.snow.css';
 import EventPreviewModal from '@/components/preview/EventPreviewModal';
 import ImageInput from '@/components/ImageInput';
+import { useAdminProgress } from '@/context/AdminProgressContext';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 
@@ -16,6 +17,7 @@ export default function EventsPage() {
     const [isEditing, setIsEditing] = useState(false);
     const [currentEvent, setCurrentEvent] = useState({});
     const [showPreview, setShowPreview] = useState(false);
+    const { startProgress, stopProgress } = useAdminProgress();
 
     const fetchEvents = async () => {
         setLoading(true);
@@ -32,14 +34,17 @@ export default function EventsPage() {
 
     const handleDelete = async (id) => {
         if (!confirm('Delete this event?')) return;
+        startProgress('Deleting event...');
         try {
             await fetch(`/api/events?id=${id}`, { method: 'DELETE' });
             fetchEvents();
         } catch (error) { alert('Failed to delete'); }
+        finally { stopProgress(); }
     };
 
     const handleSave = async (e) => {
         e.preventDefault();
+        startProgress('Saving event...');
         const method = currentEvent._id ? 'PUT' : 'POST';
         const body = { ...currentEvent, id: currentEvent._id };
 
@@ -62,6 +67,7 @@ export default function EventsPage() {
                 alert('Failed to save');
             }
         } catch (error) { alert('Error saving event'); }
+        finally { stopProgress(); }
     };
 
     if (isEditing) {

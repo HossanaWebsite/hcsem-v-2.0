@@ -63,7 +63,7 @@ export default function AboutPage() {
         : defaultActivities;
 
     return (
-        <div ref={containerRef} className="min-h-screen">
+        <div ref={containerRef} className="min-h-screen overflow-x-hidden">
             {/* Hero Section */}
             {settings.showAboutHeader && (
                 <section className="relative min-h-screen flex items-center justify-center px-6 py-20 overflow-hidden">

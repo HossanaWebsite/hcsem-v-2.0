@@ -122,14 +122,23 @@ export default function Footer() {
                 </div>
 
                 {/* Bottom Bar */}
-                <div className="pt-10 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6 text-muted-foreground">
-                    <p>© 2024 HCSEM. All rights reserved.</p>
-                    <div className="flex gap-8">
-                        <Link href="#" className="hover:text-primary transition-colors">
-                            Privacy Policy
-                        </Link>
-                        <Link href="#" className="hover:text-primary transition-colors">
-                            Terms of Service
+                <div className="pt-10 border-t border-border flex flex-col items-center gap-6 text-muted-foreground">
+                    <div className="w-full flex flex-col md:flex-row justify-between items-center gap-6">
+                        <p>© {new Date().getFullYear()} HCSEM. All rights reserved.</p>
+                        <div className="flex gap-8">
+                            <Link href="/privacy" className="hover:text-primary transition-colors">
+                                Privacy Policy
+                            </Link>
+                            <Link href="/terms" className="hover:text-primary transition-colors">
+                                Terms of Service
+                            </Link>
+                        </div>
+                    </div>
+                    {/* Developers Link */}
+                    <div className="mt-4 pb-4">
+                        <Link href="/developers" className="group text-sm font-medium transition-all duration-300 inline-flex items-center gap-2">
+                            <span>Crafted by</span>
+                            <span className="font-bold border-b-2 border-dotted border-transparent group-hover:border-indigo-400 group-hover:text-indigo-400 transition-all duration-300 group-hover:-translate-y-1 inline-block">Developers</span>
                         </Link>
                     </div>
                 </div>

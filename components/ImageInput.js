@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { Link2, Upload, X, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
+import { toast } from 'react-toastify';
 
 /**
  * A reusable image input that supports both:
@@ -30,6 +31,7 @@ export default function ImageInput({ value, onChange, label = 'Cover Image', cla
 
         setUploading(true);
         setError('');
+        const toastId = toast.loading("Uploading image to secure storage...");
         try {
             const formData = new FormData();
             formData.append('file', file);
@@ -41,12 +43,15 @@ export default function ImageInput({ value, onChange, label = 'Cover Image', cla
 
             if (res.ok && (imageData.url || imageData.secure_url)) {
                 onChange(imageData.url || imageData.secure_url);
+                toast.update(toastId, { render: "Image successfully uploaded!", type: "success", isLoading: false, autoClose: 3000 });
             } else {
                 setError(result.error || result.message || 'Upload failed. Please try again.');
+                toast.update(toastId, { render: "Upload failed. Please try again.", type: "error", isLoading: false, autoClose: 4000 });
             }
         } catch (error) {
             console.error('Upload component error:', error);
             setError('Network error. Please try again.');
+            toast.update(toastId, { render: "System error during upload. Please check your connection.", type: "error", isLoading: false, autoClose: 4000 });
         } finally {
             setUploading(false);
             if (fileRef.current) fileRef.current.value = '';

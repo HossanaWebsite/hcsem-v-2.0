@@ -6,6 +6,7 @@ import AppHeader from '@/components/layout/AppHeader';
 import AppSidebar from '@/components/layout/AppSidebar';
 import Backdrop from '@/components/layout/Backdrop';
 import ForcePasswordChangeModal from '@/components/ForcePasswordChangeModal';
+import { AdminProgressProvider } from '@/context/AdminProgressContext';
 
 function AdminLayoutContent({ children }) {
     const { isExpanded, isHovered, isMobileOpen } = useSidebar();
@@ -35,8 +36,10 @@ function AdminLayoutContent({ children }) {
 
 export default function AdminLayout({ children }) {
     return (
-        <SidebarProvider>
-            <AdminLayoutContent>{children}</AdminLayoutContent>
-        </SidebarProvider>
+        <AdminProgressProvider>
+            <SidebarProvider>
+                <AdminLayoutContent>{children}</AdminLayoutContent>
+            </SidebarProvider>
+        </AdminProgressProvider>
     );
 }

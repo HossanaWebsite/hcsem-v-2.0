@@ -168,8 +168,9 @@ export default function EventsContentPage() {
         const files = e.target.files;
         if (!files || files.length === 0) return;
 
-        const toastId = toast.loading("Uploading image(s)...");
+        const toastId = toast.loading("Uploading image(s) to secure storage...");
         let successCount = 0;
+        let newSettings = { ...settings };
 
         try {
             for (let i = 0; i < files.length; i++) {
@@ -184,25 +185,24 @@ export default function EventsContentPage() {
                 if (res.ok) {
                     const response = await res.json();
                     const imageUrl = response.data?.url || response.url;
+                    
+                    if (!imageUrl) continue;
 
                     if (type === 'header') {
-                        setSettings(prev => ({ ...prev, eventsPageImage: imageUrl }));
+                        newSettings.eventsPageImage = imageUrl;
                         successCount++;
                         break; // Only one header image
                     } else if (type === 'gallery') {
-                        setSettings(prev => ({
-                            ...prev,
-                            eventsGalleryImages: [
-                                ...prev.eventsGalleryImages,
-                                { url: imageUrl, order: prev.eventsGalleryImages.length }
-                            ]
-                        }));
+                        newSettings.eventsGalleryImages = [
+                            ...newSettings.eventsGalleryImages,
+                            { url: imageUrl, order: newSettings.eventsGalleryImages.length }
+                        ];
                         successCount++;
                     } else if (type.startsWith('walkthrough-')) {
                         const index = parseInt(type.split('-')[1]);
-                        const newItems = [...settings.walkthroughItems];
-                        newItems[index].image = imageUrl;
-                        setSettings(prev => ({ ...prev, walkthroughItems: newItems }));
+                        const newItems = [...newSettings.walkthroughItems];
+                        newItems[index] = { ...newItems[index], image: imageUrl };
+                        newSettings.walkthroughItems = newItems;
                         successCount++;
                         break;
                     }
@@ -210,14 +210,29 @@ export default function EventsContentPage() {
             }
 
             if (successCount > 0) {
-                toast.update(toastId, { render: `${successCount} image(s) uploaded!`, type: "success", isLoading: false, autoClose: 3000 });
+                setSettings(newSettings);
+                // Background auto-save
+                try {
+                    const saveRes = await fetch('/api/settings', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(newSettings),
+                    });
+                    if (saveRes.ok) {
+                        toast.update(toastId, { render: `${successCount} image(s) successfully uploaded and saved to Database!`, type: "success", isLoading: false, autoClose: 4000 });
+                    } else {
+                        throw new Error("DB persistence failed");
+                    }
+                } catch (saveError) {
+                    toast.update(toastId, { render: `Uploaded to Cloudinary but failed to sync to Database. Please click Save Changes manually.`, type: "warning", isLoading: false, autoClose: 5000 });
+                }
             } else {
-                toast.update(toastId, { render: "Upload failed", type: "error", isLoading: false, autoClose: 3000 });
+                toast.update(toastId, { render: "Upload mechanism failed. Please try again.", type: "error", isLoading: false, autoClose: 4000 });
             }
 
         } catch (error) {
             console.error(error);
-            toast.update(toastId, { render: "Error uploading", type: "error", isLoading: false, autoClose: 3000 });
+            toast.update(toastId, { render: "System error during upload. Please check your connection.", type: "error", isLoading: false, autoClose: 4000 });
         }
     };
 
@@ -259,7 +274,24 @@ export default function EventsContentPage() {
     }
 
     return (
-        <div className="space-y-8 max-w-5xl mx-auto pb-20">
+        <>
+            {saving && (
+                <div className="fixed inset-0 z-[100] bg-slate-950/80 backdrop-blur-md flex flex-col items-center justify-center">
+                    <div className="bg-slate-900 px-10 py-8 rounded-2xl border border-white/10 shadow-2xl flex flex-col items-center gap-6 max-w-sm text-center">
+                        <div className="relative">
+                            <div className="w-16 h-16 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <Save className="w-6 h-6 text-indigo-400" />
+                            </div>
+                        </div>
+                        <div>
+                            <p className="text-xl font-bold text-white mb-2">Saving Changes...</p>
+                            <p className="text-sm text-slate-400">Please wait while your updates are securely saved to the database. This usually takes a second.</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+            <div className="space-y-8 max-w-5xl mx-auto pb-20">
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold font-heading text-white">Events Page Content</h1>
@@ -654,5 +686,6 @@ export default function EventsContentPage() {
                 </div>
             </section>
         </div>
+        </>
     );
 }

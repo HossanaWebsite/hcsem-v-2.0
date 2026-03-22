@@ -31,10 +31,15 @@ export default function UserDropdown() {
         setIsOpen(false);
     }
 
-    const handleSignOut = () => {
-        // Implement sign out logic here
-        console.log("Sign out clicked");
-        router.push('/');
+    const handleSignOut = async () => {
+        try {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            // Hard redirect to clear router cache and middleware state
+            window.location.href = '/';
+        } catch (error) {
+            console.error("Sign out failed", error);
+            router.push('/');
+        }
     };
 
     return (
