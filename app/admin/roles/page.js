@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash, Shield, Check } from 'lucide-react';
 import { toast } from 'react-toastify';
+import ConfirmModal from '@/components/admin/ConfirmModal';
 
 const AVAILABLE_PERMISSIONS = [
     { id: 'manage_users', label: 'Manage Users' },
@@ -17,6 +18,7 @@ export default function RolesPage() {
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [currentRole, setCurrentRole] = useState({ permissions: [] });
+    const [confirmAction, setConfirmAction] = useState({ isOpen: false, id: null });
 
     const fetchRoles = async () => {
         try {
@@ -33,10 +35,10 @@ export default function RolesPage() {
 
     useEffect(() => { fetchRoles(); }, []);
 
-    const handleDelete = async (id) => {
-        if (!confirm('Are you sure you want to delete this role?')) return;
+    const executeDelete = async () => {
+        if (!confirmAction.id) return;
         try {
-            const res = await fetch(`/api/roles?id=${id}`, { method: 'DELETE' });
+            const res = await fetch(`/api/roles?id=${confirmAction.id}`, { method: 'DELETE' });
             if (res.ok) {
                 toast.success('Role deleted successfully');
                 fetchRoles();
@@ -46,7 +48,13 @@ export default function RolesPage() {
         } catch (error) {
             console.error(error);
             toast.error('Error deleting role');
+        } finally {
+            setConfirmAction({ isOpen: false, id: null });
         }
+    };
+
+    const handleDelete = (id) => {
+        setConfirmAction({ isOpen: true, id });
     };
 
     const handleSave = async (e) => {
@@ -176,7 +184,7 @@ export default function RolesPage() {
 
     return (
         <div className="space-y-8 max-w-6xl mx-auto pb-20">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold font-heading text-white">Roles & Permissions</h1>
                     <p className="text-slate-400">Define access levels for system administrators</p>
@@ -246,6 +254,15 @@ export default function RolesPage() {
                     <span className="font-medium">Create New Role</span>
                 </button>
             </div>
+
+            <ConfirmModal 
+                isOpen={confirmAction.isOpen}
+                onClose={() => setConfirmAction({ isOpen: false, id: null })}
+                onConfirm={executeDelete}
+                title="Delete Role"
+                message="Are you sure you want to delete this role? This action cannot be undone."
+                confirmText="Delete Role"
+            />
         </div>
     );
 }

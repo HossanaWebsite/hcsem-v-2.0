@@ -29,7 +29,7 @@ export async function GET(req) {
         }
 
         const query = isAdmin ? {} : { isHidden: { $ne: true } };
-        let blogsQuery = Blog.find(query).sort({ updatedAt: -1 }).populate('author', 'fullName');
+        let blogsQuery = Blog.find(query).select('-content -blocks').sort({ updatedAt: -1 }).populate('author', 'fullName');
 
         let total = null;
         if (limit > 0) {
@@ -50,10 +50,14 @@ export async function GET(req) {
 export async function POST(req) {
     try {
         await dbConnect();
-        const body = await req.json();
-        const blog = await Blog.create(body);
+        const currentUser = await getCurrentUser(req);
+        if (!currentUser) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
 
-        await logAction(null, 'CREATE_BLOG', { title: blog.title, id: blog._id }, req);
+        const body = await req.json();
+        // Attach the author to the blog post
+        const blog = await Blog.create({ ...body, author: currentUser._id });
+
+        await logAction(currentUser._id, 'CREATE_BLOG', { title: blog.title, id: blog._id }, req);
         return handleSuccess(blog, "Blog created successfully");
     } catch (error) {
         return handleError(error, req);
@@ -63,6 +67,9 @@ export async function POST(req) {
 export async function PUT(req) {
     try {
         await dbConnect();
+        const currentUser = await getCurrentUser(req);
+        if (!currentUser) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+
         const body = await req.json();
         const { id, ...updateData } = body;
 
@@ -70,7 +77,7 @@ export async function PUT(req) {
 
         const blog = await Blog.findByIdAndUpdate(id, updateData, { new: true });
 
-        await logAction(null, 'UPDATE_BLOG', { title: blog.title, id: blog._id }, req);
+        await logAction(currentUser._id, 'UPDATE_BLOG', { title: blog.title, id: blog._id }, req);
         return handleSuccess(blog, "Blog updated successfully");
     } catch (error) {
         return handleError(error, req);
@@ -80,6 +87,9 @@ export async function PUT(req) {
 export async function DELETE(req) {
     try {
         await dbConnect();
+        const currentUser = await getCurrentUser(req);
+        if (!currentUser) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+
         const { searchParams } = new URL(req.url);
         const id = searchParams.get('id');
 
@@ -93,7 +103,7 @@ export async function DELETE(req) {
 
         await Blog.findByIdAndDelete(id);
 
-        await logAction(null, 'DELETE_BLOG', { id }, req);
+        await logAction(currentUser._id, 'DELETE_BLOG', { id }, req);
         return handleSuccess({ id }, "Blog deleted successfully");
     } catch (error) {
         return handleError(error, req);

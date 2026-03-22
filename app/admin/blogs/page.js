@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Plus, Edit, Trash, Check, X, Eye } from 'lucide-react';
+import { toast } from 'react-toastify';
+import ConfirmModal from '@/components/admin/ConfirmModal';
 import 'react-quill-new/dist/quill.snow.css';
 import BlogPreviewModal from '@/components/preview/BlogPreviewModal';
 import ImageInput from '@/components/ImageInput';
@@ -16,6 +18,7 @@ export default function BlogsPage() {
     const [isEditing, setIsEditing] = useState(false);
     const [currentBlog, setCurrentBlog] = useState({});
     const [showPreview, setShowPreview] = useState(false);
+    const [confirmAction, setConfirmAction] = useState({ isOpen: false, id: null });
     const { startProgress, stopProgress } = useAdminProgress();
 
     // Fetch Blogs
@@ -32,15 +35,27 @@ export default function BlogsPage() {
 
     useEffect(() => { fetchBlogs(); }, []);
 
-    const handleDelete = async (id) => {
-        if (!confirm('Are you sure you want to delete this blog?')) return;
+    const executeDelete = async () => {
+        if (!confirmAction.id) return;
         startProgress('Deleting blog...');
         try {
-            const res = await fetch(`/api/blogs?id=${id}`, { method: 'DELETE' });
-            if (res.ok) fetchBlogs();
+            const res = await fetch(`/api/blogs?id=${confirmAction.id}`, { method: 'DELETE' });
+            if (res.ok) {
+                toast.success('Blog deleted successfully');
+                fetchBlogs();
+            } else {
+                toast.error('Failed to delete blog');
+            }
         } catch (error) {
-            alert('Failed to delete');
-        } finally { stopProgress(); }
+            toast.error('Error deleting blog');
+        } finally { 
+            stopProgress(); 
+            setConfirmAction({ isOpen: false, id: null });
+        }
+    };
+
+    const handleDelete = (id) => {
+        setConfirmAction({ isOpen: true, id });
     };
 
     const handleSave = async (e) => {
@@ -57,21 +72,36 @@ export default function BlogsPage() {
             });
             const data = await res.json();
             if (data.success) {
+                toast.success('Blog saved successfully');
                 setIsEditing(false);
                 setCurrentBlog({});
                 fetchBlogs();
             } else {
-                alert(data.message);
+                toast.error(data.message || 'Failed to save blog');
             }
         } catch (error) {
             console.error(error);
-            alert('Failed to save');
+            toast.error('Failed to save blog');
         } finally { stopProgress(); }
     };
 
-    const handleEdit = (blog) => {
-        setCurrentBlog(blog);
-        setIsEditing(true);
+    const handleEdit = async (blog) => {
+        startProgress();
+        try {
+            const res = await fetch(`/api/blogs?id=${blog._id}`);
+            const data = await res.json();
+            if (data.success) {
+                setCurrentBlog(data.data);
+                setIsEditing(true);
+            } else {
+                toast.error('Failed to load blog details');
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('Error loading blog details');
+        } finally {
+            stopProgress();
+        }
     };
 
     const handleCreate = () => {
@@ -195,7 +225,7 @@ export default function BlogsPage() {
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <h2 className="text-3xl font-bold font-heading text-slate-900 dark:text-white">Blogs Management</h2>
                 <button onClick={handleCreate} className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg shadow-indigo-500/20 transition-all font-medium">
                     <Plus size={18} /> Create Blog
@@ -203,7 +233,8 @@ export default function BlogsPage() {
             </div>
 
             <div className="glass-panel rounded-2xl border border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/50 backdrop-blur-xl overflow-hidden shadow-sm">
-                <table className="w-full text-left">
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
                     <thead className="bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/5">
                         <tr>
                             <th className="px-6 py-4 text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">Title</th>
@@ -231,7 +262,17 @@ export default function BlogsPage() {
                         ))}
                     </tbody>
                 </table>
+                </div>
             </div>
+
+            <ConfirmModal 
+                isOpen={confirmAction.isOpen}
+                onClose={() => setConfirmAction({ isOpen: false, id: null })}
+                onConfirm={executeDelete}
+                title="Delete Blog"
+                message="Are you sure you want to permanently delete this blog? This action cannot be undone."
+                confirmText="Delete Blog"
+            />
         </div>
     );
 }

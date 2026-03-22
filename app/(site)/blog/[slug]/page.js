@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import dbConnect from '@/lib/db';
@@ -6,6 +7,7 @@ import { Calendar, User, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import { getCurrentUser } from '@/lib/auth';
+import ReadingProgressBar from '@/components/common/ReadingProgressBar';
 
 async function getBlog(slug) {
     await dbConnect();
@@ -19,7 +21,7 @@ async function getBlog(slug) {
         query.isHidden = { $ne: true };
     }
 
-    const blog = await Blog.findOne(query).populate('author', 'fullName');
+    const blog = await Blog.findOne(query).populate('author', 'fullName').lean();
     if (!blog) return null;
     return blog;
 }
@@ -51,6 +53,9 @@ export default async function BlogDetailPage({ params }) {
     }
 
     return (
+        <>
+        <ReadingProgressBar />
+
         <div className="min-h-screen section-spacing container-spacing">
             <article className="max-w-[85%] mx-auto space-y-16">
                 <Link href="/blog" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-lg">
@@ -83,9 +88,9 @@ export default async function BlogDetailPage({ params }) {
 
                 <div className="space-y-12 overflow-hidden break-words">
                     {blog.content ? (
-                        <div className="prose prose-xl dark:prose-invert max-w-none break-words  prose-headings:mb-4 prose-headings:mt-8" dangerouslySetInnerHTML={{ __html: blog.content }} />
+                        <div className="prose prose-xl dark:prose-invert max-w-none break-words  prose-headings:mb-4 prose-headings:mt-8" dangerouslySetInnerHTML={{ __html: blog.content || '' }} />
                     ) : (
-                        blog.blocks.map((block) => (
+                        (blog.blocks || []).map((block) => (
                             <div key={block._id} className="animate-in fade-in slide-in-from-bottom-4 duration-700">
                                 {/* Single Text */}
                                 {block.type === 'text' && (
@@ -156,6 +161,7 @@ export default async function BlogDetailPage({ params }) {
                 </div>
             </article >
         </div >
+        </>
     );
 }
 

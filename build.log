@@ -1,0 +1,11 @@
+
+> hcsem-v2@0.1.0 build
+> next build
+
+   ▲ Next.js 15.1.0
+   - Environments: .env.local
+
+
+> Build error occurred
+Error: You cannot use different slug names for the same dynamic path ('id' !== 'slug').
+    at Array.forEach (<anonymous>)

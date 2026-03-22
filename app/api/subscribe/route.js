@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/db';
 import { Subscriber } from '@/models';
+import { getCurrentUser } from '@/lib/auth';
 import { rateLimit } from '@/lib/rateLimit';
 
 // POST /api/subscribe — Subscribe to newsletter
@@ -39,38 +40,62 @@ export async function POST(req) {
     }
 }
 
-// DELETE /api/subscribe — Unsubscribe
-export async function DELETE(req) {
+// GET /api/subscribe — List ALL subscribers (admin only)
+export async function GET(req) {
     try {
         await dbConnect();
-        const { searchParams } = new URL(req.url);
-        const email = searchParams.get('email');
+        const currentUser = await getCurrentUser(req);
+        if (!currentUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-        if (!email) {
-            return NextResponse.json({ error: 'Email is required.' }, { status: 400 });
-        }
-
-        await Subscriber.findOneAndUpdate(
-            { email: email.toLowerCase() },
-            { active: false }
-        );
-
-        return NextResponse.json({ success: true, message: 'You have been unsubscribed.' });
-    } catch (error) {
-        console.error('Unsubscribe error:', error);
-        return NextResponse.json({ error: 'Failed to unsubscribe.' }, { status: 500 });
-    }
-}
-
-// GET /api/subscribe — List subscribers (admin only)
-export async function GET() {
-    try {
-        await dbConnect();
-        const subscribers = await Subscriber.find({ active: true })
+        const subscribers = await Subscriber.find({})
             .sort({ subscribedAt: -1 })
             .lean();
         return NextResponse.json({ success: true, data: subscribers, total: subscribers.length });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to fetch subscribers.' }, { status: 500 });
+    }
+}
+
+// PUT /api/subscribe — Toggle active state (admin only)
+export async function PUT(req) {
+    try {
+        await dbConnect();
+        const currentUser = await getCurrentUser(req);
+        if (!currentUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+        const { id, active } = await req.json();
+        if (!id) return NextResponse.json({ error: 'ID is required' }, { status: 400 });
+
+        await Subscriber.findByIdAndUpdate(id, { active });
+        return NextResponse.json({ success: true });
+    } catch (error) {
+        return NextResponse.json({ error: 'Failed to update subscriber.' }, { status: 500 });
+    }
+}
+
+// DELETE /api/subscribe — Remove subscriber (admin) or unsubscribe by email (public)
+export async function DELETE(req) {
+    try {
+        await dbConnect();
+        const { searchParams } = new URL(req.url);
+        const id = searchParams.get('id');
+        const email = searchParams.get('email');
+
+        if (id) {
+            // Admin hard delete by ID
+            const currentUser = await getCurrentUser(req);
+            if (!currentUser) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            await Subscriber.findByIdAndDelete(id);
+        } else if (email) {
+            // Public unsubscribe by email
+            await Subscriber.findOneAndUpdate({ email: email.toLowerCase() }, { active: false });
+        } else {
+            return NextResponse.json({ error: 'ID or email is required.' }, { status: 400 });
+        }
+
+        return NextResponse.json({ success: true, message: 'Done.' });
+    } catch (error) {
+        console.error('Unsubscribe error:', error);
+        return NextResponse.json({ error: 'Failed.' }, { status: 500 });
     }
 }

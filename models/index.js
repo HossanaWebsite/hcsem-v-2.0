@@ -324,6 +324,10 @@ const EventSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    rsvpEnabled: {
+        type: Boolean,
+        default: true, // RSVP is on by default; admins can turn it off per event
+    },
     // RSVP registrations for this event
     rsvps: [
         {

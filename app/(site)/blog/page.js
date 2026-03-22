@@ -11,7 +11,7 @@ export const dynamic = 'force-dynamic';
 async function getBlogs() {
     try {
         await dbConnect();
-        return await Blog.find({ isHidden: false }).sort({ createdAt: -1 }).populate('author', 'fullName');
+        return await Blog.find({ isHidden: false }).select('-content -blocks').sort({ createdAt: -1 }).populate('author', 'fullName').lean();
     } catch (error) {
         console.warn("Failed to fetch blogs during build (DB Connection Error):", error.message);
         return [];

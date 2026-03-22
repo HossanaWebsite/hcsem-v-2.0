@@ -105,10 +105,10 @@ export default function EventsPage() {
                         transition={{ duration: 0.8 }}
                         className="max-w-4xl mx-auto text-center space-y-6"
                     >
-                        <h1 className="text-6xl md:text-8xl font-heading font-bold">
+                        <h1 className="text-5xl md:text-8xl font-heading font-bold">
                             {settings.eventsPageTitle}
                         </h1>
-                        <p className="text-2xl md:text-3xl font-light text-foreground/80 whitespace-pre-line">
+                        <p className="text-xl md:text-3xl font-light text-foreground/80 whitespace-pre-line">
                             {settings.eventsPageSubtitle}
                         </p>
                     </motion.div>

@@ -5,8 +5,7 @@ import { logAction } from '@/lib/logger';
 import { getCurrentUser } from '@/lib/auth';
 import { deleteCloudinaryImages } from '@/lib/cloudinaryHelper';
 
-// Cache events for 20 seconds to reduce database load
-export const revalidate = 20;
+export const dynamic = 'force-dynamic';
 
 export async function GET(req) {
     try {
@@ -49,10 +48,13 @@ export async function GET(req) {
 export async function POST(req) {
     try {
         await dbConnect();
+        const currentUser = await getCurrentUser(req);
+        if (!currentUser) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+
         const body = await req.json();
         const event = await Event.create(body);
 
-        await logAction(null, 'CREATE_EVENT', { title: event.title, id: event._id }, req);
+        await logAction(currentUser._id, 'CREATE_EVENT', { title: event.title, id: event._id }, req);
         return handleSuccess(event, "Event created successfully");
     } catch (error) {
         return handleError(error, req);
@@ -62,6 +64,9 @@ export async function POST(req) {
 export async function PUT(req) {
     try {
         await dbConnect();
+        const currentUser = await getCurrentUser(req);
+        if (!currentUser) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+
         const body = await req.json();
         const { id, ...updateData } = body;
 
@@ -69,7 +74,7 @@ export async function PUT(req) {
 
         const event = await Event.findByIdAndUpdate(id, updateData, { new: true });
 
-        await logAction(null, 'UPDATE_EVENT', { title: event.title, id: event._id }, req);
+        await logAction(currentUser._id, 'UPDATE_EVENT', { title: event.title, id: event._id }, req);
         return handleSuccess(event, "Event updated successfully");
     } catch (error) {
         return handleError(error, req);
@@ -79,6 +84,9 @@ export async function PUT(req) {
 export async function DELETE(req) {
     try {
         await dbConnect();
+        const currentUser = await getCurrentUser(req);
+        if (!currentUser) return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
+
         const { searchParams } = new URL(req.url);
         const id = searchParams.get('id');
 
@@ -93,7 +101,7 @@ export async function DELETE(req) {
 
         await Event.findByIdAndDelete(id);
 
-        await logAction(null, 'DELETE_EVENT', { id }, req);
+        await logAction(currentUser._id, 'DELETE_EVENT', { id }, req);
         return handleSuccess({ id }, "Event deleted successfully");
     } catch (error) {
         return handleError(error, req);

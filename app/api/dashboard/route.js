@@ -1,4 +1,4 @@
-import { User, Blog, Event, ContactRequest } from '@/models';
+import { User, Blog, Event, ContactRequest, Subscriber } from '@/models';
 import dbConnect from '@/lib/db';
 import { handleError, handleSuccess } from '@/lib/errorHandler';
 
@@ -6,12 +6,13 @@ export async function GET(req) {
     try {
         await dbConnect();
 
-        const [userCount, blogCount, eventCount, contactCount, recentActivity] = await Promise.all([
+        const [userCount, blogCount, eventCount, contactCount, subscriberCount, recentActivity] = await Promise.all([
             User.countDocuments(),
-            Blog.countDocuments(),
-            Event.countDocuments(),
+            Blog.countDocuments({ isHidden: false }),
+            Event.countDocuments({ isHidden: false }),
             ContactRequest.countDocuments({ read: false }),
-            import('@/models').then(m => m.AuditLog.find().sort({ timestamp: -1 }).limit(10).populate('userId', 'fullName email'))
+            Subscriber.countDocuments({ active: true }),
+            import('@/models').then(m => m.AuditLog.find().sort({ timestamp: -1 }).limit(10).populate('userId', 'fullName email').lean())
         ]);
 
         return handleSuccess({
@@ -19,6 +20,7 @@ export async function GET(req) {
             blogs: blogCount,
             events: eventCount,
             messages: contactCount,
+            subscribers: subscriberCount,
             recentActivity: recentActivity || []
         });
     } catch (error) {

@@ -3,11 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import { Plus, Edit, Trash, Calendar, X } from 'lucide-react';
+import { Plus, Edit, Trash, Calendar, X, Users, ToggleLeft, ToggleRight, ChevronDown } from 'lucide-react';
+import { toast } from 'react-toastify';
 import 'react-quill-new/dist/quill.snow.css';
+import ConfirmModal from '@/components/admin/ConfirmModal';
 import EventPreviewModal from '@/components/preview/EventPreviewModal';
 import ImageInput from '@/components/ImageInput';
 import { useAdminProgress } from '@/context/AdminProgressContext';
+import { EventCardSkeleton } from '@/components/common/Skeletons';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 
@@ -17,6 +20,9 @@ export default function EventsPage() {
     const [isEditing, setIsEditing] = useState(false);
     const [currentEvent, setCurrentEvent] = useState({});
     const [showPreview, setShowPreview] = useState(false);
+    const [confirmAction, setConfirmAction] = useState({ isOpen: false, id: null });
+    const [rsvpDrawer, setRsvpDrawer] = useState(null); // event object whose attendees to show
+    const [togglingRsvp, setTogglingRsvp] = useState(null);
     const { startProgress, stopProgress } = useAdminProgress();
 
     const fetchEvents = async () => {
@@ -32,14 +38,26 @@ export default function EventsPage() {
 
     useEffect(() => { fetchEvents(); }, []);
 
-    const handleDelete = async (id) => {
-        if (!confirm('Delete this event?')) return;
+    const executeDelete = async () => {
+        if (!confirmAction.id) return;
         startProgress('Deleting event...');
         try {
-            await fetch(`/api/events?id=${id}`, { method: 'DELETE' });
-            fetchEvents();
-        } catch (error) { alert('Failed to delete'); }
-        finally { stopProgress(); }
+            const res = await fetch(`/api/events?id=${confirmAction.id}`, { method: 'DELETE' });
+            if (res.ok) {
+                toast.success('Event deleted successfully');
+                fetchEvents();
+            } else {
+                toast.error('Failed to delete event');
+            }
+        } catch (error) { toast.error('Error deleting event'); }
+        finally { 
+            stopProgress(); 
+            setConfirmAction({ isOpen: false, id: null });
+        }
+    };
+
+    const handleDelete = (id) => {
+        setConfirmAction({ isOpen: true, id });
     };
 
     const handleSave = async (e) => {
@@ -64,10 +82,26 @@ export default function EventsPage() {
                 setCurrentEvent({});
                 fetchEvents();
             } else {
-                alert('Failed to save');
+                toast.error('Failed to save event');
             }
-        } catch (error) { alert('Error saving event'); }
+        } catch (error) { toast.error('Error saving event'); }
         finally { stopProgress(); }
+    };
+
+    const toggleRsvp = async (event) => {
+        setTogglingRsvp(event._id);
+        try {
+            const res = await fetch('/api/events', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: event._id, rsvpEnabled: !event.rsvpEnabled }),
+            });
+            if (res.ok) {
+                setEvents(prev => prev.map(e => e._id === event._id ? { ...e, rsvpEnabled: !e.rsvpEnabled } : e));
+                toast.success(`RSVP ${!event.rsvpEnabled ? 'enabled' : 'disabled'} for this event`);
+            }
+        } catch { toast.error('Failed to update RSVP setting'); }
+        finally { setTogglingRsvp(null); }
     };
 
     if (isEditing) {
@@ -201,11 +235,15 @@ export default function EventsPage() {
         );
     }
 
-    if (loading) return <div>Loading...</div>;
+    if (loading) return (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1,2,3,4,5,6].map(i => <EventCardSkeleton key={i} />)}
+        </div>
+    );
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <h2 className="text-3xl font-bold font-heading text-slate-900 dark:text-white">Events Management</h2>
                 <button onClick={() => { setCurrentEvent({ gallery: [] }); setIsEditing(true); }} className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg shadow-indigo-500/20 transition-all font-medium"><Plus size={18} /> Create Event</button>
             </div>
@@ -232,6 +270,30 @@ export default function EventsPage() {
                                         : 'Invalid Date'}
                                 </p>
                             </div>
+                            {/* RSVP count + enabled toggle */}
+                            <div className="flex items-center justify-between text-sm">
+                                <button
+                                    onClick={() => setRsvpDrawer(event)}
+                                    className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+                                >
+                                    <Users size={14} />
+                                    {event.rsvps?.length || 0} attendee{event.rsvps?.length !== 1 ? 's' : ''}
+                                </button>
+                                <button
+                                    onClick={() => toggleRsvp(event)}
+                                    disabled={togglingRsvp === event._id}
+                                    className={`flex items-center gap-1 text-xs font-medium transition-all px-2 py-1 rounded-full border ${
+                                        event.rsvpEnabled !== false
+                                            ? 'text-emerald-600 border-emerald-500/30 hover:bg-emerald-50 dark:hover:bg-emerald-500/10'
+                                            : 'text-slate-400 border-slate-300 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/5'
+                                    }`}
+                                    title={event.rsvpEnabled !== false ? 'Disable RSVP' : 'Enable RSVP'}
+                                >
+                                    {event.rsvpEnabled !== false
+                                        ? <><ToggleRight size={14} /> RSVP On</>
+                                        : <><ToggleLeft size={14} /> RSVP Off</>}
+                                </button>
+                            </div>
                             <div className="flex gap-2 pt-2 border-t border-slate-100 dark:border-white/5">
                                 <button onClick={() => { setCurrentEvent(event); setIsEditing(true); }} className="flex-1 py-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-all text-sm font-medium">Edit</button>
                                 <button onClick={() => handleDelete(event._id)} className="flex-1 py-2 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-lg transition-all text-sm font-medium">Delete</button>
@@ -240,6 +302,56 @@ export default function EventsPage() {
                     </div>
                 ))}
             </div>
+
+            <ConfirmModal 
+                isOpen={confirmAction.isOpen}
+                onClose={() => setConfirmAction({ isOpen: false, id: null })}
+                onConfirm={executeDelete}
+                title="Delete Event"
+                message="Are you sure you want to permanently delete this event? This will remove all associated images and data. This action cannot be undone."
+                confirmText="Delete Event"
+            />
+
+            {/* RSVP Attendees Drawer */}
+            {rsvpDrawer && (
+                <div className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-sm">
+                    <div className="w-full max-w-md h-full bg-white dark:bg-slate-900 shadow-2xl flex flex-col">
+                        <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-white/10">
+                            <div>
+                                <h2 className="text-xl font-bold text-slate-900 dark:text-white">Attendees</h2>
+                                <p className="text-sm text-slate-500 mt-0.5 line-clamp-1">{rsvpDrawer.title}</p>
+                            </div>
+                            <button onClick={() => setRsvpDrawer(null)} className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-white/10 text-slate-500 transition-all">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto p-6">
+                            {!rsvpDrawer.rsvps || rsvpDrawer.rsvps.length === 0 ? (
+                                <div className="text-center py-12">
+                                    <Users className="w-10 h-10 mx-auto mb-3 text-slate-300 dark:text-slate-600" />
+                                    <p className="text-slate-400">No RSVPs yet for this event</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-3">
+                                    <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider mb-4">{rsvpDrawer.rsvps.length} registered</p>
+                                    {rsvpDrawer.rsvps.map((r, i) => (
+                                        <div key={i} className="flex items-center gap-4 p-4 rounded-xl bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/5">
+                                            <div className="w-9 h-9 rounded-full bg-indigo-500/10 flex items-center justify-center flex-shrink-0">
+                                                <span className="text-indigo-500 font-bold text-sm">{r.name?.charAt(0)?.toUpperCase()}</span>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="font-semibold text-sm text-slate-900 dark:text-white">{r.name}</p>
+                                                <p className="text-xs text-slate-400 truncate">{r.email}</p>
+                                            </div>
+                                            <span className="text-xs text-slate-400 flex-shrink-0">{new Date(r.rsvpAt).toLocaleDateString()}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

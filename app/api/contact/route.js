@@ -15,41 +15,55 @@ const transporter = nodemailer.createTransport({
 
 // Generate HTML email template
 function generateContactRequestHTML(data) {
-  const tableRows = Object.entries(data).map(([key, value]) => {
-    const label = key
-      .replace(/([A-Z])/g, " $1")
-      .replace(/^./, (str) => str.toUpperCase());
-
+  const formatField = (label, value) => {
+    if (!value || value === 'undefined') return '';
     return `
       <tr>
-        <td style="padding: 8px; border: 1px solid #ccc;">${label}</td>
-        <td style="padding: 8px; border: 1px solid #ccc;">${value || ''}</td>
+        <td style="padding: 12px 15px; border-bottom: 1px solid #eee; font-weight: 600; width: 35%; color: #4b5563; vertical-align: top;">${label}</td>
+        <td style="padding: 12px 15px; border-bottom: 1px solid #eee; color: #111827; vertical-align: top; line-height: 1.5;">${value}</td>
       </tr>`;
-  });
+  };
+
+  const formattedAddress = [data.address, data.apartment, data.city, data.state, data.zipCode]
+      .filter(Boolean)
+      .join(', ');
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
   return `
-    <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
-      <h2 style="background-color: #004085; color: white; padding: 10px 15px; border-radius: 5px;">
-       HCSEM - New Contact Request
-      </h2>
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9fafb; border-radius: 12px;">
+      <div style="background-color: #4f46e5; color: white; padding: 30px 24px; border-radius: 12px 12px 0 0; text-align: center;">
+        <h2 style="margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">New Contact Request</h2>
+        <p style="margin: 8px 0 0 0; opacity: 0.9; font-size: 15px;">Hossana Community Hub</p>
+      </div>
 
-      <p style="margin: 20px 0;">You have received a new contact request. See the details below:</p>
+      <div style="background-color: white; padding: 32px 24px; border-radius: 0 0 12px 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+        <p style="margin: 0 0 24px 0; color: #4b5563; font-size: 16px; line-height: 1.5;">
+          You have received a new inquiry from <strong style="color: #111827;">${data.firstName} ${data.lastName}</strong>.
+        </p>
 
-      <table style="width: 100%; border-collapse: collapse; border: 1px solid #ccc;">
-        <thead>
-          <tr style="background-color: #f2f2f2;">
-            <th style="text-align: left; padding: 8px; border: 1px solid #ccc;">Field</th>
-            <th style="text-align: left; padding: 8px; border: 1px solid #ccc;">Value</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${tableRows.join("")}
-        </tbody>
-      </table>
+        <table style="width: 100%; border-collapse: collapse; background-color: white; border-radius: 8px; overflow: hidden; border: 1px solid #eee; font-size: 14px;">
+          <tbody>
+            ${formatField('Reason for Contact', data.reason)}
+            ${formatField('Full Name', `${data.firstName || ''} ${data.lastName || ''}`.trim())}
+            ${formatField('Email Address', `<a href="mailto:${data.email}" style="color: #4f46e5; text-decoration: none; font-weight: 500;">${data.email}</a>`)}
+            ${formatField('Phone Number', data.phone)}
+            ${formatField('Location', formattedAddress)}
+            ${formatField('Additional Notes', data.notes ? data.notes.replace(/\\n/g, '<br>') : '')}
+          </tbody>
+        </table>
 
-      <p style="margin-top: 30px; font-size: 14px; color: #888;">
-        This message was sent automatically from the HCSEM contact request system.
-      </p>
+        <div style="margin-top: 32px; text-align: center;">
+          <a href="${siteUrl}/admin/requests" style="display: inline-block; background-color: #4f46e5; color: white; text-decoration: none; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 15px; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);">
+            View Details in Dashboard
+          </a>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 24px; color: #9ca3af; font-size: 12px; line-height: 1.5;">
+        <p style="margin: 0;">This is an automated message from the HCSEM Contact System.</p>
+        <p style="margin: 4px 0 0 0;">Generated on ${new Date().toLocaleString()}</p>
+      </div>
     </div>
   `;
 }
@@ -73,7 +87,7 @@ export async function GET(req) {
       query.status = status;
     }
 
-    const requests = await ContactRequest.find(query).sort({ createdAt: -1 });
+    const requests = await ContactRequest.find(query).sort({ createdAt: -1 }).lean();
     return NextResponse.json({ success: true, data: requests });
   } catch (error) {
     console.error("Error fetching contact requests:", error);
@@ -113,14 +127,39 @@ export async function POST(req) {
 
     const htmlContent = generateContactRequestHTML(contactRequest.toObject());
 
-    // Send email notification if credentials are configured
     if (process.env.ADMIN_EMAIL && process.env.ADMIN_EMAIL_PASSWORD) {
+      // 1. Notify admins
       await transporter.sendMail({
         from: `"HCSEM" <${process.env.ADMIN_EMAIL}>`,
         to: process.env.ADMIN_EMAIL_RECEIVER || process.env.ADMIN_EMAIL,
         subject: `New Contact Request: ${contactRequest.reason}`,
         html: htmlContent,
       });
+
+      // 2. Auto-reply to submitter if they provided an email
+      if (data.email) {
+        await transporter.sendMail({
+          from: `"HCSEM" <${process.env.ADMIN_EMAIL}>`,
+          to: data.email,
+          subject: `We received your request – HCSEM`,
+          html: `
+            <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#333">
+              <div style="background:linear-gradient(135deg,#4f46e5,#7c3aed);padding:28px;border-radius:12px 12px 0 0;text-align:center">
+                <h2 style="color:white;margin:0;font-size:22px">Thank You, ${data.first_name}!</h2>
+              </div>
+              <div style="background:#f9fafb;padding:28px;border-radius:0 0 12px 12px;border:1px solid #e5e7eb;border-top:none">
+                <p style="font-size:15px;line-height:1.6">We've received your request regarding <strong>${contactRequest.reason}</strong>.</p>
+                <p style="font-size:15px;line-height:1.6;color:#6b7280">Our team will review it and get back to you as soon as possible. You can expect a response within 1–3 business days.</p>
+                <div style="background:#ede9fe;border-radius:8px;padding:16px;margin:20px 0">
+                  <p style="margin:0;font-size:13px;color:#7c3aed;font-weight:600">📋 Request Summary</p>
+                  <p style="margin:6px 0 0;font-size:13px;color:#555">Reason: ${contactRequest.reason}</p>
+                  <p style="margin:4px 0 0;font-size:13px;color:#555">Submitted: ${new Date().toLocaleString()}</p>
+                </div>
+                <p style="font-size:13px;color:#9ca3af;margin-top:20px">If you have questions, contact us at <a href="mailto:${process.env.ADMIN_EMAIL}" style="color:#4f46e5">${process.env.ADMIN_EMAIL}</a></p>
+              </div>
+            </div>`,
+        }).catch(err => console.warn('Auto-reply email failed (non-critical):', err.message));
+      }
     }
 
     return NextResponse.json({ success: true, request: contactRequest });

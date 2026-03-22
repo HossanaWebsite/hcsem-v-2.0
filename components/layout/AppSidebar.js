@@ -63,6 +63,14 @@ const navItems = [
         ],
     },
     {
+        name: "Community",
+        icon: <MessageSquare />,
+        subItems: [
+            { name: "Messages", path: "/admin/messages", pro: false },
+            { name: "Newsletter", path: "/admin/newsletter", pro: false },
+        ],
+    },
+    {
         name: "Management",
         icon: <TableIcon />,
         subItems: [
@@ -74,7 +82,7 @@ const navItems = [
 ];
 
 const AppSidebar = () => {
-    const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+    const { isExpanded, isMobileOpen, isHovered, setIsHovered, closeMobileSidebar } = useSidebar();
     const pathname = usePathname();
     const [logoUrl, setLogoUrl] = useState(null);
 
@@ -164,6 +172,7 @@ const AppSidebar = () => {
                         nav.path && (
                             <Link
                                 href={nav.path}
+                                onClick={closeMobileSidebar}
                                 className={`menu-item group ${isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
                                     } ${!isExpanded && !isHovered ? "lg:justify-center" : "lg:justify-start"}`}
                             >
@@ -199,6 +208,7 @@ const AppSidebar = () => {
                                     <li key={subItem.name}>
                                         <Link
                                             href={subItem.path}
+                                            onClick={closeMobileSidebar}
                                             className={`menu-dropdown-item py-2 ${isActive(subItem.path)
                                                 ? "menu-dropdown-item-active"
                                                 : "menu-dropdown-item-inactive"
@@ -245,7 +255,7 @@ const AppSidebar = () => {
                 className={`py-8 flex items-center h-20 ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
                     }`}
             >
-                <Link href="/" className="flex items-center gap-4 group">
+                <Link href="/" onClick={closeMobileSidebar} className="flex items-center gap-4 group">
                     {logoUrl ? (
                         <div className="relative w-10 h-10 group-hover:scale-110 transition-transform">
                             <Image src={logoUrl} alt="Logo" fill sizes="40px" className="object-contain" />

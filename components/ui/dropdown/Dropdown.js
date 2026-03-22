@@ -1,5 +1,6 @@
 'use client';
 import React, { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 
 export function Dropdown({ isOpen, onClose, className, children }) {
     const dropdownRef = useRef(null);
@@ -30,7 +31,7 @@ export function Dropdown({ isOpen, onClose, className, children }) {
 
 export function DropdownItem({ children, onClick, href, className }) {
     if (href) {
-        return <a href={href} className={className}>{children}</a>
+        return <Link href={href} className={className}>{children}</Link>
     }
     return (
         <button onClick={onClick} className={className}>

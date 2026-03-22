@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash, Lock, Unlock, RefreshCw, Key, Calendar, AlertTriangle, X } from 'lucide-react';
 import { toast } from 'react-toastify';
+import ConfirmModal from '@/components/admin/ConfirmModal';
 import { useAdminProgress } from '@/context/AdminProgressContext';
 
 export default function UsersPage() {
@@ -13,9 +14,11 @@ export default function UsersPage() {
     const [userForm, setUserForm] = useState({});
     const [showResetModal, setShowResetModal] = useState(false);
     const [resetToken, setResetToken] = useState(null);
+    const [resetTarget, setResetTarget] = useState(null); // Two-step confirm: stores user before firing
     const [myPermissions, setMyPermissions] = useState([]);
 
     const [myRole, setMyRole] = useState(null);
+    const [confirmAction, setConfirmAction] = useState({ isOpen: false, id: null, type: null });
     const { startProgress, stopProgress } = useAdminProgress();
 
     const fetchData = async () => {
@@ -49,23 +52,49 @@ export default function UsersPage() {
 
     const canManageUsers = myPermissions.includes('manage_users') || (myRole && myRole.toLowerCase() === 'admin');
 
-    const handleDelete = async (id) => {
-        if (!confirm('Delete this user?')) return;
-        startProgress('Deleting user...');
-        try {
-            const res = await fetch(`/api/users?id=${id}`, { method: 'DELETE' });
-            if (res.ok) {
-                toast.success('User deleted successfully');
-                fetchData();
-            } else {
-                const data = await res.json();
-                toast.error(data.error || 'Failed to delete user');
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error('Error deleting user');
-        } finally { stopProgress(); }
+    const executeAction = async () => {
+        const { id, type } = confirmAction;
+        if (!id) return;
+        
+        if (type === 'DELETE') {
+            startProgress('Deleting user...');
+            try {
+                const res = await fetch(`/api/users?id=${id}`, { method: 'DELETE' });
+                if (res.ok) {
+                    toast.success('User deleted successfully');
+                    fetchData();
+                } else {
+                    const data = await res.json();
+                    toast.error(data.error || 'Failed to delete user');
+                }
+            } catch (error) {
+                console.error(error);
+                toast.error('Error deleting user');
+            } finally { stopProgress(); }
+        } else if (type === 'UNLOCK') {
+            startProgress('Unlocking account...');
+            try {
+                const res = await fetch('/api/users', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, unlockAccount: true }),
+                });
+                if (res.ok) {
+                    toast.success('Account unlocked successfully');
+                    fetchData();
+                } else {
+                    const data = await res.json();
+                    toast.error(data.error || 'Failed to unlock account');
+                }
+            } catch (error) {
+                console.error(error);
+                toast.error('Error unlocking account');
+            } finally { stopProgress(); }
+        }
+        setConfirmAction({ isOpen: false, id: null, type: null });
     };
+
+    const handleDelete = (id) => setConfirmAction({ isOpen: true, id, type: 'DELETE' });
 
     const handleSave = async (e) => {
         e.preventDefault();
@@ -101,27 +130,7 @@ export default function UsersPage() {
         } finally { stopProgress(); }
     };
 
-    const handleUnlockAccount = async (userId) => {
-        if (!confirm('Unlock this user account?')) return;
-        startProgress('Unlocking account...');
-        try {
-            const res = await fetch('/api/users', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id: userId, unlockAccount: true }),
-            });
-            if (res.ok) {
-                toast.success('Account unlocked successfully');
-                fetchData();
-            } else {
-                const data = await res.json();
-                toast.error(data.error || 'Failed to unlock account');
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error('Error unlocking account');
-        } finally { stopProgress(); }
-    };
+    const handleUnlockAccount = (userId) => setConfirmAction({ isOpen: true, id: userId, type: 'UNLOCK' });
 
     const handleResetFailedAttempts = async (userId) => {
         startProgress('Resetting attempts...');
@@ -144,19 +153,21 @@ export default function UsersPage() {
         } finally { stopProgress(); }
     };
 
-    const handleInitiatePasswordReset = async (userId) => {
-        startProgress('Initiating password reset...');
+    const handleInitiatePasswordReset = async () => {
+        if (!resetTarget) return;
+        startProgress('Sending password reset email...');
         try {
             const res = await fetch('/api/password-reset', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId }),
+                body: JSON.stringify({ userId: resetTarget._id }),
             });
             const data = await res.json();
             if (data.success) {
                 setResetToken(data.data);
+                setResetTarget(null); // close confirm panel
                 setShowResetModal(true);
-                toast.success('Password reset initiated');
+                toast.success(data.data.emailSent ? 'Reset email sent!' : 'Reset token generated');
             } else {
                 toast.error(data.error || 'Failed to initiate reset');
             }
@@ -304,7 +315,7 @@ export default function UsersPage() {
 
     return (
         <div className="space-y-8 max-w-6xl mx-auto pb-20">
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold font-heading text-slate-900 dark:text-white">Users</h1>
                     <p className="text-slate-400">Manage system users and access roles</p>
@@ -381,7 +392,7 @@ export default function UsersPage() {
                                                     </button>
                                                 )}
                                                 <button
-                                                    onClick={() => handleInitiatePasswordReset(user._id)}
+                                                    onClick={() => setResetTarget(user)}
                                                     className="p-2 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 rounded-lg transition-all"
                                                     title="Reset Password"
                                                 >
@@ -425,20 +436,64 @@ export default function UsersPage() {
                 </div>
             </div>
 
-            {/* Reset Token Modal */}
+            {/* Two-step Reset Confirm Panel */}
+            {resetTarget && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="w-full max-w-md glass-panel p-8 rounded-2xl border border-white/10 bg-slate-900 shadow-2xl animate-in zoom-in-95 duration-200">
+                        <div className="flex items-center gap-4 mb-6">
+                            <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20">
+                                <Key className="w-6 h-6 text-indigo-400" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold text-white">Send Password Reset</h2>
+                                <p className="text-sm text-slate-400">This will generate a secure reset link</p>
+                            </div>
+                        </div>
+                        <div className="bg-slate-800/50 rounded-xl p-4 border border-white/5 mb-6">
+                            <p className="text-sm text-slate-400 mb-1">Reset will be sent to:</p>
+                            <p className="text-white font-semibold">{resetTarget.fullName}</p>
+                            <p className="text-indigo-300 text-sm">{resetTarget.email}</p>
+                        </div>
+                        <p className="text-sm text-slate-400 mb-6">A password reset email will be delivered to the user. The link expires in 24 hours.</p>
+                        <div className="flex gap-3 justify-end">
+                            <button
+                                onClick={() => setResetTarget(null)}
+                                className="px-5 py-2.5 rounded-xl text-slate-300 hover:text-white hover:bg-white/5 transition-all font-medium"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleInitiatePasswordReset}
+                                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium shadow-lg shadow-indigo-500/20 transition-all"
+                            >
+                                <Key size={16} /> Send Reset Email
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Reset Token Result Modal */}
             {showResetModal && resetToken && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
                     <div className="w-full max-w-2xl glass-panel p-8 rounded-2xl border border-white/10 bg-slate-900 shadow-2xl relative">
                         <button
-                            onClick={() => {
-                                setShowResetModal(false);
-                                setResetToken(null);
-                            }}
+                            onClick={() => { setShowResetModal(false); setResetToken(null); }}
                             className="absolute top-4 right-4 text-slate-400 hover:text-white"
                         >
                             <X size={20} />
                         </button>
-                        <h2 className="text-2xl font-bold text-white mb-6">Password Reset Token Generated</h2>
+                        <h2 className="text-2xl font-bold text-white mb-2">Password Reset Initiated</h2>
+
+                        {/* Email Status Badge */}
+                        <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium border mb-6 ${
+                            resetToken.emailSent
+                                ? 'bg-green-500/10 text-green-400 border-green-500/20'
+                                : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                        }`}>
+                            {resetToken.emailSent ? '✓ Email delivered to user' : '⚠ Email not sent — use manual link below'}
+                        </div>
+
                         <div className="space-y-4">
                             <div>
                                 <label className="text-sm font-medium text-slate-300 mb-2 block">User</label>
@@ -446,35 +501,40 @@ export default function UsersPage() {
                             </div>
                             <div>
                                 <label className="text-sm font-medium text-slate-300 mb-2 block">Reset URL</label>
-                                <div className="bg-slate-950/50 border border-white/10 rounded-lg p-4">
-                                    <code className="text-sm text-indigo-400 break-all">{resetToken.resetUrl}</code>
-                                </div>
-                            </div>
-                            <div>
-                                <label className="text-sm font-medium text-slate-300 mb-2 block">Token (for manual delivery)</label>
-                                <div className="bg-slate-950/50 border border-white/10 rounded-lg p-4">
-                                    <code className="text-sm text-green-400 break-all">{resetToken.resetToken}</code>
+                                <div className="bg-slate-950/50 border border-white/10 rounded-lg p-4 flex items-start gap-3">
+                                    <code className="text-sm text-indigo-400 break-all flex-1">{resetToken.resetUrl}</code>
+                                    <button
+                                        onClick={() => { navigator.clipboard.writeText(resetToken.resetUrl); toast.success('Link copied!'); }}
+                                        className="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-medium bg-indigo-600 hover:bg-indigo-700 text-white transition-all"
+                                    >
+                                        Copy
+                                    </button>
                                 </div>
                             </div>
                             <div className="text-sm text-slate-400">
                                 <p>⏰ Expires: {new Date(resetToken.expiresAt).toLocaleString()}</p>
-                                <p className="mt-2">📧 In production, this would be sent via email automatically.</p>
                             </div>
                         </div>
                         <div className="mt-6 flex justify-end">
                             <button
-                                onClick={() => {
-                                    setShowResetModal(false);
-                                    setResetToken(null);
-                                }}
+                                onClick={() => { setShowResetModal(false); setResetToken(null); }}
                                 className="px-6 py-3 rounded-xl font-medium bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 transition-all"
                             >
-                                Close
+                                Done
                             </button>
                         </div>
                     </div>
                 </div>
             )}
+            <ConfirmModal 
+                isOpen={confirmAction.isOpen}
+                onClose={() => setConfirmAction({ isOpen: false, id: null, type: null })}
+                onConfirm={executeAction}
+                title={confirmAction.type === 'DELETE' ? 'Delete User' : 'Unlock Account'}
+                message={confirmAction.type === 'DELETE' ? 'Are you sure you want to permanently delete this user? This action cannot be undone.' : 'Are you sure you want to unlock this user account?'}
+                confirmText={confirmAction.type === 'DELETE' ? 'Delete User' : 'Unlock Account'}
+                isDanger={confirmAction.type === 'DELETE'}
+            />
         </div>
     );
 }

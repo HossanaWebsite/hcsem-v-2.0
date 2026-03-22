@@ -126,11 +126,11 @@ export default function HomePage() {
                   transition={{ duration: 0.8 }}
                   className="space-y-8"
                 >
-                  <h1 className="text-7xl md:text-8xl font-heading font-bold leading-tight">
+                  <h1 className="text-5xl sm:text-6xl md:text-8xl font-heading font-bold leading-tight">
                     <span className="text-gradient whitespace-pre-line">{settings.heroTitle}</span>
                   </h1>
 
-                  <p className="text-2xl md:text-3xl font-light text-foreground/90 leading-relaxed whitespace-pre-line">
+                  <p className="text-xl md:text-3xl font-light text-foreground/90 leading-relaxed whitespace-pre-line">
                     {settings.heroSubtitle}
                   </p>
 

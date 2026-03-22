@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Users, FileText, Calendar, MessageSquare, ArrowUpRight, TrendingUp, Clock, ShieldCheck, Zap } from 'lucide-react';
+import Link from 'next/link';
+import { Users, FileText, Calendar, MessageSquare, ArrowUpRight, TrendingUp, Clock, ShieldCheck, Zap, Bell } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const containerVariants = {
@@ -20,7 +21,7 @@ const itemVariants = {
 };
 
 export default function DashboardPage() {
-    const [stats, setStats] = useState({ users: 542, blogs: 24, events: 12, messages: 89 });
+    const [stats, setStats] = useState({ users: 0, blogs: 0, events: 0, messages: 0, subscribers: 0 });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -41,10 +42,11 @@ export default function DashboardPage() {
     }, []);
 
     const statCards = [
-        { label: 'Total Members', value: stats.users, icon: Users, color: 'text-blue-400', glow: 'stat-glow-blue', trend: '+12%' },
-        { label: 'Published Blogs', value: stats.blogs, icon: FileText, color: 'text-emerald-400', glow: 'stat-glow-emerald', trend: '+4' },
-        { label: 'Upcoming Events', value: stats.events, icon: Calendar, color: 'text-purple-400', glow: 'stat-glow-purple', trend: 'Next: Sat' },
-        { label: 'Unread Messages', value: stats.messages, icon: MessageSquare, color: 'text-amber-400', glow: 'stat-glow-amber', trend: '9 new' },
+        { label: 'Total Members', value: stats.users, icon: Users, color: 'text-blue-400', glow: 'stat-glow-blue', trend: '+12%', href: '/admin/users' },
+        { label: 'Published Blogs', value: stats.blogs, icon: FileText, color: 'text-emerald-400', glow: 'stat-glow-emerald', trend: '+4', href: '/admin/blogs' },
+        { label: 'Upcoming Events', value: stats.events, icon: Calendar, color: 'text-purple-400', glow: 'stat-glow-purple', trend: 'Next: Sat', href: '/admin/events' },
+        { label: 'Unread Messages', value: stats.messages, icon: MessageSquare, color: 'text-amber-400', glow: 'stat-glow-amber', trend: '9 new', href: '/admin/messages' },
+        { label: 'Subscribers', value: stats.subscribers ?? 0, icon: Bell, color: 'text-indigo-400', glow: 'stat-glow-blue', trend: 'active', href: '/admin/newsletter' },
     ];
 
     if (loading) {
@@ -73,7 +75,7 @@ export default function DashboardPage() {
                         <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                         <span className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">System Status: Online</span>
                     </div>
-                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Overview</h1>
+                    <h1 className="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight">Overview</h1>
                     <p className="text-slate-500 dark:text-slate-400 font-medium">Monitoring Hossana Community Hub in real-time.</p>
                 </header>
 
@@ -91,13 +93,14 @@ export default function DashboardPage() {
             </div>
 
             {/* Asymmetric Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-6">
                 {statCards.map((stat, index) => (
                     <motion.div
                         key={index}
                         variants={itemVariants}
                         className={`admin-glass-card p-6 overflow-hidden relative group`}
                     >
+                        <Link href={stat.href} className="absolute inset-0 z-20" aria-label={stat.label} />
                         <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
                             <stat.icon size={64} className="text-slate-900 dark:text-white" />
                         </div>
@@ -113,7 +116,7 @@ export default function DashboardPage() {
                             <div>
                                 <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">{stat.label}</p>
                                 <div className="flex items-baseline gap-2">
-                                    <h3 className="text-4xl font-black text-slate-900 dark:text-white">{stat.value.toLocaleString()}</h3>
+                                    <h3 className="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white">{stat.value.toLocaleString()}</h3>
                                     <ArrowUpRight className="w-4 h-4 text-emerald-500 opacity-50" />
                                 </div>
                             </div>

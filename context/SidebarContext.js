@@ -14,23 +14,24 @@ export function SidebarProvider({ children }) {
         const handleResize = () => {
             const mobile = window.innerWidth < 1024;
             setIsMobile(mobile);
-            if (!mobile) {
-                setIsMobileOpen(false);
-            }
+            if (!mobile) setIsMobileOpen(false);
         };
-
         handleResize();
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // Desktop: collapse/expand. Mobile: open/close overlay.
     const toggleSidebar = () => {
         if (isMobile) {
-            setIsMobileOpen(!isMobileOpen);
+            setIsMobileOpen(prev => !prev);
         } else {
-            setIsExpanded(!isExpanded);
+            setIsExpanded(prev => !prev);
         }
     };
+
+    // Explicit mobile toggle (used by AppHeader hamburger)
+    const toggleMobileSidebar = () => setIsMobileOpen(prev => !prev);
 
     const closeMobileSidebar = () => setIsMobileOpen(false);
 
@@ -42,6 +43,7 @@ export function SidebarProvider({ children }) {
                 isMobileOpen,
                 isMobile,
                 toggleSidebar,
+                toggleMobileSidebar,
                 closeMobileSidebar,
                 setIsHovered,
             }}
