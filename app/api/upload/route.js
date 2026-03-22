@@ -21,6 +21,8 @@ export async function POST(req) {
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
+        console.log('Uploading file to Cloudinary...');
+
         // Upload to Cloudinary using an upload stream
         const uploadResult = await new Promise((resolve, reject) => {
             const uploadStream = cloudinary.uploader.upload_stream(
@@ -29,8 +31,10 @@ export async function POST(req) {
                 },
                 (error, result) => {
                     if (error) {
+                        console.error('Cloudinary upload error:', error);
                         reject(error);
                     } else {
+                        console.log('Cloudinary upload success:', result.secure_url);
                         resolve(result);
                     }
                 }
@@ -44,6 +48,7 @@ export async function POST(req) {
             publicId: uploadResult.public_id,
         });
     } catch (error) {
+        console.error('Upload API level error:', error);
         return handleError(error, req);
     }
 }

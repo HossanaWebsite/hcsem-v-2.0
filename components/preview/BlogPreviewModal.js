@@ -60,7 +60,7 @@ export default function BlogPreviewModal({ isOpen, onClose, blog }) {
 
                     {/* Rich Text Content */}
                     <div
-                        className="prose prose-lg dark:prose-invert max-w-3xl mx-auto
+                        className="prose prose-lg dark:prose-invert max-w-3xl mx-auto 
                             prose-headings:font-heading prose-headings:font-bold
                             prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline
                             prose-img:rounded-xl prose-img:shadow-lg

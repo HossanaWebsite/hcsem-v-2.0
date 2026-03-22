@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import { ContactRequest } from "@/models";
 import nodemailer from "nodemailer";
+import { rateLimit } from "@/lib/rateLimit";
 
 // Set up SMTP transporter
 const transporter = nodemailer.createTransport({
@@ -82,6 +83,15 @@ export async function GET(req) {
 
 // POST method for submitting new requests
 export async function POST(req) {
+  // Rate limit: max 3 contact form submissions per 5 minutes per IP
+  const { success, retryAfter } = rateLimit(req, { limit: 3, windowMs: 5 * 60 * 1000 });
+  if (!success) {
+    return NextResponse.json(
+      { error: `Too many requests. Please try again in ${retryAfter} seconds.` },
+      { status: 429 }
+    );
+  }
+
   try {
     await dbConnect();
     const data = await req.json();

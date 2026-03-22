@@ -2,8 +2,8 @@ import { Event } from '@/models';
 import dbConnect from '@/lib/db';
 import { handleError, handleSuccess } from '@/lib/errorHandler';
 import { logAction } from '@/lib/logger';
-
 import { getCurrentUser } from '@/lib/auth';
+import { deleteCloudinaryImages } from '@/lib/cloudinaryHelper';
 
 // Cache events for 20 seconds to reduce database load
 export const revalidate = 20;
@@ -13,6 +13,8 @@ export async function GET(req) {
         await dbConnect();
         const { searchParams } = new URL(req.url);
         const id = searchParams.get('id');
+        const page = parseInt(searchParams.get('page') || '1', 10);
+        const limit = parseInt(searchParams.get('limit') || '0', 10); // 0 = no limit
 
         // Check if user is admin/has permission
         const user = await getCurrentUser(req);
@@ -21,21 +23,24 @@ export async function GET(req) {
         if (id) {
             const event = await Event.findById(id).lean();
             if (!event) throw new Error('Event not found');
-            // Assuming Event model has isHidden field, if not we might strictly rely on date or add it.
-            // The previous code in page.js didn't show isHidden for events, but user asked for it. 
-            // We should add isHidden to Event Schema if we haven't already. 
-            // Let's assume it exists or we add strict public filtering.
-            // For now, let's just implement the filter logic anticipating the field exists or will be added.
             if (event.isHidden && !isAdmin) throw new Error('Event not found');
             return handleSuccess(event);
         }
 
-        // Only show future events for public, unless admin needs to see all? 
-        // Typically admin sees all. Public sees future (and maybe past in archive).
-        // Let's stick to isHidden logic first.
         const query = isAdmin ? {} : { isHidden: { $ne: true } };
-        const events = await Event.find(query).sort({ date: 1 }).lean();
-        return handleSuccess(events);
+        let eventsQuery = Event.find(query).sort({ date: 1 });
+
+        let total = null;
+        if (limit > 0) {
+            total = await Event.countDocuments(query);
+            eventsQuery = eventsQuery.skip((page - 1) * limit).limit(limit);
+        }
+
+        const events = await eventsQuery.lean();
+        const response = limit > 0
+            ? { events, page, limit, total, totalPages: Math.ceil(total / limit) }
+            : events;
+        return handleSuccess(response);
     } catch (error) {
         return handleError(error, req);
     }
@@ -78,6 +83,13 @@ export async function DELETE(req) {
         const id = searchParams.get('id');
 
         if (!id) throw new Error('Event ID is required');
+
+        // Fetch event first to delete Cloudinary images (cover + gallery)
+        const event = await Event.findById(id);
+        if (event) {
+            const imagesToDelete = [event.coverImage, ...(event.gallery || [])].filter(Boolean);
+            await deleteCloudinaryImages(imagesToDelete);
+        }
 
         await Event.findByIdAndDelete(id);
 

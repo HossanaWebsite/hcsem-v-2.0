@@ -88,7 +88,21 @@ module.exports = {
                 'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
                 'hero-glow': 'conic-gradient(from 180deg at 50% 50%, #2a8af6 0deg, #a853ba 180deg, #e92a67 360deg)',
             },
+            typography: (theme) => ({
+                DEFAULT: {
+                    css: {
+                        p: {
+                            marginTop: '0',
+                            marginBottom: '0.75rem',
+                            lineHeight: '1.6',
+                        },
+                    },
+                },
+            }),
         },
     },
-    plugins: [require("tailwindcss-animate")],
+    plugins: [
+        require("tailwindcss-animate"),
+        require("@tailwindcss/typography"),
+    ],
 }

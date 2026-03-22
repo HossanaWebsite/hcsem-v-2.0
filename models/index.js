@@ -11,6 +11,7 @@ if (process.env.NODE_ENV === 'development') {
     if (mongoose.models.Event) delete mongoose.models.Event;
     if (mongoose.models.ContactRequest) delete mongoose.models.ContactRequest;
     if (mongoose.models.MembershipRequest) delete mongoose.models.MembershipRequest;
+    if (mongoose.models.Subscriber) delete mongoose.models.Subscriber;
 }
 
 // --- Site Settings Model (Hero/Banner Images, etc.) ---
@@ -323,6 +324,14 @@ const EventSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    // RSVP registrations for this event
+    rsvps: [
+        {
+            name: { type: String, required: true },
+            email: { type: String, required: true },
+            rsvpAt: { type: Date, default: Date.now },
+        }
+    ],
 });
 
 export const Event = mongoose.models.Event || mongoose.model('Event', EventSchema);
@@ -423,3 +432,23 @@ const MembershipRequestSchema = new mongoose.Schema({
 
 export const MembershipRequest = mongoose.models.MembershipRequest || mongoose.model('MembershipRequest', MembershipRequestSchema);
 
+// --- Newsletter Subscriber Model ---
+const SubscriberSchema = new mongoose.Schema({
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
+    },
+    active: {
+        type: Boolean,
+        default: true,
+    },
+    subscribedAt: {
+        type: Date,
+        default: Date.now,
+    },
+});
+
+export const Subscriber = mongoose.models.Subscriber || mongoose.model('Subscriber', SubscriberSchema);

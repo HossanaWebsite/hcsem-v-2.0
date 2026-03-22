@@ -4,8 +4,17 @@ import { User } from '@/models';
 import { signToken } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
+import { rateLimit } from '@/lib/rateLimit';
 
 export async function POST(request) {
+    // Rate limit: max 10 login attempts per minute per IP
+    const { success, retryAfter } = rateLimit(request, { limit: 10, windowMs: 60 * 1000 });
+    if (!success) {
+        return NextResponse.json(
+            { error: `Too many login attempts. Please try again in ${retryAfter} seconds.` },
+            { status: 429 }
+        );
+    }
     try {
         await dbConnect();
         const { email, password } = await request.json();

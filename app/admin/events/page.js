@@ -3,9 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import { Plus, Edit, Trash, Calendar } from 'lucide-react';
+import { Plus, Edit, Trash, Calendar, X } from 'lucide-react';
 import 'react-quill-new/dist/quill.snow.css';
 import EventPreviewModal from '@/components/preview/EventPreviewModal';
+import ImageInput from '@/components/ImageInput';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 
@@ -82,7 +83,15 @@ export default function EventsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Date</label>
-                            <input type="date" className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-slate-900 dark:text-white" value={currentEvent.date ? new Date(currentEvent.date).toISOString().split('T')[0] : ''} onChange={e => setCurrentEvent({ ...currentEvent, date: e.target.value })} required />
+                            <input 
+                                type="date" 
+                                className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-slate-900 dark:text-white" 
+                                value={currentEvent.date && !isNaN(new Date(currentEvent.date).getTime()) 
+                                    ? new Date(currentEvent.date).toISOString().split('T')[0] 
+                                    : ''} 
+                                onChange={e => setCurrentEvent({ ...currentEvent, date: e.target.value })} 
+                                required 
+                            />
                         </div>
                         <div>
                             <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Location</label>
@@ -133,12 +142,46 @@ export default function EventsPage() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Cover Image</label>
-                        <input className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-slate-900 dark:text-white" value={currentEvent.coverImage || ''} onChange={e => setCurrentEvent({ ...currentEvent, coverImage: e.target.value })} />
+                        <ImageInput
+                            label="Cover Image"
+                            value={currentEvent.coverImage || ''}
+                            onChange={url => setCurrentEvent({ ...currentEvent, coverImage: url })}
+                        />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Gallery Images (comma separated URLs)</label>
-                        <textarea className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-slate-900 dark:text-white h-24" value={Array.isArray(currentEvent.gallery) ? currentEvent.gallery.join(', ') : currentEvent.gallery || ''} onChange={e => setCurrentEvent({ ...currentEvent, gallery: e.target.value })} />
+                        <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Gallery Images</label>
+                        <div className="space-y-4">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {(currentEvent.gallery || []).map((img, idx) => (
+                                    <div key={idx} className="relative aspect-square rounded-lg overflow-hidden border border-slate-200 dark:border-white/10 group">
+                                        <Image src={img} alt="" fill className="object-cover" />
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                const newGallery = [...(currentEvent.gallery || [])];
+                                                newGallery.splice(idx, 1);
+                                                setCurrentEvent({ ...currentEvent, gallery: newGallery });
+                                            }}
+                                            className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                        >
+                                            <X size={12} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                            <ImageInput
+                                label="Add to Gallery"
+                                value=""
+                                onChange={url => {
+                                    if (url) {
+                                        setCurrentEvent({
+                                            ...currentEvent,
+                                            gallery: [...(currentEvent.gallery || []), url]
+                                        });
+                                    }
+                                }}
+                            />
+                        </div>
                     </div>
 
                     <div className="flex gap-4 pt-4 justify-end">
@@ -178,7 +221,9 @@ export default function EventsPage() {
                                 <h3 className="font-bold text-xl text-slate-900 dark:text-white mb-2 line-clamp-1">{event.title}</h3>
                                 <p className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-2">
                                     <Calendar className="w-4 h-4" />
-                                    {new Date(event.date).toLocaleDateString()}
+                                    {event.date && !isNaN(new Date(event.date).getTime()) 
+                                        ? new Date(event.date).toLocaleDateString() 
+                                        : 'Invalid Date'}
                                 </p>
                             </div>
                             <div className="flex gap-2 pt-2 border-t border-slate-100 dark:border-white/5">

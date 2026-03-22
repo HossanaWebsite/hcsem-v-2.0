@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import { Plus, Edit, Trash, Check, X, Eye } from 'lucide-react';
 import 'react-quill-new/dist/quill.snow.css';
 import BlogPreviewModal from '@/components/preview/BlogPreviewModal';
+import ImageInput from '@/components/ImageInput';
 
 const ReactQuill = dynamic(() => import('react-quill-new'), { ssr: false });
 
@@ -138,12 +139,10 @@ export default function BlogsPage() {
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Cover Image URL</label>
-                        <input
-                            className="w-full bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-white/10 rounded-lg px-4 py-3 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500/50 transition-all"
+                        <ImageInput
+                            label="Cover Image"
                             value={currentBlog.coverImage || ''}
-                            onChange={e => setCurrentBlog({ ...currentBlog, coverImage: e.target.value })}
-                            placeholder="/images/blog-1.jpg"
+                            onChange={url => setCurrentBlog({ ...currentBlog, coverImage: url })}
                         />
                     </div>
 
