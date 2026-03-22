@@ -11,8 +11,6 @@ async function getBlog(slug) {
     await dbConnect();
 
     const cookieStore = await cookies();
-    // getCurrentUser expects a request-like object with cookies.get
-    // cookieStore has .get().
     const user = await getCurrentUser({ cookies: cookieStore });
     const isAdmin = user && (user.role?.name === 'Admin' || user.role?.permissions?.includes('manage_blogs'));
 
@@ -26,6 +24,24 @@ async function getBlog(slug) {
     return blog;
 }
 
+// SEO: Generate dynamic metadata for each blog post
+export async function generateMetadata({ params }) {
+    const { slug } = await params;
+    await dbConnect();
+    const blog = await Blog.findOne({ slug, isHidden: { $ne: true } }).lean();
+    if (!blog) return { title: 'Blog | HCSEM' };
+    return {
+        title: `${blog.title} | HCSEM Blog`,
+        description: blog.summary || blog.title,
+        openGraph: {
+            title: blog.title,
+            description: blog.summary || '',
+            images: blog.coverImage ? [{ url: blog.coverImage }] : [],
+            type: 'article',
+        },
+    };
+}
+
 export default async function BlogDetailPage({ params }) {
     const { slug } = await params;
     const blog = await getBlog(slug);
@@ -36,7 +52,7 @@ export default async function BlogDetailPage({ params }) {
 
     return (
         <div className="min-h-screen section-spacing container-spacing">
-            <article className="max-w-6xl mx-auto space-y-16">
+            <article className="max-w-[85%] mx-auto space-y-16">
                 <Link href="/blog" className="inline-flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors text-lg">
                     <ArrowLeft className="w-5 h-5" />
                     Back to Blogs
@@ -55,7 +71,7 @@ export default async function BlogDetailPage({ params }) {
                             </div>
                         )}
                     </div>
-                    <h1 className="text-5xl md:text-7xl font-heading font-bold text-gradient leading-tight">
+                    <h1 className="text-xl md:text-2xl font-heading font-bold text-gradient leading-tight">
                         {blog.title}
                     </h1>
                     {blog.coverImage && (
@@ -65,9 +81,9 @@ export default async function BlogDetailPage({ params }) {
                     )}
                 </header>
 
-                <div className="space-y-16">
+                <div className="space-y-12 overflow-hidden break-words">
                     {blog.content ? (
-                        <div className="prose prose-xl dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: blog.content }} />
+                        <div className="prose prose-xl dark:prose-invert max-w-none break-words  prose-headings:mb-4 prose-headings:mt-8" dangerouslySetInnerHTML={{ __html: blog.content }} />
                     ) : (
                         blog.blocks.map((block) => (
                             <div key={block._id} className="animate-in fade-in slide-in-from-bottom-4 duration-700">

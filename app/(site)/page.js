@@ -291,32 +291,40 @@ export default function HomePage() {
                   viewport={{ once: true }}
                   transition={{ delay: i * 0.1 }}
                   whileHover={{ y: -10 }}
-                  className="glass-card overflow-hidden group cursor-pointer"
+                  className="glass-card overflow-hidden group"
                 >
-                  <div className="h-56 relative overflow-hidden">
-                    <SafeImage
-                      src={event.image || event.coverImage || '/event-placeholder.png'}
-                      alt={event.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      className="object-cover group-hover:scale-110 transition-transform duration-700"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                    <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold">
-                      {event.date && (typeof event.date === 'string' ? event.date : new Date(event.date).toLocaleDateString())}
+                  <Link href={`/events/${event._id}`} className="block">
+                    <div className="h-56 relative overflow-hidden">
+                      <SafeImage
+                        src={event.image || event.coverImage || '/event-placeholder.png'}
+                        alt={event.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        className="object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                      <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+                        {event.date && !isNaN(new Date(event.date).getTime()) ? (
+                          new Date(event.date).toLocaleDateString(undefined, { 
+                            month: 'short', 
+                            day: 'numeric', 
+                            year: 'numeric' 
+                          })
+                        ) : 'Check Event'}
+                      </div>
                     </div>
-                  </div>
-                  <div className="p-8 space-y-4">
-                    <h3 className="text-2xl font-heading font-bold group-hover:text-primary transition-colors line-clamp-1">
-                      {event.title}
-                    </h3>
-                    <p className="text-muted-foreground line-clamp-2">
-                      {event.description}
-                    </p>
-                    <Link href={event.slug ? `/events/${event.slug}` : "/events"} className="inline-flex items-center gap-2 text-primary font-medium">
-                      Learn More <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </div>
+                    <div className="p-8 space-y-4">
+                      <h3 className="text-2xl font-heading font-bold group-hover:text-primary transition-colors line-clamp-1">
+                        {event.title}
+                      </h3>
+                      <p className="text-muted-foreground line-clamp-2">
+                        {event.description?.replace(/<\/p>|<br\s*\/?>/gi, ' ').replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim() || ''}
+                      </p>
+                      <div className="inline-flex items-center gap-2 text-primary font-medium">
+                        Learn More <ArrowRight className="w-4 h-4" />
+                      </div>
+                    </div>
+                  </Link>
                 </motion.div>
               ))}
             </div>

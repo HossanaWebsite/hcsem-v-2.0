@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { Heart, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube } from 'lucide-react';
+import NewsletterSignup from '@/components/NewsletterSignup';
 
 export default function Footer() {
     return (
@@ -110,6 +111,15 @@ export default function Footer() {
                         </button>
                     </Link>
                 </div> */}
+
+                {/* Newsletter Signup */}
+                <div className="glass-card p-8 mb-10 text-center space-y-4">
+                    <h3 className="text-2xl font-heading font-bold">Stay Connected</h3>
+                    <p className="text-muted-foreground max-w-xl mx-auto">
+                        Subscribe to receive the latest news, events, and updates from HCSEM community.
+                    </p>
+                    <NewsletterSignup />
+                </div>
 
                 {/* Bottom Bar */}
                 <div className="pt-10 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6 text-muted-foreground">

@@ -215,7 +215,7 @@ export default function EventsPage() {
 
                                             {/* Description */}
                                             <p className="text-lg text-muted-foreground leading-relaxed">
-                                                {event.description}
+                                                {event.description?.replace(/<[^>]+>/g, '')}
                                             </p>
 
                                             {/* CTA */}
