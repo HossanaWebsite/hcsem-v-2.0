@@ -6,7 +6,7 @@ import { Calendar, User } from 'lucide-react';
 import fs from 'fs';
 import path from 'path';
 
-export const revalidate = 60; // Revalidate every minute
+export const dynamic = 'force-dynamic';
 
 async function getBlogs() {
     try {

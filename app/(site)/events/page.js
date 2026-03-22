@@ -3,24 +3,25 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Calendar, Clock, ArrowRight } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import Image from 'next/image';
-import dynamic from 'next/dynamic';
+import nextDynamic from 'next/dynamic';
 
 // Dynamic imports for heavy components to reduce initial bundle size
-const RoomWalkthrough = dynamic(() => import('@/components/RoomWalkthrough'), {
+const RoomWalkthrough = nextDynamic(() => import('@/components/RoomWalkthrough'), {
     loading: () => <div className="h-96 animate-pulse bg-muted/20 rounded-3xl" />
 });
-const InfiniteScroll = dynamic(() => import('@/components/InfiniteScroll'), {
+const InfiniteScroll = nextDynamic(() => import('@/components/InfiniteScroll'), {
     loading: () => <div className="h-96 animate-pulse bg-muted/20 rounded-3xl" />
 });
-const VideoSection = dynamic(() => import('@/components/VideoSection'), {
+const VideoSection = nextDynamic(() => import('@/components/VideoSection'), {
     loading: () => <div className="h-96 animate-pulse bg-muted/20 rounded-3xl" />
 });
-const LargeGallery = dynamic(() => import('@/components/LargeGallery'), {
+const LargeGallery = nextDynamic(() => import('@/components/LargeGallery'), {
     loading: () => <div className="h-96 animate-pulse bg-muted/20 rounded-3xl" />
 });
-const PhotoTicker = dynamic(() => import('@/components/PhotoTicker'), {
+const PhotoTicker = nextDynamic(() => import('@/components/PhotoTicker'), {
     loading: () => <div className="h-32 animate-pulse bg-muted/20" />
 });
 
