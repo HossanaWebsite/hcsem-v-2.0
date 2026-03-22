@@ -7,6 +7,14 @@ export default function Error({ error, reset }) {
     useEffect(() => {
         // Log the error to an error reporting service
         console.error('Application Error:', error);
+
+        // Auto-reload on ChunkLoadError
+        if (
+            error.name === 'ChunkLoadError' ||
+            (error.message && error.message.toLowerCase().includes('loading chunk'))
+        ) {
+            window.location.reload();
+        }
     }, [error]);
 
     return (

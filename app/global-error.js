@@ -7,6 +7,14 @@ import Link from 'next/link';
 export default function GlobalError({ error, reset }) {
     useEffect(() => {
         console.error('Global Error:', error);
+
+        // Auto-reload on ChunkLoadError
+        if (
+            error.name === 'ChunkLoadError' ||
+            (error.message && error.message.toLowerCase().includes('loading chunk'))
+        ) {
+            window.location.reload();
+        }
     }, [error]);
 
     return (
