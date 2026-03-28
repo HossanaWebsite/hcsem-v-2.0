@@ -1,13 +1,8 @@
 import { NextResponse } from 'next/server';
-import { v2 as cloudinary } from 'cloudinary';
 import { handleError, handleSuccess } from '@/lib/errorHandler';
-
-cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-    secure: true,
-});
+import fs from 'fs/promises';
+import path from 'path';
+import crypto from 'crypto';
 
 export async function POST(req) {
     try {
@@ -21,31 +16,25 @@ export async function POST(req) {
         const bytes = await file.arrayBuffer();
         const buffer = Buffer.from(bytes);
 
-        console.log('Uploading file to Cloudinary...');
+        // Extract original extension or default to .jpg
+        const extension = file.name ? path.extname(file.name) : '.jpg';
+        const filename = `${crypto.randomUUID()}${extension}`;
+        
+        const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+        const filePath = path.join(uploadsDir, filename);
 
-        // Upload to Cloudinary using an upload stream
-        const uploadResult = await new Promise((resolve, reject) => {
-            const uploadStream = cloudinary.uploader.upload_stream(
-                {
-                    folder: 'hcsem_uploads',
-                },
-                (error, result) => {
-                    if (error) {
-                        console.error('Cloudinary upload error:', error);
-                        reject(error);
-                    } else {
-                        console.log('Cloudinary upload success:', result.secure_url);
-                        resolve(result);
-                    }
-                }
-            );
-            uploadStream.end(buffer);
-        });
+        // Ensure the directory exists
+        await fs.mkdir(uploadsDir, { recursive: true });
 
-        // Return both public_id (for CldImage) and secure_url (as fallback)
+        // Save the file exactly where you requested
+        await fs.writeFile(filePath, buffer);
+
+        console.log(`Saved locally as: /uploads/${filename}`);
+
+        // Match previous response shape for compatibility
         return handleSuccess({
-            url: uploadResult.secure_url,
-            publicId: uploadResult.public_id,
+            url: `/uploads/${filename}`,
+            publicId: `/uploads/${filename}`,
         });
     } catch (error) {
         console.error('Upload API level error:', error);

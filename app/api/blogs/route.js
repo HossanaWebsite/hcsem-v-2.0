@@ -4,7 +4,7 @@ import { handleError, handleSuccess } from '@/lib/errorHandler';
 import { logAction } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
-import { deleteCloudinaryImages } from '@/lib/cloudinaryHelper';
+import { deleteImages } from '@/lib/imageHelper';
 
 // Cache blogs for 20 seconds to reduce database load
 export const revalidate = 20;
@@ -98,7 +98,7 @@ export async function DELETE(req) {
         // Fetch the blog first so we can clean up the Cloudinary image
         const blog = await Blog.findById(id);
         if (blog) {
-            await deleteCloudinaryImages(blog.coverImage);
+            await deleteImages(blog.coverImage);
         }
 
         await Blog.findByIdAndDelete(id);

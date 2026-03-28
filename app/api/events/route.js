@@ -3,7 +3,7 @@ import dbConnect from '@/lib/db';
 import { handleError, handleSuccess } from '@/lib/errorHandler';
 import { logAction } from '@/lib/logger';
 import { getCurrentUser } from '@/lib/auth';
-import { deleteCloudinaryImages } from '@/lib/cloudinaryHelper';
+import { deleteImages } from '@/lib/imageHelper';
 
 export const dynamic = 'force-dynamic';
 
@@ -96,7 +96,7 @@ export async function DELETE(req) {
         const event = await Event.findById(id);
         if (event) {
             const imagesToDelete = [event.coverImage, ...(event.gallery || [])].filter(Boolean);
-            await deleteCloudinaryImages(imagesToDelete);
+            await deleteImages(imagesToDelete);
         }
 
         await Event.findByIdAndDelete(id);
