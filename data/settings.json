@@ -1,24 +1,117 @@
 {
-    "logoUrl": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774168882/hcsem_uploads/xpxqfqvqny6dj8ivmucx.png",
-    "heroImage": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774168751/hcsem_uploads/bvaz5veppbfb8hebx1ab.jpg",
+    "heroImage": "/hero-home.png",
+    "logoUrl": "/uploads/c93ca259-660b-4dc3-9616-8a8145cd0b99.png",
     "heroTitle": "HCSEM",
     "heroSubtitle": "Building community. \nPreserving culture .",
-    "adminTheme": {
-        "colors": {
-            "primary": "#3b82f6",
-            "background": "#0f172a",
-            "text": "#f8fafc"
+    "eventsTitle": "Event highlights",
+    "eventsSubtitle": "Moments from our vibrant community celebrations.",
+    "stats": [
+        {
+            "label": "Members",
+            "value": "500+",
+            "_id": "695e402180b5b0cdb41bdb5c"
         },
-        "font": {
-            "family": "Inter",
-            "size": "16px"
+        {
+            "label": "Events",
+            "value": "40+",
+            "_id": "695e402180b5b0cdb41bdb5d"
+        },
+        {
+            "label": "Years",
+            "value": "10+",
+            "_id": "695e402180b5b0cdb41bdb5e"
         }
+    ],
+    "tickerImages": [
+        {
+            "url": "/uploads/4c71d5dc-ee8b-447f-9f20-c8f40c0181e3.jpeg",
+            "title": "Cultural Festival",
+            "subtitle": "Celebrating our heritage together",
+            "_id": "695e402180b5b0cdb41bdb5f"
+        },
+        {
+            "url": "/uploads/e2be7176-64f1-4236-bb1f-496e680b5256.jpeg",
+            "title": "Youth Program",
+            "subtitle": "Empowering our next generation",
+            "_id": "695e402180b5b0cdb41bdb61"
+        },
+        {
+            "url": "/uploads/51cda805-58ed-4157-8f1a-fc3a67c48e80.jpeg",
+            "order": 5,
+            "title": "Community Gathering",
+            "subtitle": "Sharing traditional Ethiopian flavors",
+            "_id": "69bf5fe6072981e932500ca2"
+        },
+        {
+            "url": "/uploads/27af8f14-d46f-4c17-a167-97ddb238e426.jpg",
+            "title": "Heritage Day",
+            "subtitle": "Keeping our traditions alive",
+            "_id": "695e402180b5b0cdb41bdb62"
+        },
+        {
+            "url": "/uploads/21fe18f7-46c2-4f7a-8c78-66e4df96f9e3.jpg",
+            "order": 4,
+            "title": "",
+            "subtitle": "",
+            "_id": "69bfb1f36c327099025f6026"
+        }
+    ],
+    "galleryImages": [
+        {
+            "url": "/uploads/e1c0f07a-e150-4f28-adaa-ddadc5a062f9.jpg",
+            "order": 7,
+            "_id": "69bf5e7f072981e932500aea"
+        },
+        {
+            "url": "/uploads/078a3de3-f1c8-4744-bc3b-bd86ebf2ba99.jpg",
+            "order": 8,
+            "_id": "69bf5e7f072981e932500aeb"
+        },
+        {
+            "url": "/uploads/8b4c45be-1930-4515-9811-1c50767dc8d1.jpg",
+            "order": 8,
+            "_id": "69bf5e7f072981e932500aec"
+        },
+        {
+            "url": "/uploads/e921424e-0fef-4ce6-bf45-95c9a4cd6b8b.jpg",
+            "order": 9,
+            "_id": "69bf5e7f072981e932500aed"
+        },
+        {
+            "url": "/uploads/a3caebd4-dac5-44cf-9503-08b328d3c966.jpg",
+            "order": 9,
+            "_id": "69bf5e7f072981e932500aee"
+        },
+        {
+            "url": "/uploads/24d1dd3a-8cdd-480c-bd7e-35dc0e3ce868.jpg",
+            "order": 5,
+            "_id": "69bf5e7f072981e932500aef"
+        },
+        {
+            "url": "/uploads/0f98fc0a-6c8a-487c-96b2-5e7de839380d.jpg",
+            "order": 6,
+            "_id": "69c722aad5fe0589bde9641e"
+        }
+    ],
+    "aboutPageTitle": {
+        "en": "About HCSEM",
+        "am": "ስለ HCSEM"
     },
-    "footer": {
-        "copyright": "© 2024 HCSEM. All rights reserved.",
-        "columns": []
+    "aboutPageSubtitle": {
+        "en": "Building unity, honoring culture, and standing together in Minnesota.",
+        "am": "ኢትዮጵያውያንን ማገናኘት፣ ባህልን መጠበቅ፣ በሜኒሶታ ጠንካራ ማህበረሰብ መገንባት"
     },
-    "updatedAt": "2026-03-22T10:18:37.803Z",
+    "aboutPageImage": "/hero-home.png",
+    "aboutMission": {
+        "en": "Our mission is to support and uplift our members and the wider Ethiopian community by providing social, emotional, and humanitarian assistance, fostering cultural unity, and standing together during times of need, in accordance with the association’s by-laws.",
+        "am": "የባለቤትነት እና የአንድነት ስሜትን ለማሳደግ..."
+    },
+    "aboutMissionImage": "/uploads/bfc9c119-90b8-4c91-87ba-cc01582a9267.jpg",
+    "aboutVision": {
+        "en": "Our vision is to build a strong, united, and compassionate community where members support one another, preserve their cultural values, empower future generations, and extend humanitarian help to Ethiopians affected by hardship both locally and beyond.",
+        "am": "ቀዳሚ የኢትዮጵያ ማህበረሰብ ድርጅት ለመሆን..."
+    },
+    "aboutVisionImage": "/uploads/3697ce37-7838-43d9-bfef-50470780e9c3.jpg",
     "aboutActivities": [
         {
             "title": {
@@ -60,190 +153,120 @@
             "_id": "695e476880b5b0cdb41bdc5a"
         }
     ],
-    "contactAddress": "Minneapolis, Minnesota",
-    "contactEmail": "info@hcsem.org",
-    "contactOfficeHours": "Monday - Friday: 9:00 AM - 5:00 PM\nSaturday: 10:00 AM - 2:00 PM\nSunday: Closed",
-    "contactPageImage": "",
-    "contactPageSubtitle": "Get in touch with us",
     "contactPageTitle": "Contact Us",
+    "contactPageSubtitle": "Get in touch with us",
+    "contactPageImage": "",
+    "contactOfficeHours": "Monday - Friday: 9:00 AM - 5:00 PM\nSaturday: 10:00 AM - 2:00 PM\nSunday: Closed",
+    "contactAddress": "Minneapolis, Minnesota",
     "contactPhone": "+1 (555) 123-4567",
+    "contactEmail": "info@hcsem.org",
+    "contactReasons": [
+        {
+            "value": "New Home",
+            "label": {
+                "en": "New Home",
+                "am": "የቤት ምረቃት"
+            },
+            "_id": "698b6fc5a045cd29b93a05de"
+        },
+        {
+            "value": "Graduation",
+            "label": {
+                "en": "Graduation",
+                "am": "ምረቃ"
+            },
+            "_id": "69b4cc9b2879800efdc6249f"
+        }
+    ],
+    "galleryTitle": "Community Gallery",
+    "gallerySubtitle": "Capturing the spirit of our community through photos",
+    "upcomingEventsTitle": "Upcoming Events",
+    "upcomingEventsSubtitle": "Join us in our upcoming gatherings and celebrations",
     "eventsGalleryImages": [
         {
             "url": "/folder/3.jpg",
-            "_id": "69bf627d9746dd94a6a5b09d"
+            "_id": "69a8faad48991a28c332b4ce"
         },
         {
             "url": "/folder/9.jpg",
-            "_id": "69bf627d9746dd94a6a5b09e"
+            "_id": "69a8faad48991a28c332b4cf"
         },
         {
             "url": "/folder/10.jpg",
-            "_id": "69bf627d9746dd94a6a5b09f"
+            "_id": "69a8faad48991a28c332b4d0"
         },
         {
             "url": "/folder/13.jpg",
-            "_id": "69bf627d9746dd94a6a5b0a0"
+            "_id": "69a8faad48991a28c332b4d1"
         },
         {
             "url": "/folder/16.jpg",
-            "_id": "69bf627d9746dd94a6a5b0a1"
+            "_id": "69a8faad48991a28c332b4d2"
         },
         {
-            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774173327/hcsem_uploads/sucvho1hlnnaipbxlfrm.jpg",
-            "order": 5,
-            "_id": "69bfbc98f73fc91b688a5356"
-        },
-        {
-            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774174682/hcsem_uploads/lhqyd1yqsttkehhgpart.jpg",
+            "url": "/uploads/c8fcd2a0-88b8-41f9-8c46-7236777f2811.jpg",
             "order": 6,
-            "_id": "69bfc1fd7defa6c499dc13dd"
+            "_id": "69b4ddc06f664a9c29768ba9"
         },
         {
-            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774174703/hcsem_uploads/eglvy2fqkk61q2tapmpn.jpg",
+            "url": "/uploads/6c84a207-f94c-40b5-92ac-3608424c2507.webp",
+            "order": 6,
+            "_id": "69bf5f39072981e932500bd9"
+        },
+        {
+            "url": "/uploads/884da136-bd57-4dcd-9af3-dec5423df296.jpg",
             "order": 7,
-            "_id": "69bfc1fd7defa6c499dc13de"
+            "_id": "69c326bd596f491a44c5c1d9"
+        },
+        {
+            "url": "/uploads/882d92d6-758f-457a-8179-38c325af255c.jpg",
+            "order": 8,
+            "_id": "69c72260d5fe0589bde9633f"
         }
     ],
     "eventsVideoUrl": "/folder/1.mp4",
-    "galleryImages": [
-        {
-            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774167934/hcsem_uploads/rj2tn6k4qywtrcldrv0t.jpg",
-            "order": 0,
-            "_id": "69bfab8485c77939bf941696"
-        },
-        {
-            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774167946/hcsem_uploads/vs3nv6zusxtjrguywc5z.jpg",
-            "order": 1,
-            "_id": "69bfab8485c77939bf941697"
-        },
-        {
-            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774167956/hcsem_uploads/ni1pe6c8jhbzcqfoledz.jpg",
-            "order": 2,
-            "_id": "69bfab8485c77939bf941698"
-        },
-        {
-            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774167965/hcsem_uploads/bruy935nccs39onx3bsw.jpg",
-            "order": 3,
-            "_id": "69bfab8485c77939bf941699"
-        },
-        {
-            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774167971/hcsem_uploads/mjiipsazoxpaumaqusv9.jpg",
-            "order": 4,
-            "_id": "69bfab8485c77939bf94169a"
-        }
-    ],
-    "showAboutHeader": true,
-    "showAboutMission": true,
-    "showAboutVision": true,
-    "showBlogHeader": true,
-    "showCommunityGallery": true,
-    "showContactHeader": true,
-    "showEventsGallery": true,
-    "showEventsHeader": true,
-    "showEventsHighlight": true,
-    "showEventsVideo": true,
-    "showHero": true,
-    "showStats": true,
-    "showUpcomingEvents": true,
-    "stats": [
-        {
-            "label": "Members",
-            "value": "500+",
-            "_id": "695e402180b5b0cdb41bdb5c"
-        },
-        {
-            "label": "Events",
-            "value": "40+",
-            "_id": "695e402180b5b0cdb41bdb5d"
-        },
-        {
-            "label": "Years",
-            "value": "10+",
-            "_id": "695e402180b5b0cdb41bdb5e"
-        }
-    ],
-    "tickerImages": [
-        {
-            "url": "/folder/2.jpg",
-            "title": "Cultural Festival1",
-            "subtitle": "Celebrating our heritage together",
-            "_id": "695e402180b5b0cdb41bdb5f"
-        },
-        {
-            "url": "/folder/3.jpg",
-            "title": "Community Gathering",
-            "subtitle": "Sharing traditional Ethiopian flavors1",
-            "_id": "695e402180b5b0cdb41bdb60"
-        },
-        {
-            "url": "/folder/9.jpg",
-            "title": "Youth Program",
-            "subtitle": "Empowering our next generation",
-            "_id": "695e402180b5b0cdb41bdb61"
-        },
-        {
-            "url": "/folder/10.jpg",
-            "title": "Heritage Day",
-            "subtitle": "Keeping our traditions alive",
-            "_id": "695e402180b5b0cdb41bdb62"
-        },
-        {
-            "url": "/uploads/1770774809523-event-placeholder.png",
-            "order": 4,
-            "title": "tst",
-            "subtitle": "test",
-            "_id": "698be13ef45ec698e6614da5"
-        },
-        {
-            "url": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774173357/hcsem_uploads/y17bkcaom51gkk6plwsu.jpg",
-            "order": 5,
-            "title": "",
-            "subtitle": "",
-            "_id": "69bfac7c85c77939bf941749"
-        }
-    ],
     "walkthroughItems": [
         {
-            "name": "Welcome Hall",
-            "title": "Community Gathering Space",
-            "description": "Our main gathering area where members connect and celebrate together.",
-            "image": "https://res.cloudinary.com/dadjsujqe/image/upload/v1774174653/hcsem_uploads/axbuugqrhv6izdbnkk9y.jpg",
+            "name": "Community Gathering",
+            "title": "Community Meeting & Cultural Events",
+            "description": "A space where members and families come together to connect, celebrate culture, and support one another.",
+            "image": "/uploads/0ac5852d-3798-4076-93cd-8e81662d9e80.jpg",
             "iconName": "Home",
             "features": [
-                "Monthly meetups",
+                "Annual gatherings",
                 "Cultural celebrations",
-                "Networking events"
+                "Member meetings"
             ],
             "order": 0,
-            "_id": "69bf627d9746dd94a6a5b0b3"
+            "_id": "69a8faad48991a28c332b4d3"
         },
         {
             "name": "Events Room",
-            "title": "Event Planning Center",
-            "description": "Where we organize and coordinate all our community events and activities.",
-            "image": "/folder/3.jpg",
+            "title": "Community Event Planning",
+            "description": "Where we organize activities that bring members together and strengthen our community.",
+            "image": "/uploads/616c2f48-6f9d-4e11-b762-faad9c1fc021.webp",
             "iconName": "Calendar",
             "features": [
-                "Festival planning",
-                "Workshop coordination",
-                "Event management"
+                "Annual gatherings",
+                "Graduation celebrations",
+                "Cultural events"
             ],
             "order": 1,
-            "_id": "69bf627d9746dd94a6a5b0b4"
+            "_id": "69a8faad48991a28c332b4d4"
         },
         {
             "name": "Community Hub",
-            "title": "Member Services",
-            "description": "Support and resources for all community members.",
-            "image": "/folder/9.jpg",
+            "title": "Member Support",
+            "description": "A place where members connect, support each other, and build a strong community.",
+            "image": "/uploads/716a1245-bbbf-4756-966c-f1d680e61d9d.jpg",
             "iconName": "Users",
             "features": [
-                "New member orientation",
-                "Resource sharing",
-                "Community support"
+                "Member support",
+                "Community discussions",
+                "Family assistance"
             ],
             "order": 2,
-            "_id": "69bf627d9746dd94a6a5b0b5"
+            "_id": "69a8faad48991a28c332b4d5"
         },
         {
             "name": "Cultural Center",
@@ -257,7 +280,7 @@
                 "Cultural education"
             ],
             "order": 3,
-            "_id": "69bf627d9746dd94a6a5b0b6"
+            "_id": "69a8faad48991a28c332b4d6"
         },
         {
             "name": "Youth Wing",
@@ -271,59 +294,37 @@
                 "Youth leadership"
             ],
             "order": 4,
-            "_id": "69bf627d9746dd94a6a5b0b7"
+            "_id": "69a8faad48991a28c332b4d7"
         },
         {
             "name": "Achievement Hall",
-            "title": "Success Stories",
-            "description": "Celebrating the accomplishments of our community members.",
+            "title": "Celebrating Success",
+            "description": "A place to honor the accomplishments of our members and their families.",
             "image": "/folder/16.jpg",
             "iconName": "Award",
             "features": [
+                "Graduation recognition",
                 "Member achievements",
-                "Community impact",
-                "Recognition programs"
+                "Community contributions"
             ],
             "order": 5,
-            "_id": "69bf627d9746dd94a6a5b0b8"
+            "_id": "69a8faad48991a28c332b4d8"
         }
     ],
-    "eventsSubtitle": "Moments from our vibrant community celebrations.",
-    "eventsTitle": "Event highlights",
-    "gallerySubtitle": "Capturing the spirit of our community through photos",
-    "galleryTitle": "Community Gallery",
-    "upcomingEventsSubtitle": "Join us in our upcoming gatherings and celebrations",
-    "upcomingEventsTitle": "Upcoming Events",
-    "aboutMission": {
-        "en": "Our mission is to support and uplift our members and the wider Ethiopian community by providing social, emotional, and humanitarian assistance, fostering cultural unity, and standing together during times of need, in accordance with the association’s by-laws.",
-        "am": "የባለቤትነት እና የአንድነት ስሜትን ለማሳደግ..."
-    },
-    "aboutMissionImage": "/about-mission.png",
-    "aboutPageImage": "/hero-home.png",
-    "aboutPageSubtitle": {
-        "en": "Building unity, honoring culture, and standing together in Minnesota.",
-        "am": "ኢትዮጵያውያንን ማገናኘት፣ ባህልን መጠበቅ፣ በሜኒሶታ ጠንካራ ማህበረሰብ መገንባት"
-    },
-    "aboutPageTitle": {
-        "en": "About HCSEM",
-        "am": "ስለ HCSEM"
-    },
-    "aboutVision": {
-        "en": "Our vision is to build a strong, united, and compassionate community where members support one another, preserve their cultural values, empower future generations, and extend humanitarian help to Ethiopians affected by hardship both locally and beyond.",
-        "am": "ቀዳሚ የኢትዮጵያ ማህበረሰብ ድርጅት ለመሆን..."
-    },
-    "aboutVisionImage": "/about-vision.png",
-    "contactReasons": [
-        {
-            "value": "New Home",
-            "label": {
-                "en": "New Home",
-                "am": "የቤት ምረቃት"
-            },
-            "_id": "698b6fc5a045cd29b93a05de"
-        }
-    ],
-    "showDonateButton": false,
+    "showHero": true,
+    "showStats": true,
+    "showEventsHighlight": true,
+    "showCommunityGallery": true,
+    "showUpcomingEvents": true,
+    "showEventsHeader": true,
+    "showEventsVideo": true,
+    "showEventsGallery": true,
+    "showAboutHeader": true,
+    "showAboutMission": true,
+    "showAboutVision": true,
+    "showBlogHeader": true,
+    "showContactHeader": true,
+    "updatedAt": "2026-03-28T02:31:36.309Z",
     "eventsGallerySubtitle": "Moments captured from our community events and celebrations",
     "eventsGalleryTitle": "Event Gallery",
     "eventsPageImage": "",
@@ -332,5 +333,8 @@
     "eventsVideoSubtitle": "Watch how we celebrate culture, unity, and community together",
     "eventsVideoTitle": "Experience Our Events",
     "walkthroughSubtitle": "Take a journey through our community spaces and discover what we offer",
-    "walkthroughTitle": "Explore Our Community"
+    "walkthroughTitle": "Explore Our Community",
+    "blogPageImage": "",
+    "blogPageSubtitle": "Latest news and stories from our community",
+    "blogPageTitle": "Blog"
 }
