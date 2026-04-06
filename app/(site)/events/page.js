@@ -53,7 +53,11 @@ export default function EventsPage() {
         fetch('/api/events')
             .then(res => res.json())
             .then(data => {
-                setEvents(data.data || []);
+                const fetchedEvents = (data.data || []).map(event => {
+                    if (event.coverImage) event.coverImage = event.coverImage.replace(/\/next\/img(\/url)?/g, '/uploads');
+                    return event;
+                });
+                setEvents(fetchedEvents);
                 setLoading(false);
             })
             .catch(() => setLoading(false));
@@ -159,6 +163,7 @@ export default function EventsPage() {
                                                     src={event.coverImage}
                                                     alt={event.title}
                                                     fill
+                                                    unoptimized={typeof event.coverImage === 'string' && event.coverImage.startsWith('/uploads')}
                                                     sizes="(max-width: 1024px) 100vw, 50vw"
                                                     className="object-cover"
                                                 />

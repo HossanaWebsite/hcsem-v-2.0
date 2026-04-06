@@ -23,6 +23,18 @@ async function getBlog(slug) {
 
     const blog = await Blog.findOne(query).populate('author', 'fullName').lean();
     if (!blog) return null;
+    if (blog.coverImage) blog.coverImage = blog.coverImage.replace(/\/next\/img(\/url)?/g, '/uploads');
+    if (blog.image) blog.image = blog.image.replace(/\/next\/img(\/url)?/g, '/uploads');
+    if (blog.content) blog.content = blog.content.replace(/\/next\/img(\/url)?/g, '/uploads');
+    if (blog.blocks) {
+        blog.blocks = blog.blocks.map(block => {
+            if (block.type === 'image' && block.content) block.content = block.content.replace(/\/next\/img(\/url)?/g, '/uploads');
+            if (block.type === 'split' && block.content.image) block.content.image = block.content.image.replace(/\/next\/img(\/url)?/g, '/uploads');
+            if (block.type === 'parallel-images' && block.content.left) block.content.left = block.content.left.replace(/\/next\/img(\/url)?/g, '/uploads');
+            if (block.type === 'parallel-images' && block.content.right) block.content.right = block.content.right.replace(/\/next\/img(\/url)?/g, '/uploads');
+            return block;
+        });
+    }
     return blog;
 }
 
@@ -81,7 +93,7 @@ export default async function BlogDetailPage({ params }) {
                     </h1>
                     {blog.coverImage && (
                         <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
-                            <Image src={blog.coverImage} alt={blog.title} fill sizes="(max-width: 1536px) 100vw, 1536px" className="object-cover" />
+                            <Image src={blog.coverImage} alt={blog.title} fill sizes="(max-width: 1536px) 100vw, 1536px" className="object-cover" unoptimized={typeof blog.coverImage === 'string' && blog.coverImage.startsWith('/uploads')} />
                         </div>
                     )}
                 </header>
@@ -102,7 +114,7 @@ export default async function BlogDetailPage({ params }) {
                                 {/* Single Image */}
                                 {block.type === 'image' && (
                                     <div className="relative aspect-video rounded-2xl overflow-hidden shadow-xl">
-                                        <Image src={block.content} alt="" fill sizes="(max-width: 1536px) 100vw, 1536px" className="object-cover" />
+                                        <Image src={block.content} alt="" fill sizes="(max-width: 1536px) 100vw, 1536px" className="object-cover" unoptimized={typeof block.content === 'string' && block.content.startsWith('/uploads')} />
                                     </div>
                                 )}
 
@@ -113,7 +125,7 @@ export default async function BlogDetailPage({ params }) {
                                             <p className="whitespace-pre-wrap leading-relaxed">{block.content.text}</p>
                                         </div>
                                         <div className="relative aspect-square rounded-2xl overflow-hidden shadow-xl">
-                                            <Image src={block.content.image} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+                                            <Image src={block.content.image} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" unoptimized={typeof block.content.image === 'string' && block.content.image.startsWith('/uploads')} />
                                         </div>
                                     </div>
                                 )}
@@ -134,10 +146,10 @@ export default async function BlogDetailPage({ params }) {
                                 {block.type === 'parallel-images' && (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <div className="relative aspect-square rounded-2xl overflow-hidden shadow-xl">
-                                            <Image src={block.content.left} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+                                            <Image src={block.content.left} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" unoptimized={typeof block.content.left === 'string' && block.content.left.startsWith('/uploads')} />
                                         </div>
                                         <div className="relative aspect-square rounded-2xl overflow-hidden shadow-xl">
-                                            <Image src={block.content.right} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
+                                            <Image src={block.content.right} alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" unoptimized={typeof block.content.right === 'string' && block.content.right.startsWith('/uploads')} />
                                         </div>
                                     </div>
                                 )}

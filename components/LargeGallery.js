@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import SafeImage from './SafeImage';
 
 const getSpanPattern = (index) => {
     const pattern = ['row-span-2', 'row-span-1', 'row-span-3', 'row-span-1', 'row-span-2', 'row-span-1'];
@@ -23,12 +23,11 @@ export default function LargeGallery({ images = [] }) {
                     whileHover={{ scale: 1.05, zIndex: 10 }}
                     className={`relative rounded-2xl overflow-hidden glass-card group cursor-pointer ${image.span || getSpanPattern(index)}`}
                 >
-                    <Image
+                    <SafeImage
                         src={image.url || image.src}
                         alt={`Gallery image ${index + 1}`}
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-700"
-                        unoptimized
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
                         <div className="text-white text-sm font-medium">Event Photo {index + 1}</div>

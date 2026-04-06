@@ -16,7 +16,12 @@ export default function SafeImage({
 }) {
     const [hasError, setHasError] = useState(false);
 
-    if (!src || src.trim() === '') {
+    let finalSrc = src;
+    if (typeof finalSrc === 'string') {
+        finalSrc = finalSrc.replace(/\/next\/img(\/url)?/g, '/uploads');
+    }
+
+    if (!finalSrc || finalSrc.trim() === '') {
         return (
             <div
                 className={`relative bg-muted/20 flex items-center justify-center overflow-hidden ${className}`}
@@ -29,13 +34,14 @@ export default function SafeImage({
 
     return (
         <Image
-            src={hasError ? fallbackSrc : src}
+            src={hasError ? fallbackSrc : finalSrc}
             alt={alt || 'Image'}
             className={className}
             fill={fill}
             width={!fill ? (width || 500) : undefined}
             height={!fill ? (height || 500) : undefined}
             onError={() => setHasError(true)}
+            unoptimized={props.unoptimized || (typeof finalSrc === 'string' && finalSrc.startsWith('/uploads'))}
             {...props}
         />
     );

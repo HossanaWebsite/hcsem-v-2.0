@@ -16,6 +16,11 @@ async function getEvent(slug) {
         if (!event && slug.match(/^[0-9a-fA-F]{24}$/)) {
             event = await Event.findById(slug).lean();
         }
+        if (event) {
+            if (event.coverImage) event.coverImage = event.coverImage.replace(/\/next\/img(\/url)?/g, '/uploads');
+            if (event.gallery) event.gallery = event.gallery.map(img => img.replace(/\/next\/img(\/url)?/g, '/uploads'));
+            if (event.description) event.description = event.description.replace(/\/next\/img(\/url)?/g, '/uploads');
+        }
         return event || null;
     } catch (e) {
         console.error('Error fetching event:', e);
@@ -83,7 +88,7 @@ export default async function EventDetailPage({ params }) {
                     </h1>
                     {event.coverImage && (
                         <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl">
-                            <Image src={event.coverImage} alt={event.title} fill sizes="(max-width: 1536px) 100vw, 1536px" className="object-cover" />
+                            <Image src={event.coverImage} alt={event.title} fill sizes="(max-width: 1536px) 100vw, 1536px" className="object-cover" unoptimized={typeof event.coverImage === 'string' && event.coverImage.startsWith('/uploads')} />
                         </div>
                     )}
                 </header>
@@ -105,7 +110,7 @@ export default async function EventDetailPage({ params }) {
                                 <div className="grid grid-cols-2 gap-4">
                                     {gallery.slice(0, 4).map((img, idx) => (
                                         <div key={idx} className="relative aspect-square rounded-xl overflow-hidden shadow-lg hover:scale-105 transition-transform duration-500">
-                                            <Image src={img} alt="" fill className="object-cover" />
+                                            <Image src={img} alt="" fill className="object-cover" unoptimized={typeof img === 'string' && img.startsWith('/uploads')} />
                                         </div>
                                     ))}
                                 </div>
@@ -117,7 +122,7 @@ export default async function EventDetailPage({ params }) {
                                 <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
                                     {gallery.map((img, idx) => (
                                         <div key={idx} className="relative rounded-2xl overflow-hidden shadow-xl break-inside-avoid">
-                                            <Image src={img} alt="" width={800} height={600} className="w-full h-auto object-cover" />
+                                            <Image src={img} alt="" width={800} height={600} className="w-full h-auto object-cover" unoptimized={typeof img === 'string' && img.startsWith('/uploads')} />
                                         </div>
                                     ))}
                                 </div>
@@ -141,7 +146,7 @@ export default async function EventDetailPage({ params }) {
                             <div className="space-y-6">
                                 {gallery.slice(0, 3).map((img, idx) => (
                                     <div key={idx} className={`relative rounded-3xl overflow-hidden shadow-xl ${idx === 0 ? 'aspect-video' : 'aspect-square w-1/2 inline-block first:mr-6'}`}>
-                                        <Image src={img} alt="" fill className="object-cover" />
+                                        <Image src={img} alt="" fill className="object-cover" unoptimized={typeof img === 'string' && img.startsWith('/uploads')} />
                                     </div>
                                 ))}
                             </div>
@@ -156,7 +161,7 @@ export default async function EventDetailPage({ params }) {
                                 <div key={idx} className="relative">
                                     <div className="absolute -left-[54px] top-0 w-4 h-4 rounded-full bg-indigo-500/30" />
                                     <div className="relative h-96 rounded-3xl overflow-hidden shadow-lg">
-                                        <Image src={img} alt="" fill className="object-cover" />
+                                        <Image src={img} alt="" fill className="object-cover" unoptimized={typeof img === 'string' && img.startsWith('/uploads')} />
                                     </div>
                                 </div>
                             ))}
@@ -167,11 +172,11 @@ export default async function EventDetailPage({ params }) {
                             {gallery.length > 0 && (
                                 <div className="grid grid-cols-12 gap-6">
                                     <div className="col-span-12 md:col-span-8 relative aspect-video rounded-3xl overflow-hidden shadow-2xl">
-                                        <Image src={gallery[0]} alt="" fill className="object-cover" />
+                                        <Image src={gallery[0]} alt="" fill className="object-cover" unoptimized={typeof gallery[0] === 'string' && gallery[0].startsWith('/uploads')} />
                                     </div>
                                     {gallery[1] && (
                                         <div className="col-span-12 md:col-span-4 relative aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl">
-                                            <Image src={gallery[1]} alt="" fill className="object-cover" />
+                                            <Image src={gallery[1]} alt="" fill className="object-cover" unoptimized={typeof gallery[1] === 'string' && gallery[1].startsWith('/uploads')} />
                                         </div>
                                     )}
                                 </div>
@@ -184,7 +189,7 @@ export default async function EventDetailPage({ params }) {
                                 <div className="grid grid-cols-1 gap-12">
                                     {gallery.slice(0, 2).map((img, idx) => (
                                         <div key={idx} className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl flex items-center justify-center bg-slate-100 dark:bg-slate-800">
-                                            <Image src={img} alt="" fill className="object-cover opacity-80" />
+                                            <Image src={img} alt="" fill className="object-cover opacity-80" unoptimized={typeof img === 'string' && img.startsWith('/uploads')} />
                                             <div className="absolute inset-0 flex items-center justify-center">
                                                 <div className="w-20 h-20 rounded-full bg-primary/90 text-white flex items-center justify-center shadow-2xl scale-110 hover:scale-125 transition-transform cursor-pointer">
                                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
@@ -205,7 +210,7 @@ export default async function EventDetailPage({ params }) {
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                 {gallery.map((img, idx) => (
                                     <div key={idx} className="relative rounded-xl overflow-hidden shadow-lg h-64">
-                                        <Image src={img} alt={`Gallery ${idx + 1}`} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover hover:scale-105 transition-transform duration-500" />
+                                        <Image src={img} alt={`Gallery ${idx + 1}`} fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover hover:scale-105 transition-transform duration-500" unoptimized={typeof img === 'string' && img.startsWith('/uploads')} />
                                     </div>
                                 ))}
                             </div>

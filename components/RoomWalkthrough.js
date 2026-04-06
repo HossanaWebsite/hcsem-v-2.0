@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, ChevronLeft, Home, Calendar, Users, Heart, Sparkles, Award, MapPin, Building, Info, Star } from 'lucide-react';
-import Image from 'next/image';
+import SafeImage from './SafeImage';
 
 const iconMap = {
     Home,
@@ -181,7 +181,7 @@ export default function RoomWalkthrough({ items }) {
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-full">
                             {/* Image */}
                             <div className="relative rounded-3xl overflow-hidden glass-card h-full">
-                                <Image
+                                <SafeImage
                                     src={room.image}
                                     alt={room.name}
                                     fill

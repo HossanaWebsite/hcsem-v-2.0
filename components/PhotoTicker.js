@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
+import SafeImage from './SafeImage';
 
 const PhotoTicker = ({ images }) => {
     if (!images || images.length === 0) return null;
@@ -12,7 +12,7 @@ const PhotoTicker = ({ images }) => {
                 {/* Triplicate for smooth infinite scroll */}
                 {[...images, ...images, ...images].map((img, i) => (
                     <div key={i} className="relative w-64 h-40 flex-shrink-0 rounded-lg overflow-hidden border border-white/10 mx-2 glass-card group cursor-pointer">
-                        <Image
+                        <SafeImage
                             src={img.url}
                             alt={img.title || "Gallery Image"}
                             fill

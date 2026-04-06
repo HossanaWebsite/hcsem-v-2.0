@@ -11,7 +11,12 @@ export const dynamic = 'force-dynamic';
 async function getBlogs() {
     try {
         await dbConnect();
-        return await Blog.find({ isHidden: false }).select('-content -blocks').sort({ createdAt: -1 }).populate('author', 'fullName').lean();
+        const blogs = await Blog.find({ isHidden: false }).select('-content -blocks').sort({ createdAt: -1 }).populate('author', 'fullName').lean();
+        return blogs.map(blog => {
+            if (blog.coverImage) blog.coverImage = blog.coverImage.replace(/\/next\/img(\/url)?/g, '/uploads');
+            if (blog.image) blog.image = blog.image.replace(/\/next\/img(\/url)?/g, '/uploads');
+            return blog;
+        });
     } catch (error) {
         console.warn("Failed to fetch blogs during build (DB Connection Error):", error.message);
         return [];
@@ -57,6 +62,7 @@ export default async function BlogPage() {
                                             src={blog.coverImage || blog.image}
                                             alt={blog.title}
                                             fill
+                                            unoptimized={typeof (blog.coverImage || blog.image) === 'string' && (blog.coverImage || blog.image).startsWith('/uploads')}
                                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                             className="object-cover transition-transform duration-500 group-hover:scale-110"
                                         />

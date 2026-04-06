@@ -24,26 +24,26 @@
     ],
     "tickerImages": [
         {
-            "url": "/uploads/d7df2bdf-4df1-485c-aab2-a1fa0d082c71.jpeg",
+            "url": "/uploads/1cc9a1ab-364e-435f-838f-c169092d1b61.png",
             "title": "Cultural Festival",
             "subtitle": "Celebrating our heritage together",
             "_id": "695e402180b5b0cdb41bdb5f"
         },
         {
-            "url": "/uploads/396deea5-6b6c-4137-bd99-e13cf8acd9aa.jpeg",
+            "url": "/uploads/191e5634-0130-4d3b-a2b7-3bf1159b7dda.png",
             "title": "Youth Program",
             "subtitle": "Empowering our next generation",
             "_id": "695e402180b5b0cdb41bdb61"
         },
         {
-            "url": "/uploads/235f1963-f680-44d2-ac39-9995462945f8.jpeg",
+            "url": "/uploads/265bd8c9-f4e3-41d9-9cdb-5a2b407c637f.png",
             "order": 5,
             "title": "Community Gathering",
             "subtitle": "Sharing traditional Ethiopian flavors",
             "_id": "69bf5fe6072981e932500ca2"
         },
         {
-            "url": "/uploads/27af8f14-d46f-4c17-a167-97ddb238e426.jpg",
+            "url": "/uploads/008d2407-765e-4892-9d33-fb2f5aa750be.png",
             "title": "Heritage Day",
             "subtitle": "Keeping our traditions alive",
             "_id": "695e402180b5b0cdb41bdb62"
@@ -222,6 +222,11 @@
             "url": "/uploads/882d92d6-758f-457a-8179-38c325af255c.jpg",
             "order": 8,
             "_id": "69c72260d5fe0589bde9633f"
+        },
+        {
+            "url": "/uploads/db028ba5-e426-4466-a83c-aeb080adb3e2.png",
+            "order": 9,
+            "_id": "69d32463e05e64f979078733"
         }
     ],
     "eventsVideoUrl": "/folder/1.mp4",
@@ -230,7 +235,7 @@
             "name": "Community Gathering",
             "title": "Community Meeting & Cultural Events",
             "description": "A space where members and families come together to connect, celebrate culture, and support one another.",
-            "image": "/uploads/0ac5852d-3798-4076-93cd-8e81662d9e80.jpg",
+            "image": "/uploads/0381ba35-47bf-4827-b86f-706390ef0002.png",
             "iconName": "Home",
             "features": [
                 "Annual gatherings",
@@ -324,7 +329,7 @@
     "showAboutVision": true,
     "showBlogHeader": true,
     "showContactHeader": true,
-    "updatedAt": "2026-04-05T22:28:31.918Z",
+    "updatedAt": "2026-04-06T03:18:02.463Z",
     "eventsGallerySubtitle": "Moments captured from our community events and celebrations",
     "eventsGalleryTitle": "Event Gallery",
     "eventsPageImage": "",
@@ -334,7 +339,7 @@
     "eventsVideoTitle": "Experience Our Events",
     "walkthroughSubtitle": "Take a journey through our community spaces and discover what we offer",
     "walkthroughTitle": "Explore Our Community",
-    "blogPageImage": "",
+    "blogPageImage": "/uploads/7ff4a008-9d79-4931-91c8-38d386fbb5d1.png",
     "blogPageSubtitle": "Latest news and stories from our community",
-    "blogPageTitle": "Blog"
+    "blogPageTitle": "Test"
 }
