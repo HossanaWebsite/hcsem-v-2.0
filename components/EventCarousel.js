@@ -28,6 +28,7 @@ export default function EventCarousel({ images }) {
                         src={images[currentIndex]}
                         alt={`Gallery Item ${currentIndex + 1}`}
                         fill
+                        unoptimized
                         className="object-cover"
                         priority
                     />

@@ -24,19 +24,19 @@
     ],
     "tickerImages": [
         {
-            "url": "/uploads/4c71d5dc-ee8b-447f-9f20-c8f40c0181e3.jpeg",
+            "url": "/uploads/d7df2bdf-4df1-485c-aab2-a1fa0d082c71.jpeg",
             "title": "Cultural Festival",
             "subtitle": "Celebrating our heritage together",
             "_id": "695e402180b5b0cdb41bdb5f"
         },
         {
-            "url": "/uploads/e2be7176-64f1-4236-bb1f-496e680b5256.jpeg",
+            "url": "/uploads/396deea5-6b6c-4137-bd99-e13cf8acd9aa.jpeg",
             "title": "Youth Program",
             "subtitle": "Empowering our next generation",
             "_id": "695e402180b5b0cdb41bdb61"
         },
         {
-            "url": "/uploads/51cda805-58ed-4157-8f1a-fc3a67c48e80.jpeg",
+            "url": "/uploads/235f1963-f680-44d2-ac39-9995462945f8.jpeg",
             "order": 5,
             "title": "Community Gathering",
             "subtitle": "Sharing traditional Ethiopian flavors",
@@ -324,7 +324,7 @@
     "showAboutVision": true,
     "showBlogHeader": true,
     "showContactHeader": true,
-    "updatedAt": "2026-03-28T02:31:36.309Z",
+    "updatedAt": "2026-04-05T22:28:31.918Z",
     "eventsGallerySubtitle": "Moments captured from our community events and celebrations",
     "eventsGalleryTitle": "Event Gallery",
     "eventsPageImage": "",

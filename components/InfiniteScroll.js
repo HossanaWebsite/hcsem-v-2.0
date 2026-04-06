@@ -77,6 +77,7 @@ export default function InfiniteScroll({ items = [], speed = 50 }) {
                                         src={item.src}
                                         alt={item.title || 'Gallery item'}
                                         fill
+                                        unoptimized
                                         className="object-cover group-hover:scale-110 transition-transform duration-700"
                                     />
                                     {item.title && (
